@@ -23,8 +23,8 @@
 (define-constant REWARD-CYCLE-LENGTH u500)          ;; how long a reward cycle is
 (define-constant MAX-REWARD-CYCLES u32)             ;; how many reward cycles a Stacker can Stack their tokens for
 (define-constant THE_BAG principal ')               ;; the custodied wallet for the city
-(define-constant STACKING_ACTIVE_STACKER_MULTIPLIER 0.7)
-(define-constant STACKING_ACTIVE_BAG_MULTIPLIER 0.3)
+(define-constant STACKING_ACTIVE_STACKER_PERCENTAGE u70)
+(define-constant STACKING_ACTIVE_BAG_PERCENTAGE u30)
 
 ;; NOTE: must be as long as MAX-REWARD-CYCLES
 (define-constant REWARD-CYCLE-INDEXES (list u0 u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 u13 u14 u15 u16 u17 u18 u19 u20 u21 u22 u23 u24 u25 u26 u27 u28 u29 u30 u31))
@@ -578,8 +578,8 @@
 
         (if (stacking-is-active)
             (begin 
-                (unwrap-panic (stx-transfer? STACKING_ACTIVE_STACKER_MULTIPLIER tx-sender (as-contract tx-sender)))
-                (unwrap-panic (stx-transfer? STACKING_ACTIVE_BAG_MULTIPLIER tx-sender THE_BAG))
+                (unwrap-panic (stx-transfer? (/ (* STACKING_ACTIVE_STACKER_PERCENTAGE amount-ustx) u100) tx-sender (as-contract tx-sender)))
+                (unwrap-panic (stx-transfer? (/ (* STACKING_ACTIVE_BAG_PERCENTAGE amount-ustx) u100) tx-sender THE_BAG))
             )
             (unwrap-panic (stx-transfer? amount-ustx tx-sender THE_BAG))
         )
