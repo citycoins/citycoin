@@ -1,10 +1,12 @@
 [project]
 name = "citycoin"
 
-[contracts.sip-010-trait]
-path = "contracts/clarinet/sip-10-ft-standard.clar"
+[[project.requirements]]
+contract_id = "STR8P3RD1EHA8AA37ERSSSZSWKS9T2GYQFGXNA4C.sip-010-trait-ft-standard"
+[contracts.citycoin]
+path = "contracts/citycoin.clar"
 depends_on = []
 
-[contracts.citycoin]
-path = "contracts/clarinet/citycoin.clar"
-depends_on = ["sip-010-trait"]
+[contracts.sip-010-trait]
+path = "contracts/sip-10-ft-standard.clar"
+depends_on = []
