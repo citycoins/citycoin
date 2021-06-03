@@ -436,6 +436,27 @@ u113 u114 u115 u116 u117 u118 u119 u120 u121 u122 u123 u124 u125 u126 u127 u128
     )
 )
 
+(define-private (get-block-winner-closure-improv (miner { miner-id: uint, ustx: uint }) (data { sample: uint, sum: uint, winner: (optional { miner-id: uint, ustx: uint}) }))
+    (let
+        (
+            (sum (get sum data))
+            (sample (get sample data))
+            (next-sum (+ sum (get ustx miner)))
+            (new-winner
+                (if (and (>= sample sum) (< sample next-sum))
+                    (some miner)
+                    (get winner data)
+                )
+            )
+        )
+        {
+            sample: sample,
+            sum: next-sum,
+            winner: new-winner
+        }
+    )
+)
+
 ;; Determine who won a given batch of tokens, given a random sample and a list of miners and commitments.
 ;; The probability that a given miner wins the batch is proportional to how many uSTX it committed out of the 
 ;; sum of commitments for this block.
@@ -445,9 +466,9 @@ u113 u114 u115 u116 u117 u118 u119 u120 u121 u122 u123 u124 u125 u126 u127 u128
             (commit-total (get-block-commit-total stacks-block-height))
         )
         (if (> commit-total u0)
-            (get winner (fold get-block-winner-closure LONG-UINT-LIST 
+            (get winner (fold get-block-winner-closure-improv (append (get-sortition-participants stacks-block-height) (var-get tmp-least-commitment))
                 { 
-                    stacks-block-height: stacks-block-height,
+                    ;; stacks-block-height: stacks-block-height,
                     sample: (mod random-sample commit-total), 
                     sum: u0, 
                     winner: none
@@ -632,6 +653,19 @@ u113 u114 u115 u116 u117 u118 u119 u120 u121 u122 u123 u124 u125 u126 u127 u128
     )
 )
 
+(define-map sortition-participants
+    { stacks-block-height: uint }
+    { participants: (list 128 { miner-id: uint, ustx: uint })}
+)
+(define-private (get-sortition-participants (stacks-block-height uint))
+    (default-to (list ) (get participants (map-get? sortition-participants { stacks-block-height: stacks-block-height })))
+)
+
+(define-data-var tmp-least-commitment { miner-id: uint, ustx: uint} { miner-id: u0, ustx: u0 })
+(define-private (remove-from-list (elem { miner-id: uint, ustx: uint }))
+    (not (is-eq elem (var-get tmp-least-commitment)))
+)
+
 ;; Mark a miner as having mined in a given Stacks block and committed the given uSTX.
 (define-private (set-tokens-mined (miner principal) (miner-id uint) (stacks-block-height uint) (commit-ustx uint) (commit-ustx-to-stackers uint) (commit-ustx-to-city uint))
     (let (
@@ -640,6 +674,7 @@ u113 u114 u115 u116 u117 u118 u119 u120 u121 u122 u123 u124 u125 u126 u127 u128
         (new-idx increased-miners-count)
         (least-commitment-idx (get least-commitment-idx block))
         (least-commitment-ustx (get least-commitment-ustx block))
+        (participants (get-sortition-participants stacks-block-height))
         
         (reward-cycle (unwrap! (get-reward-cycle stacks-block-height)
             (err ERR-STACKING-NOT-AVAILABLE)))
@@ -656,7 +691,6 @@ u113 u114 u115 u116 u117 u118 u119 u120 u121 u122 u123 u124 u125 u126 u127 u128
                     { stacks-block-height: stacks-block-height, idx: new-idx }
                     { miner-id: miner-id, ustx: commit-ustx }
                 )
-
                 (map-set mined-blocks
                     { stacks-block-height: stacks-block-height }
                     {
@@ -666,6 +700,29 @@ u113 u114 u115 u116 u117 u118 u119 u120 u121 u122 u123 u124 u125 u126 u127 u128
                         claimed: false
                     }
                 )
+                (if (is-eq new-idx u1)
+                    (var-set tmp-least-commitment { miner-id: miner-id, ustx: commit-ustx })
+                    (if (< commit-ustx least-commitment-ustx)
+                        (begin
+                            (map-set sortition-participants
+                                {stacks-block-height: stacks-block-height }
+                                { participants: (unwrap-panic (as-max-len? (append 
+                                    participants
+                                    (var-get tmp-least-commitment)) u128))
+                                }
+                            )
+                            (var-set tmp-least-commitment { miner-id: miner-id, ustx: commit-ustx })
+                        )
+                        (map-set sortition-participants
+                            {stacks-block-height: stacks-block-height }
+                            { participants: (unwrap-panic (as-max-len? (append 
+                                participants
+                                { miner-id: miner-id, ustx: commit-ustx }) u128))
+                            }
+                        )
+                    )
+                )
+                
             )
             (begin
                 ;; list is full - replace miner who committed the least with new one and calculate new miner who committed the least
@@ -684,6 +741,14 @@ u113 u114 u115 u116 u117 u118 u119 u120 u121 u122 u123 u124 u125 u126 u127 u128
                             least-commitment-idx: (get least-commitment-idx least-commitment),
                             least-commitment-ustx: (get least-commitment-ustx least-commitment),
                             claimed: false
+                        }
+                    )
+                    (var-set tmp-least-commitment (default-to { miner-id: u0, ustx: u0 } 
+                        (map-get? blocks-miners { stacks-block-height: stacks-block-height, idx: (get least-commitment-idx least-commitment) })
+                    ))
+                    (map-set sortition-participants
+                        {stacks-block-height: stacks-block-height }
+                        { participants: (filter remove-from-list (unwrap-panic (as-max-len? (append participants { miner-id: miner-id, ustx: commit-ustx }) u128)))
                         }
                     )
                 )
