@@ -572,7 +572,7 @@ u113 u114 u115 u116 u117 u118 u119 u120 u121 u122 u123 u124 u125 u126 u127 u128
         (asserts! (> amount-tokens u0)
             (err ERR-CANNOT-STACK))
 
-        (asserts! (<= amount-tokens (ft-get-balance citycoins stacker))
+        (asserts! (<= amount-tokens (ft-get-balance miamicoin stacker))
             (err ERR-INSUFFICIENT-BALANCE))
 
         (ok true)
@@ -949,7 +949,7 @@ u113 u114 u115 u116 u117 u118 u119 u120 u121 u122 u123 u124 u125 u126 u127 u128
             { amount-token: u0 })
 
         (try! (as-contract (stx-transfer? entitled-ustx tx-sender stacker)))
-        (try! (as-contract (ft-transfer? citycoins stacked-in-cycle tx-sender stacker)))
+        (try! (as-contract (ft-transfer? miamicoin stacked-in-cycle tx-sender stacker)))
 
         (ok true)
     ))

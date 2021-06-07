@@ -26,6 +26,8 @@ export enum ErrCode {
   ERR_TOO_SMALL_COMMITMENT
 }
 
+export const TOKEN_NAME = 'miamicoin';
+export const TOKEN_SYMBOL = 'MIA';
 export const MINING_HALVING_BLOCKS = 210000;
 export const MINING_ACTIVATION_DELAY = 100;
 export const FIRST_STACKING_BLOCK = 1 + MINING_ACTIVATION_DELAY;

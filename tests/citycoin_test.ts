@@ -19,7 +19,9 @@ import {
   MINING_ACTIVATION_DELAY,
   MINING_HALVING_BLOCKS,
   SPLIT_STACKER_PERCENTAGE,
-  SPLIT_CITY_PERCENTAGE
+  SPLIT_CITY_PERCENTAGE,
+  TOKEN_NAME,
+  TOKEN_SYMBOL
 } from "../src/citycoin-client.ts"
 
 describe('[CityCoin]', () => {
@@ -77,18 +79,18 @@ describe('[CityCoin]', () => {
     });
 
     describe("get-name()", () => {
-      it("should return 'citycoins'", () => {
+      it("should return 'MiamiCoin'", () => {
         const result = client.getName().result;
 
-        result.expectOk().expectAscii("citycoins");
+        result.expectOk().expectAscii("MiamiCoin");
       });
     });
 
     describe("get-symbol()", () => {
-      it("should return 'CYCN'", () => {
+      it(`should return '${TOKEN_SYMBOL}'`, () => {
         const result = client.getSymbol().result;
 
-        result.expectOk().expectAscii("CYCN");
+        result.expectOk().expectAscii(TOKEN_SYMBOL);
       });
     });
 
@@ -894,7 +896,7 @@ describe('[CityCoin]', () => {
           100,
           wallet_1.address,
           client.getContractAddress(),
-          "citycoins"
+          TOKEN_NAME
         );
 
       });
@@ -1146,7 +1148,7 @@ describe('[CityCoin]', () => {
           stackedAmount,
           client.getContractAddress(),
           stacker.address,
-          'citycoins'
+          TOKEN_NAME
         );
       })
     });
