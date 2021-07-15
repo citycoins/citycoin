@@ -135,18 +135,18 @@
     value value
     (let
       (
-        (new-id (+ u1 (var-get usersNonce)))
+        (newId (+ u1 (var-get usersNonce)))
       )
       (map-set Users
         { user: user }
-        { user-id: new-id }
+        { user-id: newId }
       )
       (map-set UserIds
-        { user-id: new-id }
+        { user-id: newId }
         { user: user }
       )
-      (var-set usersNonce new-id)
-      new-id
+      (var-set usersNonce newId)
+      newId
     )
   )
 )
@@ -155,14 +155,14 @@
 (define-public (register-user (memo (optional (buff 34))))
   (let
     (
-      (new-id (+ u1 (var-get usersNonce)))
+      (newId (+ u1 (var-get usersNonce)))
       (threshold (var-get activationThreshold))
     )
 
     (asserts! (is-none (map-get? Users { user: tx-sender }))
       (err ERR_USER_ALREADY_REGISTERED))
 
-    (asserts! (<= new-id threshold)
+    (asserts! (<= newId threshold)
       (err ERR_ACTIVATION_THRESHOLD_REACHED))
 
     (if (is-some memo)
@@ -172,28 +172,29 @@
 
     (map-set Users
       { user: tx-sender }
-      { user-id: new-id }
+      { user-id: newId }
     )
 
     (map-set UserIds
-      { user-id: new-id }
+      { user-id: newId }
       { user: user }
     )
 
-    (var-set usersNonce new-id)
+    (var-set usersNonce newId)
 
-    (if (is-eq new-id threshold)
+    (if (is-eq newId threshold)
       (let 
         (
-          (activationBlock-val (+ block-height (var-get activationDelay)))
+          (activationBlockVal (+ block-height (var-get activationDelay)))
         )
         (var-set activationReached true)
-        (var-set activationBlock activationBlock-val)
-        (var-set coinbaseThreshold1 (+ activationBlock-val TOKEN_HALVING_BLOCKS))
-        (var-set coinbaseThreshold2 (+ activationBlock-val (* u2 TOKEN_HALVING_BLOCKS)))
-        (var-set coinbaseThreshold3 (+ activationBlock-val (* u3 TOKEN_HALVING_BLOCKS)))
-        (var-set coinbaseThreshold4 (+ activationBlock-val (* u4 TOKEN_HALVING_BLOCKS)))
-        (var-set coinbaseThreshold5 (+ activationBlock-val (* u5 TOKEN_HALVING_BLOCKS)))
+        (var-set activationBlock activationBlockVal)
+        (var-set coinbaseThreshold1 (+ activationBlockVal TOKEN_HALVING_BLOCKS))
+        (var-set coinbaseThreshold2 (+ activationBlockVal (* u2 TOKEN_HALVING_BLOCKS)))
+        (var-set coinbaseThreshold3 (+ activationBlockVal (* u3 TOKEN_HALVING_BLOCKS)))
+        (var-set coinbaseThreshold4 (+ activationBlockVal (* u4 TOKEN_HALVING_BLOCKS)))
+        (var-set coinbaseThreshold5 (+ activationBlockVal (* u5 TOKEN_HALVING_BLOCKS)))
+        ;; TODO: update map so citycoin-logic-v1 is activated
         (ok true)
       )
       (ok true)
