@@ -9,9 +9,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define-constant ERR_UNAUTHORIZED u1000)
-(define-constant ERR-USER-ALREADY-REGISTERED u1001)
-(define-constant ERR-ACTIVATION-THRESHOLD-REACHED u1002)
-(define-constant ERR-CONTRACT-NOT-ACTIVATED u1003)
+(define-constant ERR_USER_ALREADY_REGISTERED u1001)
+(define-constant ERR_ACTIVATION_THRESHOLD_REACHED u1002)
+(define-constant ERR_CONTRACT_NOT_ACTIVATED u1003)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CITY WALLET MANAGEMENT
@@ -74,63 +74,63 @@
 ;; REGISTRATION
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define-data-var activation-block uint u340282366920938463463374607431768211455)
-(define-data-var activation-delay uint u150)
-(define-data-var activation-reached bool false)
-(define-data-var activation-threshold uint u20)
-(define-data-var users-nonce uint u0)
+(define-data-var activationBlock uint u340282366920938463463374607431768211455)
+(define-data-var activationDelay uint u150)
+(define-data-var activationReached bool false)
+(define-data-var activationThreshold uint u20)
+(define-data-var usersNonce uint u0)
 
-(define-read-only (get-activation-block)
+(define-read-only (get-activationBlock)
   (let 
     (
-      (activated (var-get activation-reached))
+      (activated (var-get activationReached))
     )
-    (asserts! activated (err ERR-CONTRACT-NOT-ACTIVATED))
-    (ok (var-get activation-block))
+    (asserts! activated (err ERR_CONTRACT_NOT_ACTIVATED))
+    (ok (var-get activationBlock))
   )
 )
 
-(define-read-only (get-activation-delay)
-  (var-get activation-delay)
+(define-read-only (get-activationDelay)
+  (var-get activationDelay)
 )
 
 (define-read-only (get-activation-status)
-  (var-get activation-reached)
+  (var-get activationReached)
 )
 
-(define-read-only (get-activation-threshold)
-  (var-get activation-threshold)
+(define-read-only (get-activationThreshold)
+  (var-get activationThreshold)
 )
 
-(define-read-only (get-registered-users-nonce)
-  (var-get users-nonce)
+(define-read-only (get-registered-usersNonce)
+  (var-get usersNonce)
 )
 
 ;; map principals to a uint ID, was: miners
-(define-map users
+(define-map Users
   { user: principal }
   { user-id: uint }
 )
 
 ;; returns user ID if it has been created
 (define-read-only (get-user-id (user principal))
-  (get user-id (map-get? users { user: user }))
+  (get user-id (map-get? Users { user: user }))
 )
 
 ;; returns user ID if it has been created, or creates and returns new ID
 (define-private (get-or-create-user-id (user principal))
   (match
-    (get user-id (map-get? users { user: user }))
+    (get user-id (map-get? Users { user: user }))
     value value
     (let
       (
-        (new-id (+ u1 (var-get users-nonce)))
+        (new-id (+ u1 (var-get usersNonce)))
       )
-      (map-set users
+      (map-set Users
         { user: user }
         { user-id: new-id }
       )
-      (var-set users-nonce new-id)
+      (var-set usersNonce new-id)
       new-id
     )
   )
@@ -140,40 +140,40 @@
 (define-public (register-user (memo (optional (buff 34))))
   (let
     (
-      (new-id (+ u1 (var-get users-nonce)))
-      (threshold (var-get activation-threshold))
+      (new-id (+ u1 (var-get usersNonce)))
+      (threshold (var-get activationThreshold))
     )
 
-    (asserts! (is-none (map-get? users { user: tx-sender }))
-      (err ERR-USER-ALREADY-REGISTERED))
+    (asserts! (is-none (map-get? Users { user: tx-sender }))
+      (err ERR_USER_ALREADY_REGISTERED))
 
     (asserts! (<= new-id threshold)
-      (err ERR-ACTIVATION-THRESHOLD-REACHED))
+      (err ERR_ACTIVATION_THRESHOLD_REACHED))
 
     (if (is-some memo)
       (print memo)
       none
     )
 
-    (map-set users
+    (map-set Users
       { user: tx-sender }
       { user-id: new-id }
     )
 
-    (var-set users-nonce new-id)
+    (var-set usersNonce new-id)
 
     (if (is-eq new-id threshold)
       (let 
         (
-          (activation-block-val (+ block-height (var-get activation-delay)))
+          (activationBlock-val (+ block-height (var-get activationDelay)))
         )
-        (var-set activation-reached true)
-        (var-set activation-block activation-block-val)
-        (var-set coinbase-threshold-1 (+ activation-block-val TOKEN-HALVING-BLOCKS))
-        (var-set coinbase-threshold-2 (+ activation-block-val (* u2 TOKEN-HALVING-BLOCKS)))
-        (var-set coinbase-threshold-3 (+ activation-block-val (* u3 TOKEN-HALVING-BLOCKS)))
-        (var-set coinbase-threshold-4 (+ activation-block-val (* u4 TOKEN-HALVING-BLOCKS)))
-        (var-set coinbase-threshold-5 (+ activation-block-val (* u5 TOKEN-HALVING-BLOCKS)))
+        (var-set activationReached true)
+        (var-set activationBlock activationBlock-val)
+        (var-set coinbaseThreshold1 (+ activationBlock-val TOKEN_HALVING_BLOCKS))
+        (var-set coinbaseThreshold2 (+ activationBlock-val (* u2 TOKEN_HALVING_BLOCKS)))
+        (var-set coinbaseThreshold3 (+ activationBlock-val (* u3 TOKEN_HALVING_BLOCKS)))
+        (var-set coinbaseThreshold4 (+ activationBlock-val (* u4 TOKEN_HALVING_BLOCKS)))
+        (var-set coinbaseThreshold5 (+ activationBlock-val (* u5 TOKEN_HALVING_BLOCKS)))
         (ok true)
       )
       (ok true)
@@ -192,28 +192,28 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; how many blocks until the next halving occurs
-(define-constant TOKEN-HALVING-BLOCKS u210000)
+(define-constant TOKEN_HALVING_BLOCKS u210000)
 
 ;; store block height at each halving, set by register-user    
-(define-data-var coinbase-threshold-1 uint u0)
-(define-data-var coinbase-threshold-2 uint u0)
-(define-data-var coinbase-threshold-3 uint u0)
-(define-data-var coinbase-threshold-4 uint u0)
-(define-data-var coinbase-threshold-5 uint u0)
+(define-data-var coinbaseThreshold1 uint u0)
+(define-data-var coinbaseThreshold2 uint u0)
+(define-data-var coinbaseThreshold3 uint u0)
+(define-data-var coinbaseThreshold4 uint u0)
+(define-data-var coinbaseThreshold5 uint u0)
 
 ;; return coinbase thresholds if contract activated
 (define-read-only (get-coinbase-thresholds)
   (let 
     (
-      (activated (var-get activation-reached))
+      (activated (var-get activationReached))
     )
-    (asserts! activated (err ERR-CONTRACT-NOT-ACTIVATED))
+    (asserts! activated (err ERR_CONTRACT_NOT_ACTIVATED))
     (ok {
-      coinbase-threshold-1: (var-get coinbase-threshold-1),
-      coinbase-threshold-2: (var-get coinbase-threshold-2),
-      coinbase-threshold-3: (var-get coinbase-threshold-3),
-      coinbase-threshold-4: (var-get coinbase-threshold-4),
-      coinbase-threshold-5: (var-get coinbase-threshold-5)
+      coinbaseThreshold1: (var-get coinbaseThreshold1),
+      coinbaseThreshold2: (var-get coinbaseThreshold2),
+      coinbaseThreshold3: (var-get coinbaseThreshold3),
+      coinbaseThreshold4: (var-get coinbaseThreshold4),
+      coinbaseThreshold5: (var-get coinbaseThreshold5)
     })
   )
 )
@@ -221,22 +221,22 @@
 ;; function for deciding how many tokens to mint, depending on when they were mined
 (define-read-only (get-coinbase-amount (miner-block-height uint))
   ;; if contract is not active, return 0
-  (asserts! (>= miner-block-height activation-block) u0)
+  (asserts! (>= miner-block-height activationBlock) u0)
   ;; if contract is active, return based on issuance schedule
   ;; halvings occur every 210,000 blocks for 1,050,000 Stacks blocks
   ;; then mining continues indefinitely with 3,125 CityCoins as the reward
-  (asserts! (> miner-block-height (var-get coinbase-threshold-1))
-    (if (<= (- miner-block-height activation-block) u10000)
+  (asserts! (> miner-block-height (var-get coinbaseThreshold1))
+    (if (<= (- miner-block-height activationBlock) u10000)
       ;; bonus reward first 10,000 blocks
       u250000
       ;; standard reward remaining 200,000 blocks until 1st halving
       u100000
     )
   )
-  (asserts! (> miner-block-height (var-get coinbase-threshold-2)) u50000)
-  (asserts! (> miner-block-height (var-get coinbase-threshold-3)) u25000)
-  (asserts! (> miner-block-height (var-get coinbase-threshold-4)) u12500)
-  (asserts! (> miner-block-height (var-get coinbase-threshold-5)) u6250)
+  (asserts! (> miner-block-height (var-get coinbaseThreshold2)) u50000)
+  (asserts! (> miner-block-height (var-get coinbaseThreshold3)) u25000)
+  (asserts! (> miner-block-height (var-get coinbaseThreshold4)) u12500)
+  (asserts! (> miner-block-height (var-get coinbaseThreshold5)) u6250)
   ;; default value after 5th halving
   u3125
 )
