@@ -11,6 +11,7 @@
 (define-constant ERR_UNAUTHORIZED u1000)
 (define-constant ERR-USER-ALREADY-REGISTERED u1001)
 (define-constant ERR-ACTIVATION-THRESHOLD-REACHED u1002)
+(define-constant ERR-CONTRACT-NOT-ACTIVATED u1003)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CITY WALLET MANAGEMENT
@@ -80,10 +81,12 @@
 (define-data-var users-nonce uint u0)
 
 (define-read-only (get-activation-block)
-  (if
-    (is-eq (var-get activation-block) u340282366920938463463374607431768211455)
-    u0
-    (var-get activation-block)
+  (let 
+    (
+      (activated (var-get activation-reached))
+    )
+    (asserts! activated (err ERR-CONTRACT-NOT-ACTIVATED))
+    (ok (var-get activation-block))
   )
 )
 
@@ -197,6 +200,51 @@
 (define-data-var coinbase-threshold-3 uint u0)
 (define-data-var coinbase-threshold-4 uint u0)
 (define-data-var coinbase-threshold-5 uint u0)
+
+;; return coinbase thresholds if contract activated
+(define-read-only (get-coinbase-thresholds)
+  (let 
+    (
+      (activated (var-get activation-reached))
+    )
+    (asserts! activated (err ERR-CONTRACT-NOT-ACTIVATED))
+    (ok {
+      coinbase-threshold-1: (var-get coinbase-threshold-1),
+      coinbase-threshold-2: (var-get coinbase-threshold-2),
+      coinbase-threshold-3: (var-get coinbase-threshold-3),
+      coinbase-threshold-4: (var-get coinbase-threshold-4),
+      coinbase-threshold-5: (var-get coinbase-threshold-5)
+    })
+  )
+)
+
+;; function for deciding how many tokens to mint, depending on when they were mined
+(define-read-only (get-coinbase-amount (miner-block-height uint))
+  ;; if contract is not active, return 0
+  (asserts! (>= miner-block-height activation-block) u0)
+  ;; if contract is active, return based on issuance schedule
+  ;; halvings occur every 210,000 blocks for 1,050,000 Stacks blocks
+  ;; then mining continues indefinitely with 3,125 CityCoins as the reward
+  (asserts! (> miner-block-height (var-get coinbase-threshold-1))
+    (if (<= (- miner-block-height activation-block) u10000)
+      ;; bonus reward first 10,000 blocks
+      u250000
+      ;; standard reward remaining 200,000 blocks until 1st halving
+      u100000
+    )
+  )
+  (asserts! (> miner-block-height (var-get coinbase-threshold-2)) u50000)
+  (asserts! (> miner-block-height (var-get coinbase-threshold-3)) u25000)
+  (asserts! (> miner-block-height (var-get coinbase-threshold-4)) u12500)
+  (asserts! (> miner-block-height (var-get coinbase-threshold-5)) u6250)
+  ;; default value after 5th halving
+  u3125
+)
+
+;; mint new tokens for claimant who won at given Stacks block height
+(define-private (mint-coinbase (recipient principal) (stacks-block-ht uint))
+  (contract-call? .citycoin-token mint (get-coinbase-amount stacks-block-ht) recipient)
+)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; UTILITIES
