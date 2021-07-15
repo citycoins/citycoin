@@ -112,9 +112,20 @@
   { user-id: uint }
 )
 
+;; map principals ID to a principal
+(define-map UserIds
+  { user-id: uint }
+  { user: principal }
+)
+
 ;; returns user ID if it has been created
 (define-read-only (get-user-id (user principal))
   (get user-id (map-get? Users { user: user }))
+)
+
+;; returns user ID if it has been created
+(define-read-only (get-user (user-id uint))
+  (get user (map-get? UserIds { user-id: user-id }))
 )
 
 ;; returns user ID if it has been created, or creates and returns new ID
@@ -129,6 +140,10 @@
       (map-set Users
         { user: user }
         { user-id: new-id }
+      )
+      (map-set UserIds
+        { user-id: new-id }
+        { user: user }
       )
       (var-set usersNonce new-id)
       new-id
@@ -158,6 +173,11 @@
     (map-set Users
       { user: tx-sender }
       { user-id: new-id }
+    )
+
+    (map-set UserIds
+      { user-id: new-id }
+      { user: user }
     )
 
     (var-set usersNonce new-id)
