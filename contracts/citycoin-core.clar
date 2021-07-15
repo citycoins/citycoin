@@ -64,7 +64,13 @@
   (map-get? CityCoinContracts address)
 )
 
-(map-set CityCoinContracts .citycoin-logic-v1 { state: u0, startHeight: u0, endHeight: u0, active: false })
+(map-set CityCoinContracts .citycoin-logic-v1
+  {
+    state: CONTRACT_DEFINED,
+    startHeight: u0,
+    endHeight: u0,
+    active: false 
+  })
 
 ;; TODO: function to update active contract
 ;;   called by register miner to activate first contract
@@ -194,7 +200,13 @@
         (var-set coinbaseThreshold3 (+ activationBlockVal (* u3 TOKEN_HALVING_BLOCKS)))
         (var-set coinbaseThreshold4 (+ activationBlockVal (* u4 TOKEN_HALVING_BLOCKS)))
         (var-set coinbaseThreshold5 (+ activationBlockVal (* u5 TOKEN_HALVING_BLOCKS)))
-        ;; TODO: update map so citycoin-logic-v1 is activated
+        (map-set CityCoinContracts .citycoin-logic-v1
+          {
+            state: CONTRACT_ACTIVE,
+            startHeight: activationBlockVal,
+            endHeight: u0,
+            active: true
+        })
         (ok true)
       )
       (ok true)
