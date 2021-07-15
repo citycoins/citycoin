@@ -50,7 +50,7 @@
   (var-get activeContract)
 )
 
-(define-map cityCoinContracts
+(define-map CityCoinContracts
   principal
   {
     state: uint,
@@ -61,10 +61,10 @@
 )
 
 (define-read-only (get-contract (address principal))
-  (map-get? cityCoinContracts address)
+  (map-get? CityCoinContracts address)
 )
 
-(map-set cityCoinContracts .citycoin-logic-v1 { state: u0, startHeight: u0, endHeight: u0, active: false })
+(map-set CityCoinContracts .citycoin-logic-v1 { state: u0, startHeight: u0, endHeight: u0, active: false })
 
 ;; TODO: function to update active contract
 ;;   called by register miner to activate first contract
@@ -118,12 +118,12 @@
   { user: principal }
 )
 
-;; returns user ID if it has been created
+;; returns user ID if it exists
 (define-read-only (get-user-id (user principal))
   (get user-id (map-get? Users { user: user }))
 )
 
-;; returns user ID if it has been created
+;; returns user principal if it exists
 (define-read-only (get-user (user-id uint))
   (get user (map-get? UserIds { user-id: user-id }))
 )
