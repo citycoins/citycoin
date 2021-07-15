@@ -80,7 +80,7 @@
 (define-data-var activationThreshold uint u20)
 (define-data-var usersNonce uint u0)
 
-(define-read-only (get-activationBlock)
+(define-read-only (get-activation-block)
   (let 
     (
       (activated (var-get activationReached))
@@ -90,7 +90,7 @@
   )
 )
 
-(define-read-only (get-activationDelay)
+(define-read-only (get-activation-delay)
   (var-get activationDelay)
 )
 
@@ -98,11 +98,11 @@
   (var-get activationReached)
 )
 
-(define-read-only (get-activationThreshold)
+(define-read-only (get-activation-threshold)
   (var-get activationThreshold)
 )
 
-(define-read-only (get-registered-usersNonce)
+(define-read-only (get-registered-users-nonce)
   (var-get usersNonce)
 )
 
