@@ -110,7 +110,7 @@
 
 (define-public (send-many (recipients (list 200 { to: principal, amount: uint })))
   (fold check-err
-    (map send-send-citycoins recipients)
+    (map send-citycoins recipients)
     (ok true)
   )
 )
