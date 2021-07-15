@@ -9,6 +9,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define-constant ERR_UNAUTHORIZED u1000)
+(define-constant ERR-USER-ALREADY-REGISTERED u1001)
+(define-constant ERR-ACTIVATION-THRESHOLD-REACHED u1002)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CITY WALLET MANAGEMENT
@@ -42,6 +44,11 @@
 
 (define-data-var activeContract principal .citycoin-logic-v1)
 
+;; test: returns result
+(define-read-only (get-active-contract)
+  (var-get activeContract)
+)
+
 (define-map cityCoinContracts
   principal
   {
@@ -52,14 +59,144 @@
   }
 )
 
+(define-read-only (get-contract (address principal))
+  (map-get? cityCoinContracts address)
+)
+
 (map-set cityCoinContracts .citycoin-logic-v1 { state: u0, startHeight: u0, endHeight: u0, active: false })
 
-;; todo: function to update active contract
+;; TODO: function to update active contract
+;;   called by register miner to activate first contract
+;;   called by city wallet to update to new contract (+ delay)
 
-;; test: returns result
-(define-read-only (get-active-contract)
-  (var-get activeContract)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; REGISTRATION
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define-data-var activation-block uint u340282366920938463463374607431768211455)
+(define-data-var activation-delay uint u150)
+(define-data-var activation-reached bool false)
+(define-data-var activation-threshold uint u20)
+(define-data-var users-nonce uint u0)
+
+(define-read-only (get-activation-block)
+  (if
+    (is-eq (var-get activation-block) u340282366920938463463374607431768211455)
+    u0
+    (var-get activation-block)
+  )
 )
+
+(define-read-only (get-activation-delay)
+  (var-get activation-delay)
+)
+
+(define-read-only (get-activation-status)
+  (var-get activation-reached)
+)
+
+(define-read-only (get-activation-threshold)
+  (var-get activation-threshold)
+)
+
+(define-read-only (get-registered-users-nonce)
+  (var-get users-nonce)
+)
+
+;; map principals to a uint ID, was: miners
+(define-map users
+  { user: principal }
+  { user-id: uint }
+)
+
+;; returns user ID if it has been created
+(define-read-only (get-user-id (user principal))
+  (get user-id (map-get? users { user: user }))
+)
+
+;; returns user ID if it has been created, or creates and returns new ID
+(define-private (get-or-create-user-id (user principal))
+  (match
+    (get user-id (map-get? users { user: user }))
+    value value
+    (let
+      (
+        (new-id (+ u1 (var-get users-nonce)))
+      )
+      (map-set users
+        { user: user }
+        { user-id: new-id }
+      )
+      (var-set users-nonce new-id)
+      new-id
+    )
+  )
+)
+
+;; registers user that signal activation of contract until threshold is met
+(define-public (register-user (memo (optional (buff 34))))
+  (let
+    (
+      (new-id (+ u1 (var-get users-nonce)))
+      (threshold (var-get activation-threshold))
+    )
+
+    (asserts! (is-none (map-get? users { user: tx-sender }))
+      (err ERR-USER-ALREADY-REGISTERED))
+
+    (asserts! (<= new-id threshold)
+      (err ERR-ACTIVATION-THRESHOLD-REACHED))
+
+    (if (is-some memo)
+      (print memo)
+      none
+    )
+
+    (map-set users
+      { user: tx-sender }
+      { user-id: new-id }
+    )
+
+    (var-set users-nonce new-id)
+
+    (if (is-eq new-id threshold)
+      (let 
+        (
+          (activation-block-val (+ block-height (var-get activation-delay)))
+        )
+        (var-set activation-reached true)
+        (var-set activation-block activation-block-val)
+        (var-set coinbase-threshold-1 (+ activation-block-val TOKEN-HALVING-BLOCKS))
+        (var-set coinbase-threshold-2 (+ activation-block-val (* u2 TOKEN-HALVING-BLOCKS)))
+        (var-set coinbase-threshold-3 (+ activation-block-val (* u3 TOKEN-HALVING-BLOCKS)))
+        (var-set coinbase-threshold-4 (+ activation-block-val (* u4 TOKEN-HALVING-BLOCKS)))
+        (var-set coinbase-threshold-5 (+ activation-block-val (* u5 TOKEN-HALVING-BLOCKS)))
+        (ok true)
+      )
+      (ok true)
+    )    
+  )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; STACKING
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; TOKEN
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; how many blocks until the next halving occurs
+(define-constant TOKEN-HALVING-BLOCKS u210000)
+
+;; store block height at each halving, set by register-user    
+(define-data-var coinbase-threshold-1 uint u0)
+(define-data-var coinbase-threshold-2 uint u0)
+(define-data-var coinbase-threshold-3 uint u0)
+(define-data-var coinbase-threshold-4 uint u0)
+(define-data-var coinbase-threshold-5 uint u0)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; UTILITIES
