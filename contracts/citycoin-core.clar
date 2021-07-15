@@ -1,4 +1,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CITYCOIN CORE CONTRACT
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CONTRACT OWNER
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -130,8 +136,8 @@
 )
 
 ;; returns user principal if it exists
-(define-read-only (get-user (user-id uint))
-  (get user (map-get? UserIds { user-id: user-id }))
+(define-read-only (get-user (userId uint))
+  (get user (map-get? UserIds { user-id: userId }))
 )
 
 ;; returns user ID if it has been created, or creates and returns new ID
@@ -252,31 +258,31 @@
 )
 
 ;; function for deciding how many tokens to mint, depending on when they were mined
-(define-read-only (get-coinbase-amount (miner-block-height uint))
+(define-read-only (get-coinbase-amount (minerBlockHeight uint))
   ;; if contract is not active, return 0
-  (asserts! (>= miner-block-height activationBlock) u0)
+  (asserts! (>= minerBlockHeight activationBlock) u0)
   ;; if contract is active, return based on issuance schedule
   ;; halvings occur every 210,000 blocks for 1,050,000 Stacks blocks
   ;; then mining continues indefinitely with 3,125 CityCoins as the reward
-  (asserts! (> miner-block-height (var-get coinbaseThreshold1))
-    (if (<= (- miner-block-height activationBlock) u10000)
+  (asserts! (> minerBlockHeight (var-get coinbaseThreshold1))
+    (if (<= (- minerBlockHeight activationBlock) u10000)
       ;; bonus reward first 10,000 blocks
       u250000
       ;; standard reward remaining 200,000 blocks until 1st halving
       u100000
     )
   )
-  (asserts! (> miner-block-height (var-get coinbaseThreshold2)) u50000)
-  (asserts! (> miner-block-height (var-get coinbaseThreshold3)) u25000)
-  (asserts! (> miner-block-height (var-get coinbaseThreshold4)) u12500)
-  (asserts! (> miner-block-height (var-get coinbaseThreshold5)) u6250)
+  (asserts! (> minerBlockHeight (var-get coinbaseThreshold2)) u50000)
+  (asserts! (> minerBlockHeight (var-get coinbaseThreshold3)) u25000)
+  (asserts! (> minerBlockHeight (var-get coinbaseThreshold4)) u12500)
+  (asserts! (> minerBlockHeight (var-get coinbaseThreshold5)) u6250)
   ;; default value after 5th halving
   u3125
 )
 
 ;; mint new tokens for claimant who won at given Stacks block height
-(define-private (mint-coinbase (recipient principal) (stacks-block-ht uint))
-  (contract-call? .citycoin-token mint (get-coinbase-amount stacks-block-ht) recipient)
+(define-private (mint-coinbase (recipient principal) (stacksBlockHeight uint))
+  (contract-call? .citycoin-token mint (get-coinbase-amount stacksBlockHeight) recipient)
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
