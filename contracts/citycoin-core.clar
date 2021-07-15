@@ -70,7 +70,8 @@
   (map-get? CityCoinContracts address)
 )
 
-(map-set CityCoinContracts .citycoin-logic-v1
+(map-set CityCoinContracts
+  .citycoin-logic-v1
   {
     state: CONTRACT_DEFINED,
     startHeight: u0,
@@ -118,26 +119,26 @@
   (var-get usersNonce)
 )
 
-;; map principals to a uint ID, was: miners
+;; store user principal by user id
 (define-map Users
-  { user: principal }
-  { user-id: uint }
+  uint
+  principal
 )
 
-;; map principals ID to a principal
+;; store user id by user principal
 (define-map UserIds
-  { user-id: uint }
-  { user: principal }
+  principal
+  uint
 )
 
 ;; returns user ID if it exists
 (define-read-only (get-user-id (user principal))
-  (get user-id (map-get? Users { user: user }))
+  (map-get? UserIds user)
 )
 
 ;; returns user principal if it exists
 (define-read-only (get-user (userId uint))
-  (get user (map-get? UserIds { user-id: userId }))
+  (map-get? Users userId)
 )
 
 ;; returns user ID if it has been created, or creates and returns new ID
@@ -149,14 +150,8 @@
       (
         (newId (+ u1 (var-get usersNonce)))
       )
-      (map-set Users
-        { user: user }
-        { user-id: newId }
-      )
-      (map-set UserIds
-        { user-id: newId }
-        { user: user }
-      )
+      (map-set Users newId user)
+      (map-set UserIds user newId)
       (var-set usersNonce newId)
       newId
     )
@@ -171,7 +166,7 @@
       (threshold (var-get activationThreshold))
     )
 
-    (asserts! (is-none (map-get? Users { user: tx-sender }))
+    (asserts! (is-none (map-get? UserIds tx-sender))
       (err ERR_USER_ALREADY_REGISTERED))
 
     (asserts! (<= newId threshold)
@@ -182,16 +177,8 @@
       none
     )
 
-    (map-set Users
-      { user: tx-sender }
-      { user-id: newId }
-    )
-
-    (map-set UserIds
-      { user-id: newId }
-      { user: user }
-    )
-
+    (map-set Users newId user)
+    (map-set UserIds user newId)
     (var-set usersNonce newId)
 
     (if (is-eq newId threshold)
@@ -206,7 +193,8 @@
         (var-set coinbaseThreshold3 (+ activationBlockVal (* u3 TOKEN_HALVING_BLOCKS)))
         (var-set coinbaseThreshold4 (+ activationBlockVal (* u4 TOKEN_HALVING_BLOCKS)))
         (var-set coinbaseThreshold5 (+ activationBlockVal (* u5 TOKEN_HALVING_BLOCKS)))
-        (map-set CityCoinContracts .citycoin-logic-v1
+        (map-set CityCoinContracts
+          .citycoin-logic-v1
           {
             state: CONTRACT_ACTIVE,
             startHeight: activationBlockVal,
