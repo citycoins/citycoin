@@ -266,13 +266,17 @@
 )
 
 ;; At a given Stacks block height and miner ID:
-;; - did the miner mine yet?
+;; - did the miner mine yet
+;; - what index in BlockMiners
 (define-map BlockMinersById
   {
     stacksBlockHeight: uint,
     userId: uint
   }
-  { committed: bool }
+  {
+    committed: bool,
+    idx: uint
+  }
 )
 
 ;;;;;
