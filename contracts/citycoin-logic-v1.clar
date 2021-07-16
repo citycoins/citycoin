@@ -6,34 +6,71 @@
 
 ;; TODO: add logic trait for future upgrades
 
-;; Determine whether or not the given miner can actually mine tokens right now.
-;; * Stacking must be active for this smart contract
-;; * No more than 31 miners must have mined already
-;; * This miner hasn't mined in this block before
-;; * The miner is committing a positive number of uSTX
-;; * The miner has the uSTX to commit
-(define-read-only (can-mine-tokens (miner principal) (miner-id uint) (stacks-block-height uint) (amount-ustx uint))
-    (let
-        (
-            (block (get-mined-block-or-default stacks-block-height))
-        )        
-        (if (and (is-eq MAX-MINERS-COUNT (get miners-count block)) (<= amount-ustx (get least-commitment-ustx block)))
-            (err ERR-TOO-SMALL-COMMITMENT)
-            (begin
-                (asserts! (is-some (get-reward-cycle stacks-block-height))
-                    (err ERR-STACKING-NOT-AVAILABLE))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ERROR CODES
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-                (asserts! (not (has-mined miner-id stacks-block-height))
-                    (err ERR-ALREADY-MINED))
+(define-constant ERR_CONTRACT_NOT_ACTIVATED u2000)
+(define-constant ERR_USER_ALREADY_MINED u2001)
+(define-constant ERR_INSUFFICIENT_COMMITMENT u2002)
+(define-constant ERR_INSUFFICIENT_BALANCE u2003)
 
-                (asserts! (> amount-ustx u0)
-                    (err ERR-CANNOT-MINE))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CORE FUNCTIONS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-                (asserts! (>= (stx-get-balance miner) amount-ustx)
-                    (err ERR-INSUFFICIENT-BALANCE))
-
-                (ok true)
-            )
-        )
-    )
+(define-private (get-activation-status)
+  (contract-call? .citycoin-core get-activation-status)
 )
+
+(define-private (has-mined-at-block (userId uint) (stacksHeight uint))
+  (contract-call? .citycoin-core has-mined-at-block userId stacksHeight)
+)
+
+(define-private (get-reward-cycle (stacksHeight uint))
+  (contract-call? .citycoin-core get-reward-cycle stacksHeight)
+)
+
+(define-private (stacking-active-at-cycle (rewardCycle uint))
+  (contract-call? .citycoin-core stacking-active-at-cycle rewardCycle)
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; MINING
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define-public (mine-tokens-at-block (userId uint) (stacksHeight uint) (amountUstx uint) (memo (optional (buff 34))))
+  (begin
+    (asserts! (get-activation-status) (err ERR_CONTRACT_NOT_ACTIVATED))
+    (asserts! (not (has-mined-at-block userId stacksHeight) (err ERR_USER_ALREADY_MINED)))
+    (asserts! (> amountUstx u0) (err ERR_INSUFFICIENT_COMMITMENT))
+    (asserts! (>= (stx-get-balance tx-sender) amountUstx) (err ERR_INSUFFICIENT_BALANCE))
+    (let (
+      (rewardCycle (get-reward-cycle stacksHeight))
+      (stackingActive (stacking-active-at-cycle rewardCycle))
+      (toCity
+        (if stackingActive
+          (/ (* SPLIT_CITY_PCT amountUstx) u100)
+          amountUstx
+        )
+      )
+      (toStackers (- amountUstx toCity))
+    )
+    (
+      (contract-call? .citycoin-core set-tokens-mined tx-sender userId stacksHeight amountUstx toStackers toCity)
+      (if (> toStackers u0)
+        (stx-transfer? toStackers tx-sender (as-contract tx-sender))
+        none
+      )
+      (stx-transfer? toCity tx-sender (contract-call? .citycoin-core get-city-wallet))
+    ))
+    (ok true)
+  )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; STACKING
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; 30% split to custodied wallet address for the city
+(define-constant SPLIT_CITY_PCT u30)

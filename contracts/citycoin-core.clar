@@ -18,9 +18,7 @@
 (define-constant ERR_USER_ALREADY_REGISTERED u1001)
 (define-constant ERR_ACTIVATION_THRESHOLD_REACHED u1002)
 (define-constant ERR_CONTRACT_NOT_ACTIVATED u1003)
-(define-constant ERR_ALREADY_MINED u1004)
-(define-constant ERR_INSUFFICIENT_COMMITMENT u1005)
-(define-constant ERR_INSUFFICIENT_BALANCE u1006)
+(define-constant ERR_USER_ALREADY_MINED u1004)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CITY WALLET MANAGEMENT
@@ -222,7 +220,7 @@
 ;; - what was the total amount submitted to the city
 ;; - what was the total amount submitted to Stackers
 ;; - was the block reward claimed
-(define-map BlockMiningStats
+(define-map MiningStatsAtBlock
   uint
   {
     minersCount: uint,
@@ -237,7 +235,7 @@
   (let 
     (
       (activated (var-get activationReached))
-      (blockStats (map-get? BlockMiningStats stacksHeight))
+      (blockStats (map-get? MiningStatsAtBlock stacksHeight))
     )
     (asserts! activated (err ERR_CONTRACT_NOT_ACTIVATED))
     (ok blockStats)
@@ -247,7 +245,7 @@
 ;; At a given Stacks block height and user ID:
 ;; - what is their ustx commitment
 ;; - what are the low/high values (used for VRF)
-(define-map BlockMiners
+(define-map MinersAtBlock
   { 
     stacksBlockHeight: uint,
     userId: uint
@@ -260,48 +258,90 @@
 )
 
 ;; At a given Stacks block height:
-;; - what is the max highValue from BlockMiners (used for VRF)
-(define-map BlockMinersHighValue
+;; - what is the max highValue from MinersAtBlock (used for VRF)
+(define-map MinersAtBlockHighValue
   uint
   uint
 )
 
-;; Mine tokens at a given block height, such that:
-;; - miner commits uSTX into this contract
-;; - miner enters their candidacy to claim block reward (via claim-mining-reward)
-;; - miner must wait for a token maturity window to claim reward ()
-;; - Stacks can claim this via claim-stacking-reward
-;; and in doing so, enters their candidacy to be able to claim the block reward (via claim-mining-reward).  The miner must 
-;; wait for a token maturity window in order to obtain the tokens.  Once that window passes, they can get the tokens.
-;; This ensures that no one knows the VRF seed that will be used to pick the winner.
 (define-public (mine-tokens (amountUstx uint) (memo (optional (buff 34))))
-  (let 
-    (
-      (activated (var-get activationReached))
-    )
-    ;; assert contract is activated
-    (asserts! activated (err ERR_CONTRACT_NOT_ACTIVATED))
-    ;; assert miner hasn't already mined
-    (asserts! (not (has-mined miner-id stacks-block-height) (err ERR_ALREADY_MINED)))
-    ;; assert value ustx is > 0
-    (asserts! (> amountUstx u0) (err ERR_INSUFFICIENT_COMMITMENT))
-    ;; assert miner has enough ustx
-    (asserts! (>= (stx-get-balance tx-sender) amountUstx) (err ERR_INSUFFICIENT_BALANCE))
-    ;; if memo, print memo
-    (if (is-some memo)
-            (print memo)
-            none
-        )
-    ;; call logic function for mining
-    (try! (contract-call? .citycoins-logic-v1 mine-tokens-at-block block-height (get-or-create-user-id tx-sender) amountUstx))
+  (if (is-some memo)
+    (try! (.citycoin-logic-v1 mine-tokens-at-block (get-or-create-miner-id tx-sender) block-height amountUstx memo))
+    (try! (.citycoin-logic-v1 mine-tokens-at-block (get-or-create-miner-id tx-sender) block-height amountUstx))
   )
 )
 
+(define-public (set-tokens-mined (user principal) (userId uint) (stacksHeight uint) (amountUstx uint) (toStackers uint) (toCity uint))
+  ;; TODO: only allow calls by active logic contract
+  (let (
+    (blockStats (get-mining-stats-at-block stacksHeight))
+    (newMinersCount (+ (get minersCount blockStats) u1))
+    (minerLowVal (get-last-high-value (stacksHeight)))
+    (rewardCycle (get-reward-cycle stacksHeight))
+    (rewardCycleStats (get-stacking-stats-at-cycle rewardCycle))
+  )
+  (
+    ;; set MiningStatsAtBlock
+    (map-set MiningStatsAtBlock
+      stacksHeight
+      {
+        minersCount: newMinersCount,
+        amount: (+ (get amount blockStats) amountUstx),
+        amountToCity: (+ (get amountToCity blockStats) toCity),
+        amountToStackers: (+ (get amountToStackers blockStats) toStackers),
+        rewardClaimed: false
+      }
+    )
+    ;; set MinersAtBlock
+    (map-set MinersAtBlock
+      { 
+        stacksBlockHeight: stacksHeight,
+        userId: userId
+      }
+      { 
+        ustx: amountUstx,
+        lowValue: minerLowVal,
+        highValue: (+ minerLowVal amountUstx)
+      }
+    )
+    ;; set MinersAtBlockHighValue
+    (map-set MinersAtBlockHighValue
+      stacksHeight
+      (+ minerLowVal amountUstx)
+    )
+    ;; set StackingStatsAtCycle
+    (map-set StackingStatsAtCycle
+      stacksHeight
+      {
+        stackersCount: (get stackersCount rewardCycleStats),
+        amountUstx: (+ (get amountUstx rewardCycleStats) toStackers),
+        amountToken: (get amountToken rewardCycleStats)
+      }
+    )
+  ))
+)
+
 ;; determine if a given miner has already mined at a given block height
-(define-read-only (has-mined (userId uint) (stacksHeight uint))
-    (is-some (get commited (map-get? BlockMinersById
-      { stacksHeight: stacksHeight, userId: userId }
-    )))
+(define-read-only (has-mined-at-block (userId uint) (stacksHeight uint))
+  (is-some (map-get? MinersAtBlock
+    { stacksHeight: stacksHeight, userId: userId }
+  ))
+)
+
+(define-read-only (get-mining-stats-at-block (stacksHeight uint))
+  (default-to {
+    minersCount: 0,
+    amount: 0,
+    amountToCity: 0,
+    amountToStackers: 0,
+    rewardClaimed: false
+  }
+  map-get? MiningStatsAtBlock stacksHeight)
+)
+
+(define-read-only (get-last-high-value (stacksHeight uint))
+  (default-to u0
+    map-get? MinersAtBlockHighValue stacksHeight)
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -315,7 +355,65 @@
 ;; STACKING
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(define-data-var rewardCycleLength uint 2100)
 
+;; At a given reward cycle:
+;; - how many Stackers were there
+;; - what is the total uSTX submitted by miners
+;; - what is the total tokens Stacked?
+(define-map StackingStatsAtCycle
+  uint
+  {
+    stackersCount: uint,
+    amountUstx: uint,
+    amountToken: uint
+  }
+)
+
+;; At a given reward cycle and user ID:
+;; - what is the total tokens Stacked?
+;; - how many tokens should be returned? (based on Stacking period)
+(define-map StackersAtCycle
+  {
+    rewardCycle: uint,
+    userId: uint
+  }
+  {
+    amountStacked: uint,
+    toReturn: uint
+  }
+)
+
+;; get the reward cycle for a given Stacks block height
+(define-read-only (get-reward-cycle (stacksHeight uint))
+  (let (
+    (firstStackingBlock (var-get activationBlock))
+    (rcLen (var-get rewardCycleLength))
+  )
+  (if (>= stacksHeight firstStackingBlock)
+    (some (/ (- stacksHeight firstStackingBlock) rcLen))
+    none
+  ))
+)
+
+;; determine if stacking is active in a given cycle
+(define-read-only (stacking-active-at-cycle (rewardCycle uint))
+  (is-some
+    (get amountToken (map-get? StackingStatsAtCycle rewardCycle))
+  )
+)
+
+;; get the total stacked tokens and committed uSTX for a given reward cycle
+(define-read-only (get-stacking-stats-at-cycle (rewardCycle uint))
+  (default-to { stackersCount: u0, amountUstx: u0, amountToken: u0 }
+    map-get? StackingStatsAtCycle rewardCycle)
+)
+
+;; get the total stacked tokens and amount to return for a given reward cycle and user
+(define-read-only (get-stacker-info-at-cycle (rewardCycle uint) (userId uint))
+  (default-to { amountStacked: u0, toReturn: u0 }
+    map-get? StackersAtCycle { rewardCycle: rewardCycle, userId: userId })
+)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TOKEN
@@ -388,19 +486,4 @@
 
 (define-private (is-authorized-owner)
   (is-eq contract-caller CONTRACT_OWNER)
-)
-
-;; refactor all "activated" checks above
-;; to use this function instead ??
-;; OR
-;; just use the get-activation-status
-;; read-only function ??
-(define-private (is-activated)
-  (let 
-    (
-      (activated (var-get activationReached))
-    )
-    (asserts! activated (err ERR_CONTRACT_NOT_ACTIVATED))
-    (ok true)
-  )
 )
