@@ -18,6 +18,9 @@
 (define-constant ERR_USER_ALREADY_REGISTERED u1001)
 (define-constant ERR_ACTIVATION_THRESHOLD_REACHED u1002)
 (define-constant ERR_CONTRACT_NOT_ACTIVATED u1003)
+(define-constant ERR_ALREADY_MINED u1004)
+(define-constant ERR_INSUFFICIENT_COMMITMENT u1005)
+(define-constant ERR_INSUFFICIENT_BALANCE u1006)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CITY WALLET MANAGEMENT
@@ -241,17 +244,15 @@
   )
 )
 
-;; At a given Stacks block height and index:
-;; - what is the miner's ID
+;; At a given Stacks block height and user ID:
 ;; - what is their ustx commitment
 ;; - what are the low/high values (used for VRF)
 (define-map BlockMiners
   { 
     stacksBlockHeight: uint,
-    idx: uint
+    userId: uint
   }
   { 
-    userId: uint,
     ustx: uint,
     lowValue: uint,
     highValue: uint
@@ -265,54 +266,50 @@
   uint
 )
 
-;; At a given Stacks block height and miner ID:
-;; - did the miner mine yet
-;; - what index in BlockMiners
-(define-map BlockMinersById
-  {
-    stacksBlockHeight: uint,
-    userId: uint
-  }
-  {
-    committed: bool,
-    idx: uint
-  }
+;; Mine tokens at a given block height, such that:
+;; - miner commits uSTX into this contract
+;; - miner enters their candidacy to claim block reward (via claim-mining-reward)
+;; - miner must wait for a token maturity window to claim reward ()
+;; - Stacks can claim this via claim-stacking-reward
+;; and in doing so, enters their candidacy to be able to claim the block reward (via claim-mining-reward).  The miner must 
+;; wait for a token maturity window in order to obtain the tokens.  Once that window passes, they can get the tokens.
+;; This ensures that no one knows the VRF seed that will be used to pick the winner.
+(define-public (mine-tokens (amountUstx uint) (memo (optional (buff 34))))
+  (let 
+    (
+      (activated (var-get activationReached))
+    )
+    ;; assert contract is activated
+    (asserts! activated (err ERR_CONTRACT_NOT_ACTIVATED))
+    ;; assert miner hasn't already mined
+    (asserts! (not (has-mined miner-id stacks-block-height) (err ERR_ALREADY_MINED)))
+    ;; assert value ustx is > 0
+    (asserts! (> amountUstx u0) (err ERR_INSUFFICIENT_COMMITMENT))
+    ;; assert miner has enough ustx
+    (asserts! (>= (stx-get-balance tx-sender) amountUstx) (err ERR_INSUFFICIENT_BALANCE))
+    ;; if memo, print memo
+    (if (is-some memo)
+            (print memo)
+            none
+        )
+    ;; call logic function for mining
+    (try! (contract-call? .citycoins-logic-v1 mine-tokens-at-block block-height (get-or-create-user-id tx-sender) amountUstx))
+  )
 )
 
-;;;;;
-
-;; OLD DATA MAPS FOR REFERENCE - IGNORE
-
-;; Bind Stacks block height to a list of up to 128 miners (and how much they mined) per block,
-;; and track whether or not the miner has come back to claim their tokens and who mined the least.
-(define-map mined-blocks
-    { stacks-block-height: uint }
-    {
-        miners-count: uint,
-        least-commitment-idx: uint,
-        least-commitment-ustx: uint,
-        claimed: bool,
-    }
+;; determine if a given miner has already mined at a given block height
+(define-read-only (has-mined (userId uint) (stacksHeight uint))
+    (is-some (get commited (map-get? BlockMinersById
+      { stacksHeight: stacksHeight, userId: userId }
+    )))
 )
 
-(define-map blocks-miners
-  { stacks-block-height: uint, idx: uint }
-  { miner-id: uint, ustx: uint }
-)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; MINING REWARD CLAIMS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; TO DO: think about adding amount to mined-blocks map.
-(define-map block-commit
-    { stacks-block-height: uint }
-    { amount: uint, 
-      amount-to-stackers: uint, 
-      amount-to-city: uint 
-    }
-)
-
-(define-map miners-block-commitment
-    { miner-id: uint, stacks-block-height: uint }
-    { committed: bool }
-)
+;; how long a miner must wait before block winner can claim their minted tokens
+(define-data-var tokenRewardMaturity uint u100)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; STACKING
