@@ -146,7 +146,7 @@
 ;; returns user ID if it has been created, or creates and returns new ID
 (define-private (get-or-create-user-id (user principal))
   (match
-    (get user-id (map-get? Users { user: user }))
+    (map-get? UserIds user)
     value value
     (let
       (
@@ -179,8 +179,8 @@
       none
     )
 
-    (map-set Users newId user)
-    (map-set UserIds user newId)
+    (map-set Users newId tx-sender)
+    (map-set UserIds tx-sender newId)
     (var-set usersNonce newId)
 
     (if (is-eq newId threshold)
@@ -270,8 +270,8 @@
       (userId (get-or-create-user-id tx-sender))
     )
     (if (is-some memo)
-      (try! (.citycoin-logic-v1 mine-tokens-at-block userId block-height amountUstx memo))
-      (try! (.citycoin-logic-v1 mine-tokens-at-block userId block-height amountUstx))
+      (try! (contract-call? .citycoin-logic-v1 mine-tokens-at-block userId block-height amountUstx memo))
+      (try! (contract-call? .citycoin-logic-v1 mine-tokens-at-block userId block-height amountUstx))
     )
     (ok true)
   )

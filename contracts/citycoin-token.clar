@@ -96,10 +96,10 @@
 )
 
 ;; send-many interface
-(define-private (send-citycoins (amount uint) (to principal))
+(define-private (send-citycoins (recipient { amount: uint, to: principal }))
   (let
     (
-      (transferOk (try! (transfer amount tx-sender to none)))
+      (transferOk (try! (transfer (get amount recipient) tx-sender (get to recipient) none)))
     )
     (ok transferOk)
   )
@@ -110,9 +110,11 @@
                err-value (err err-value))
 )
 
-(define-public (send-many (recipients (list 200 { to: principal, amount: uint })))
+(define-public (send-many (recipients (list 200 { amount: uint, to: principal })))
   (fold check-err
     (map send-citycoins recipients)
     (ok true)
   )
 )
+
+;; TODO: add send-many-memo to support exchange transfers
