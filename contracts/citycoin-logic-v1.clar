@@ -45,25 +45,25 @@
     (asserts! (not (has-mined-at-block userId stacksHeight) (err ERR_USER_ALREADY_MINED)))
     (asserts! (> amountUstx u0) (err ERR_INSUFFICIENT_COMMITMENT))
     (asserts! (>= (stx-get-balance tx-sender) amountUstx) (err ERR_INSUFFICIENT_BALANCE))
-    (let (
-      (rewardCycle (get-reward-cycle stacksHeight))
-      (stackingActive (stacking-active-at-cycle rewardCycle))
-      (toCity
-        (if stackingActive
-          (/ (* SPLIT_CITY_PCT amountUstx) u100)
-          amountUstx
+    (let
+      (
+        (rewardCycle (get-reward-cycle stacksHeight))
+        (stackingActive (stacking-active-at-cycle rewardCycle))
+        (toCity
+            (if stackingActive
+            (/ (* SPLIT_CITY_PCT amountUstx) u100)
+            amountUstx
+            )
         )
+        (toStackers (- amountUstx toCity))
       )
-      (toStackers (- amountUstx toCity))
-    )
-    (
-      (contract-call? .citycoin-core set-tokens-mined tx-sender userId stacksHeight amountUstx toStackers toCity)
+      (contract-call? .citycoin-core set-tokens-mined userId stacksHeight amountUstx toStackers toCity)
       (if (> toStackers u0)
         (stx-transfer? toStackers tx-sender (as-contract tx-sender))
         none
       )
       (stx-transfer? toCity tx-sender (contract-call? .citycoin-core get-city-wallet))
-    ))
+    )
     (ok true)
   )
 )

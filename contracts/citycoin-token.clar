@@ -61,7 +61,7 @@
 )
 
 (define-read-only (get-token-uri)
-    (ok (var-get token-uri))
+    (ok (var-get tokenUri))
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -74,7 +74,7 @@
 ;; set token URI to new value, only accessible by CITYCOIN CORE
 (define-public (set-token-uri (newUri (optional (string-utf8 256))))
     (begin
-        (asserts! (is-eq contract-caller trustedCaller) (err ERR_UNAUTHORIZED))
+        (asserts! (is-eq contract-caller (var-get trustedCaller)) (err ERR_UNAUTHORIZED))
         (ok (var-set tokenUri newUri))
     )
 )
@@ -82,7 +82,7 @@
 ;; mint new tokens, only accessible by CITYCOIN CORE
 (define-public (mint (amount uint) (recipient principal))
   (begin
-    (asserts! (is-eq contract-caller trustedCaller) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq contract-caller (var-get trustedCaller)) (err ERR_UNAUTHORIZED))
     (ft-mint? citycoins amount recipient)
   )
 )
@@ -90,7 +90,7 @@
 ;; burn tokens, only accessible by CITYCOIN CORE
 (define-public (burn (amount uint) (recipient principal))
   (begin
-    (asserts! (is-eq contract-caller trustedCaller) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq contract-caller (var-get trustedCaller)) (err ERR_UNAUTHORIZED))
     (ft-burn? citycoins amount recipient)
   )
 )
@@ -98,9 +98,11 @@
 ;; send-many interface
 (define-private (send-citycoins (amount uint) (to principal))
   (let
-    (transferOk  (try! (transfer amount tx-sender to none)))
+    (
+      (transferOk (try! (transfer amount tx-sender to none)))
+    )
+    (ok transferOk)
   )
-  (ok transferOk)
 )
 
 (define-private (check-err (result (response bool uint)) (prior (response bool uint)))

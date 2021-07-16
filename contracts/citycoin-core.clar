@@ -265,22 +265,28 @@
 )
 
 (define-public (mine-tokens (amountUstx uint) (memo (optional (buff 34))))
-  (if (is-some memo)
-    (try! (.citycoin-logic-v1 mine-tokens-at-block (get-or-create-miner-id tx-sender) block-height amountUstx memo))
-    (try! (.citycoin-logic-v1 mine-tokens-at-block (get-or-create-miner-id tx-sender) block-height amountUstx))
+  (let
+    (
+      (userId (get-or-create-user-id tx-sender))
+    )
+    (if (is-some memo)
+      (try! (.citycoin-logic-v1 mine-tokens-at-block userId block-height amountUstx memo))
+      (try! (.citycoin-logic-v1 mine-tokens-at-block userId block-height amountUstx))
+    )
+    (ok true)
   )
 )
 
-(define-public (set-tokens-mined (user principal) (userId uint) (stacksHeight uint) (amountUstx uint) (toStackers uint) (toCity uint))
+(define-public (set-tokens-mined (userId uint) (stacksHeight uint) (amountUstx uint) (toStackers uint) (toCity uint))
   ;; TODO: only allow calls by active logic contract
-  (let (
-    (blockStats (get-mining-stats-at-block stacksHeight))
-    (newMinersCount (+ (get minersCount blockStats) u1))
-    (minerLowVal (get-last-high-value (stacksHeight)))
-    (rewardCycle (get-reward-cycle stacksHeight))
-    (rewardCycleStats (get-stacking-stats-at-cycle rewardCycle))
-  )
-  (
+  (let
+    (
+      (blockStats (get-mining-stats-at-block stacksHeight))
+      (newMinersCount (+ (get minersCount blockStats) u1))
+      (minerLowVal (get-last-high-value stacksHeight))
+      (rewardCycle (get-reward-cycle stacksHeight))
+      (rewardCycleStats (get-stacking-stats-at-cycle rewardCycle))
+    )
     ;; set MiningStatsAtBlock
     (map-set MiningStatsAtBlock
       stacksHeight
@@ -318,7 +324,8 @@
         amountToken: (get amountToken rewardCycleStats)
       }
     )
-  ))
+    (ok true)
+  )
 )
 
 ;; determine if a given miner has already mined at a given block height
@@ -386,14 +393,15 @@
 
 ;; get the reward cycle for a given Stacks block height
 (define-read-only (get-reward-cycle (stacksHeight uint))
-  (let (
-    (firstStackingBlock (var-get activationBlock))
-    (rcLen (var-get rewardCycleLength))
+  (let
+    (
+      (firstStackingBlock (var-get activationBlock))
+      (rcLen (var-get rewardCycleLength))
+    )
+    (if (>= stacksHeight firstStackingBlock)
+      (some (/ (- stacksHeight firstStackingBlock) rcLen))
+      none)
   )
-  (if (>= stacksHeight firstStackingBlock)
-    (some (/ (- stacksHeight firstStackingBlock) rcLen))
-    none
-  ))
 )
 
 ;; determine if stacking is active in a given cycle
