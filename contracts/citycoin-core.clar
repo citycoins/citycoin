@@ -255,7 +255,7 @@
 ;; - what are the low/high values (used for VRF)
 (define-map MinersAtBlock
   {
-    stacksBlockHeight: uint,
+    stacksHeight: uint,
     userId: uint
   }
   {
@@ -292,7 +292,7 @@
       (blockStats (get-mining-stats-at-block stacksHeight))
       (newMinersCount (+ (get minersCount blockStats) u1))
       (minerLowVal (get-last-high-value stacksHeight))
-      (rewardCycle (get-reward-cycle stacksHeight))
+      (rewardCycle (default-to u0 (get-reward-cycle stacksHeight)))
       (rewardCycleStats (get-stacking-stats-at-cycle rewardCycle))
     )
     ;; set MiningStatsAtBlock
@@ -309,7 +309,7 @@
     ;; set MinersAtBlock
     (map-set MinersAtBlock
       {
-        stacksBlockHeight: stacksHeight,
+        stacksHeight: stacksHeight,
         userId: userId
       }
       {
@@ -345,18 +345,18 @@
 
 (define-read-only (get-mining-stats-at-block (stacksHeight uint))
   (default-to {
-    minersCount: 0,
-    amount: 0,
-    amountToCity: 0,
-    amountToStackers: 0,
+    minersCount: u0,
+    amount: u0,
+    amountToCity: u0,
+    amountToStackers: u0,
     rewardClaimed: false
   }
-  map-get? MiningStatsAtBlock stacksHeight)
+  (map-get? MiningStatsAtBlock stacksHeight))
 )
 
 (define-read-only (get-last-high-value (stacksHeight uint))
   (default-to u0
-    map-get? MinersAtBlockHighValue stacksHeight)
+    (map-get? MinersAtBlockHighValue stacksHeight))
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -370,7 +370,7 @@
 ;; STACKING
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define-data-var rewardCycleLength uint 2100)
+(define-data-var rewardCycleLength uint u2100)
 
 ;; At a given reward cycle:
 ;; - how many Stackers were there
@@ -422,13 +422,13 @@
 ;; get the total stacked tokens and committed uSTX for a given reward cycle
 (define-read-only (get-stacking-stats-at-cycle (rewardCycle uint))
   (default-to { stackersCount: u0, amountUstx: u0, amountToken: u0 }
-    map-get? StackingStatsAtCycle rewardCycle)
+    (map-get? StackingStatsAtCycle rewardCycle))
 )
 
 ;; get the total stacked tokens and amount to return for a given reward cycle and user
 (define-read-only (get-stacker-info-at-cycle (rewardCycle uint) (userId uint))
   (default-to { amountStacked: u0, toReturn: u0 }
-    map-get? StackersAtCycle { rewardCycle: rewardCycle, userId: userId })
+    (map-get? StackersAtCycle { rewardCycle: rewardCycle, userId: userId }))
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -466,12 +466,12 @@
 (define-read-only (get-coinbase-amount (minerBlockHeight uint))
   (begin
     ;; if contract is not active, return 0
-    (asserts! (>= minerBlockHeight activationBlock) u0)
+    (asserts! (>= minerBlockHeight (var-get activationBlock)) u0)
     ;; if contract is active, return based on issuance schedule
     ;; halvings occur every 210,000 blocks for 1,050,000 Stacks blocks
     ;; then mining continues indefinitely with 3,125 CityCoins as the reward
     (asserts! (> minerBlockHeight (var-get coinbaseThreshold1))
-      (if (<= (- minerBlockHeight activationBlock) u10000)
+      (if (<= (- minerBlockHeight (var-get activationBlock)) u10000)
         ;; bonus reward first 10,000 blocks
         u250000
         ;; standard reward remaining 200,000 blocks until 1st halving
@@ -488,8 +488,8 @@
 )
 
 ;; mint new tokens for claimant who won at given Stacks block height
-(define-private (mint-coinbase (recipient principal) (stacksBlockHeight uint))
-  (contract-call? .citycoin-token mint (get-coinbase-amount stacksBlockHeight) recipient)
+(define-private (mint-coinbase (recipient principal) (stacksHeight uint))
+  (contract-call? .citycoin-token mint (get-coinbase-amount stacksHeight) recipient)
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
