@@ -30,38 +30,38 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define-public (transfer (amount uint) (from principal) (to principal) (memo (optional (buff 34))))
-    (begin
-        (asserts! (is-eq from tx-sender) (err ERR_UNAUTHORIZED))
-        (if (is-some memo)
-            (print memo)
-            none
-        )
-        (ft-transfer? citycoins amount from to)
+  (begin
+    (asserts! (is-eq from tx-sender) (err ERR_UNAUTHORIZED))
+    (if (is-some memo)
+      (print memo)
+      none
     )
+    (ft-transfer? citycoins amount from to)
+  )
 )
 
 (define-read-only (get-name)
-    (ok "citycoins")
+  (ok "citycoins")
 )
 
 (define-read-only (get-symbol)
-    (ok "CYCN")
+  (ok "CYCN")
 )
 
 (define-read-only (get-decimals)
-    (ok u0)
+  (ok u0)
 )
 
 (define-read-only (get-balance (user principal))
-    (ok (ft-get-balance citycoins user))
+  (ok (ft-get-balance citycoins user))
 )
 
 (define-read-only (get-total-supply)
-    (ok (ft-get-supply citycoins))
+  (ok (ft-get-supply citycoins))
 )
 
 (define-read-only (get-token-uri)
-    (ok (var-get tokenUri))
+  (ok (var-get tokenUri))
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -73,10 +73,10 @@
 
 ;; set token URI to new value, only accessible by CITYCOIN CORE
 (define-public (set-token-uri (newUri (optional (string-utf8 256))))
-    (begin
-        (asserts! (is-eq contract-caller (var-get trustedCaller)) (err ERR_UNAUTHORIZED))
-        (ok (var-set tokenUri newUri))
-    )
+  (begin
+    (asserts! (is-eq contract-caller (var-get trustedCaller)) (err ERR_UNAUTHORIZED))
+    (ok (var-set tokenUri newUri))
+  )
 )
 
 ;; mint new tokens, only accessible by CITYCOIN CORE

@@ -30,7 +30,7 @@
 (define-read-only (get-city-wallet)
   (var-get cityWallet)
 )
-
+ 
 ;; test: call with no principal specified
 ;; test: call from non-approved principal
 ;; test: call from external contract
@@ -96,7 +96,7 @@
 (define-data-var usersNonce uint u0)
 
 (define-read-only (get-activation-block)
-  (let 
+  (let
     (
       (activated (var-get activationReached))
     )
@@ -206,7 +206,7 @@
         (ok true)
       )
       (ok true)
-    )    
+    )
   )
 )
 
@@ -246,11 +246,11 @@
 ;; - what is their ustx commitment
 ;; - what are the low/high values (used for VRF)
 (define-map MinersAtBlock
-  { 
+  {
     stacksBlockHeight: uint,
     userId: uint
   }
-  { 
+  {
     ustx: uint,
     lowValue: uint,
     highValue: uint
@@ -300,11 +300,11 @@
     )
     ;; set MinersAtBlock
     (map-set MinersAtBlock
-      { 
+      {
         stacksBlockHeight: stacksHeight,
         userId: userId
       }
-      { 
+      {
         ustx: amountUstx,
         lowValue: minerLowVal,
         highValue: (+ minerLowVal amountUstx)
@@ -439,7 +439,7 @@
 
 ;; return coinbase thresholds if contract activated
 (define-read-only (get-coinbase-thresholds)
-  (let 
+  (let
     (
       (activated (var-get activationReached))
     )

@@ -39,6 +39,9 @@
 ;; MINING
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; 30% split to custodied wallet address for the city
+(define-constant SPLIT_CITY_PCT u30)
+
 (define-public (mine-tokens-at-block (userId uint) (stacksHeight uint) (amountUstx uint) (memo (optional (buff 34))))
   (begin
     (asserts! (get-activation-status) (err ERR_CONTRACT_NOT_ACTIVATED))
@@ -71,6 +74,3 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; STACKING
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; 30% split to custodied wallet address for the city
-(define-constant SPLIT_CITY_PCT u30)
