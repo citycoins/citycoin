@@ -69,7 +69,7 @@
     (unwrap-panic (contract-call? .citycoin-core set-tokens-mined userId stacksHeight amountUstx toStackers toCity))
     (if stackingActive
       (try! (stx-transfer? toStackers tx-sender .citycoin-core))
-      none
+      false
     )
     (try! (stx-transfer? toCity tx-sender cityWallet))
     (ok true)
