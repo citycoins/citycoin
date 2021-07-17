@@ -117,4 +117,4 @@
   )
 )
 
-;; TODO: add send-many-memo to support exchange transfers
+;; TODO: add send-many-memo support

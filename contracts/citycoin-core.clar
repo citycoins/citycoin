@@ -30,17 +30,15 @@
 ;; CITY WALLET MANAGEMENT
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; initial value for city wallet
 (define-data-var cityWallet principal 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE)
 
-;; test: returns result
+;; returns set city wallet principal
 (define-read-only (get-city-wallet)
   (var-get cityWallet)
 )
  
-;; test: call with no principal specified
-;; test: call from non-approved principal
-;; test: call from external contract
-;; test: call from approved principal
+;; protected function to update city wallet variable
 (define-public (set-city-wallet (newCityWallet principal))
   (begin
     (asserts! (is-authorized-city) (err ERR_UNAUTHORIZED))
@@ -52,17 +50,36 @@
 ;; CONTRACT MANAGEMENT
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; contract states used in map CityCoinContracts
 (define-constant CONTRACT_DEFINED u0)
 (define-constant CONTRACT_ACTIVE u1)
 (define-constant CONTRACT_INACTIVE u2)
 
-(define-data-var activeContract principal tx-sender)
+;; initial value for active logic contract
+;; set to deployer address at startup to prevent circular dependency of citycoin-core on citycoin-logic
+(define-data-var activeContract principal CONTRACT_OWNER)
 
-;; test: returns result
+;; defines if the initial logic contract is provided for initialization
+(define-data-var initialized bool false)
+
+;; updates the activeContract variable with initial logic contract
+;; can only be run once after deployment
+(define-public (setup-active-contract (firstActiveContract principal))
+  (begin
+    (asserts! (is-authorized-owner) (err ERR_UNAUTHORIZED))
+    (asserts! (not (var-get initialized)) (err ERR_UNAUTHORIZED))
+    (var-set activeContract firstActiveContract)
+    (var-set initialized true)
+    (ok true)
+  )
+)
+
+;; returns active contract
 (define-read-only (get-active-contract)
   (var-get activeContract)
 )
 
+;; store logic contract information
 (define-map CityCoinContracts
   principal
   {
@@ -73,10 +90,12 @@
   }
 )
 
+;; returns logic contract information
 (define-read-only (get-contract (address principal))
   (map-get? CityCoinContracts address)
 )
 
+;; set initial value for logic contract
 (map-set CityCoinContracts
   .citycoin-logic-v1
   {
@@ -89,7 +108,7 @@
 ;; TODO: function to update active contract
 ;;   called by register miner to activate first contract
 ;;   called by city wallet to update to new contract (+ delay)
-;; (try! (contract-call? .citycoin-logic-v1 startup (some activationBlockVal))
+;; (try! (contract-call? .citycoin-logic-v1 startup (some activationBlockVal)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; REGISTRATION
@@ -101,6 +120,7 @@
 (define-data-var activationThreshold uint u20)
 (define-data-var usersNonce uint u0)
 
+;; returns Stacks block height registration was activated at plus activationDelay
 (define-read-only (get-activation-block)
   (let
     (
@@ -111,18 +131,22 @@
   )
 )
 
+;; returns activation delay
 (define-read-only (get-activation-delay)
   (var-get activationDelay)
 )
 
+;; returns activation status as boolean
 (define-read-only (get-activation-status)
   (var-get activationReached)
 )
 
+;; returns activation threshold
 (define-read-only (get-activation-threshold)
   (var-get activationThreshold)
 )
 
+;; returns number of registered users, used for activation and tracking user IDs
 (define-read-only (get-registered-users-nonce)
   (var-get usersNonce)
 )
@@ -166,7 +190,7 @@
   )
 )
 
-;; registers user that signal activation of contract until threshold is met
+;; registers users that signal activation of contract until threshold is met
 (define-public (register-user (memo (optional (buff 34))))
   (let
     (
@@ -239,14 +263,17 @@
   }
 )
 
-(define-read-only (get-mined-blocks-stats (stacksHeight uint))
-  (let 
-    (
-      (activated (var-get activationReached))
-      (blockStats (map-get? MiningStatsAtBlock stacksHeight))
-    )
-    (asserts! activated (err ERR_CONTRACT_NOT_ACTIVATED))
-    (ok blockStats)
+;; returns map MiningStatsAtBlock at a given Stacks block height
+;; or, an empty structure
+(define-read-only (get-mining-stats-at-block (stacksHeight uint))
+  (default-to {
+      minersCount: u0,
+      amount: u0,
+      amountToCity: u0,
+      amountToStackers: u0,
+      rewardClaimed: false
+    }
+    (map-get? MiningStatsAtBlock stacksHeight)
   )
 )
 
@@ -265,6 +292,25 @@
   }
 )
 
+;; returns true if a given miner has already mined at a given block height
+(define-read-only (has-mined-at-block (stacksHeight uint) (userId uint))
+  (is-some 
+    (map-get? MinersAtBlock { stacksHeight: stacksHeight, userId: userId })
+  )
+)
+
+;; returns map MinersAtBlock at a given Stacks block height for a user ID
+;; or, an empty structure
+(define-read-only (get-miner-at-block (stacksHeight uint) (userId uint))
+  (default-to {
+      ustx: u0,
+      lowValue: u0,
+      highValue: u0
+    }
+    (map-get? MinersAtBlock { stacksHeight: stacksHeight, userId: userId })
+  )
+)
+
 ;; At a given Stacks block height:
 ;; - what is the max highValue from MinersAtBlock (used for VRF)
 (define-map MinersAtBlockHighValue
@@ -272,6 +318,13 @@
   uint
 )
 
+;; returns last high value from map MinersAtBlockHighValue
+(define-read-only (get-last-high-value-at-block (stacksHeight uint))
+  (default-to u0
+    (map-get? MinersAtBlockHighValue stacksHeight))
+)
+
+;; calls function to mine tokens in logic contract
 (define-public (mine-tokens (amountUstx uint) (memo (optional (buff 34))) (logicTrait <logic>))
   (let
     (
@@ -285,17 +338,17 @@
   )
 )
 
+;; updates data based on mine tokens function in logic contract
 (define-public (set-tokens-mined (userId uint) (stacksHeight uint) (amountUstx uint) (toStackers uint) (toCity uint))
   ;; TODO: only allow calls by active logic contract
   (let
     (
       (blockStats (get-mining-stats-at-block stacksHeight))
       (newMinersCount (+ (get minersCount blockStats) u1))
-      (minerLowVal (get-last-high-value stacksHeight))
+      (minerLowVal (get-last-high-value-at-block stacksHeight))
       (rewardCycle (default-to u0 (get-reward-cycle stacksHeight)))
       (rewardCycleStats (get-stacking-stats-at-cycle rewardCycle))
     )
-    ;; set MiningStatsAtBlock
     (map-set MiningStatsAtBlock
       stacksHeight
       {
@@ -306,7 +359,6 @@
         rewardClaimed: false
       }
     )
-    ;; set MinersAtBlock
     (map-set MinersAtBlock
       {
         stacksHeight: stacksHeight,
@@ -318,12 +370,10 @@
         highValue: (+ minerLowVal amountUstx)
       }
     )
-    ;; set MinersAtBlockHighValue
     (map-set MinersAtBlockHighValue
       stacksHeight
       (+ minerLowVal amountUstx)
     )
-    ;; set StackingStatsAtCycle
     (map-set StackingStatsAtCycle
       stacksHeight
       {
@@ -334,29 +384,6 @@
     )
     (ok true)
   )
-)
-
-;; determine if a given miner has already mined at a given block height
-(define-read-only (has-mined-at-block (userId uint) (stacksHeight uint))
-  (is-some (map-get? MinersAtBlock
-    { stacksHeight: stacksHeight, userId: userId }
-  ))
-)
-
-(define-read-only (get-mining-stats-at-block (stacksHeight uint))
-  (default-to {
-    minersCount: u0,
-    amount: u0,
-    amountToCity: u0,
-    amountToStackers: u0,
-    rewardClaimed: false
-  }
-  (map-get? MiningStatsAtBlock stacksHeight))
-)
-
-(define-read-only (get-last-high-value (stacksHeight uint))
-  (default-to u0
-    (map-get? MinersAtBlockHighValue stacksHeight))
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -370,6 +397,7 @@
 ;; STACKING
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; how long a reward cycle is
 (define-data-var rewardCycleLength uint u2100)
 
 ;; At a given reward cycle:
@@ -385,6 +413,13 @@
   }
 )
 
+;; returns the total stacked tokens and committed uSTX for a given reward cycle
+;; or, an empty structure
+(define-read-only (get-stacking-stats-at-cycle (rewardCycle uint))
+  (default-to { stackersCount: u0, amountUstx: u0, amountToken: u0 }
+    (map-get? StackingStatsAtCycle rewardCycle))
+)
+
 ;; At a given reward cycle and user ID:
 ;; - what is the total tokens Stacked?
 ;; - how many tokens should be returned? (based on Stacking period)
@@ -397,6 +432,13 @@
     amountStacked: uint,
     toReturn: uint
   }
+)
+
+;; returns the total stacked tokens and amount to return for a given reward cycle and user
+;; or, an empty structure
+(define-read-only (get-stacker-info-at-cycle (rewardCycle uint) (userId uint))
+  (default-to { amountStacked: u0, toReturn: u0 }
+    (map-get? StackersAtCycle { rewardCycle: rewardCycle, userId: userId }))
 )
 
 ;; get the reward cycle for a given Stacks block height
@@ -417,18 +459,6 @@
   (is-some
     (get amountToken (map-get? StackingStatsAtCycle rewardCycle))
   )
-)
-
-;; get the total stacked tokens and committed uSTX for a given reward cycle
-(define-read-only (get-stacking-stats-at-cycle (rewardCycle uint))
-  (default-to { stackersCount: u0, amountUstx: u0, amountToken: u0 }
-    (map-get? StackingStatsAtCycle rewardCycle))
-)
-
-;; get the total stacked tokens and amount to return for a given reward cycle and user
-(define-read-only (get-stacker-info-at-cycle (rewardCycle uint) (userId uint))
-  (default-to { amountStacked: u0, toReturn: u0 }
-    (map-get? StackersAtCycle { rewardCycle: rewardCycle, userId: userId }))
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -478,6 +508,7 @@
         u100000
       )
     )
+    ;; computations based on each halving threshold
     (asserts! (> minerBlockHeight (var-get coinbaseThreshold2)) u50000)
     (asserts! (> minerBlockHeight (var-get coinbaseThreshold3)) u25000)
     (asserts! (> minerBlockHeight (var-get coinbaseThreshold4)) u12500)
@@ -488,6 +519,7 @@
 )
 
 ;; mint new tokens for claimant who won at given Stacks block height
+;; TODO: verify access to function only available by core
 (define-private (mint-coinbase (recipient principal) (stacksHeight uint))
   (contract-call? .citycoin-token mint (get-coinbase-amount stacksHeight) recipient)
 )
@@ -496,22 +528,12 @@
 ;; UTILITIES
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define-data-var initialized bool false)
-
+;; check if contract caller is city wallet
 (define-private (is-authorized-city)
   (is-eq contract-caller (var-get cityWallet))
 )
 
+;; check if contract caller is contract owner
 (define-private (is-authorized-owner)
   (is-eq contract-caller CONTRACT_OWNER)
-)
-
-(define-public (setup (firstActiveContract principal))
-  (begin
-    (asserts! (is-authorized-owner) (err ERR_UNAUTHORIZED))
-    (asserts! (not (var-get initialized)) (err ERR_UNAUTHORIZED))
-    (var-set activeContract firstActiveContract)
-    (var-set initialized true)
-    (ok true)
-  )
 )
