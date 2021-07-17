@@ -5,6 +5,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; TRAIT DEFINITIONS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-trait logic .citycoin-logic-trait.citycoin-logic)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CONTRACT OWNER
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -50,7 +56,7 @@
 (define-constant CONTRACT_ACTIVE u1)
 (define-constant CONTRACT_INACTIVE u2)
 
-(define-data-var activeContract principal .citycoin-logic-v1)
+(define-data-var activeContract principal tx-sender)
 
 ;; test: returns result
 (define-read-only (get-active-contract)
@@ -168,6 +174,8 @@
       (threshold (var-get activationThreshold))
     )
 
+    (asserts! (not (var-get initialized)) (err ERR_UNAUTHORIZED))
+
     (asserts! (is-none (map-get? UserIds tx-sender))
       (err ERR_USER_ALREADY_REGISTERED))
 
@@ -264,14 +272,14 @@
   uint
 )
 
-(define-public (mine-tokens (amountUstx uint) (memo (optional (buff 34))))
+(define-public (mine-tokens (amountUstx uint) (memo (optional (buff 34))) (logicTrait <logic>))
   (let
     (
       (userId (get-or-create-user-id tx-sender))
     )
     (if (is-some memo)
-      (try! (contract-call? .citycoin-logic-v1 mine-tokens-at-block userId block-height amountUstx memo))
-      (try! (contract-call? .citycoin-logic-v1 mine-tokens-at-block userId block-height amountUstx))
+      (try! (contract-call? logicTrait mine-tokens-at-block userId block-height amountUstx memo))
+      (try! (contract-call? logicTrait mine-tokens-at-block userId block-height amountUstx none))
     )
     (ok true)
   )
@@ -488,10 +496,22 @@
 ;; UTILITIES
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(define-data-var initialized bool false)
+
 (define-private (is-authorized-city)
   (is-eq contract-caller (var-get cityWallet))
 )
 
 (define-private (is-authorized-owner)
   (is-eq contract-caller CONTRACT_OWNER)
+)
+
+(define-public (setup (firstActiveContract principal))
+  (begin
+    (asserts! (is-authorized-owner) (err ERR_UNAUTHORIZED))
+    (asserts! (not (var-get initialized)) (err ERR_UNAUTHORIZED))
+    (var-set activeContract firstActiveContract)
+    (var-set initialized true)
+    (ok true)
+  )
 )

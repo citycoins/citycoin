@@ -5,7 +5,7 @@ name = "citycoin"
 
 [contracts.citycoin-core]
 path = "contracts/clarinet/citycoin-core.clar"
-depends_on = ["citycoin-token"]
+depends_on = ["citycoin-token", "citycoin-logic-trait"]
 
 [contracts.citycoin-token]
 path = "contracts/clarinet/citycoin-token.clar"
@@ -15,15 +15,19 @@ depends_on = ["sip-010-trait"]
 path = "contracts/clarinet/citycoin-vrf.clar"
 depends_on = []
 
-# upgradeable contracts
-
 [contracts.citycoin-lifecycle-trait]
 path = "contracts/clarinet/citycoin-lifecycle-trait.clar"
 depends_on = []
 
+[contracts.citycoin-logic-trait]
+path = "contracts/clarinet/citycoin-logic-trait.clar"
+depends_on = []
+
+# upgradeable contracts
+
 [contracts.citycoin-logic-v1]
 path = "contracts/clarinet/citycoin-logic-v1.clar"
-depends_on = ["citycoin-lifecycle-trait", "citycoin-token", "citycoin-vrf", "citycoin-core"]
+depends_on = ["citycoin-logic-trait", "citycoin-token", "citycoin-vrf", "citycoin-core"]
 
 # contracts listed below are used only in test suite
 
