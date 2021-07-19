@@ -22,9 +22,9 @@
 
 (define-constant ERR_UNAUTHORIZED u1000)
 (define-constant ERR_USER_ALREADY_REGISTERED u1001)
-(define-constant ERR_ACTIVATION_THRESHOLD_REACHED u1002)
-(define-constant ERR_CONTRACT_NOT_ACTIVATED u1003)
-(define-constant ERR_USER_ALREADY_MINED u1004)
+(define-constant ERR_USER_NOT_FOUND u1002)
+(define-constant ERR_ACTIVATION_THRESHOLD_REACHED u1003)
+(define-constant ERR_CONTRACT_NOT_ACTIVATED u1004)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CITY WALLET MANAGEMENT
@@ -163,12 +163,12 @@
   uint
 )
 
-;; returns user ID if it exists
+;; returns (some userId) or none
 (define-read-only (get-user-id (user principal))
   (map-get? UserIds user)
 )
 
-;; returns user principal if it exists
+;; returns (some userPrincipal) or none
 (define-read-only (get-user (userId uint))
   (map-get? Users userId)
 )
@@ -211,6 +211,7 @@
       none
     )
 
+    ;; TODO: replace with get-or-create-user-id ?
     (map-set Users newId tx-sender)
     (map-set UserIds tx-sender newId)
     (var-set usersNonce newId)
@@ -263,9 +264,14 @@
   }
 )
 
+;; returns map MiningStatsAtBlock at a given Stacks block height if it exists
+(define-read-only (get-mining-stats-at-block (stacksHeight uint))
+  (map-get? MiningStatsAtBlock stacksHeight)
+)
+
 ;; returns map MiningStatsAtBlock at a given Stacks block height
 ;; or, an empty structure
-(define-read-only (get-mining-stats-at-block (stacksHeight uint))
+(define-read-only (get-mining-stats-at-block-or-default (stacksHeight uint))
   (default-to {
       minersCount: u0,
       amount: u0,
@@ -302,13 +308,7 @@
 ;; returns map MinersAtBlock at a given Stacks block height for a user ID
 ;; or, an empty structure
 (define-read-only (get-miner-at-block (stacksHeight uint) (userId uint))
-  (default-to {
-      ustx: u0,
-      lowValue: u0,
-      highValue: u0
-    }
-    (map-get? MinersAtBlock { stacksHeight: stacksHeight, userId: userId })
-  )
+  (map-get? MinersAtBlock { stacksHeight: stacksHeight, userId: userId })
 )
 
 ;; At a given Stacks block height:
@@ -325,7 +325,7 @@
 )
 
 ;; calls function to mine tokens in logic contract
-(define-public (mine-tokens (amountUstx uint) (memo (optional (buff 34))) (logicTrait <logic>))
+(define-public (mine-tokens (logicTrait <logic>) (amountUstx uint) (memo (optional (buff 34))))
   (let
     (
       (userId (get-or-create-user-id tx-sender))
@@ -340,15 +340,16 @@
 
 ;; updates data based on mine tokens function in logic contract
 (define-public (set-tokens-mined (userId uint) (stacksHeight uint) (amountUstx uint) (toStackers uint) (toCity uint))
-  ;; TODO: only allow calls by active logic contract
   (let
     (
-      (blockStats (get-mining-stats-at-block stacksHeight))
+      (blockStats (get-mining-stats-at-block-or-default stacksHeight))
       (newMinersCount (+ (get minersCount blockStats) u1))
       (minerLowVal (get-last-high-value-at-block stacksHeight))
       (rewardCycle (default-to u0 (get-reward-cycle stacksHeight)))
       (rewardCycleStats (get-stacking-stats-at-cycle rewardCycle))
     )
+    ;; TODO: only allow calls by active logic contract
+    (asserts! true (err u0))
     (map-set MiningStatsAtBlock
       stacksHeight
       {
@@ -366,7 +367,7 @@
       }
       {
         ustx: amountUstx,
-        lowValue: minerLowVal,
+        lowValue: (+ minerLowVal u1),
         highValue: (+ minerLowVal amountUstx)
       }
     )
@@ -374,6 +375,7 @@
       stacksHeight
       (+ minerLowVal amountUstx)
     )
+    ;; TODO: use MERGE instead?
     (map-set StackingStatsAtCycle
       stacksHeight
       {
@@ -390,8 +392,18 @@
 ;; MINING REWARD CLAIMS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; how long a miner must wait before block winner can claim their minted tokens
-(define-data-var tokenRewardMaturity uint u100)
+;; calls function to claim mining reward in active logic contract
+(define-public (claim-mining-reward (logicTrait <logic>) (minerBlockHeight uint))
+  (begin
+    (try! (contract-call? logicTrait claim-mining-reward-at-block tx-sender block-height minerBlockHeight))
+    (ok true)
+  )
+)
+
+(define-public (set-mining-reward-claimed)
+  ;; TODO: only allow calls by active logic contract
+  (ok true)
+)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; STACKING
