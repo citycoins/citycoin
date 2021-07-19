@@ -126,7 +126,7 @@
     (asserts! (not (is-eq commitTotal u0)) (err ERR_NO_MINERS_AT_BLOCK))
     (asserts! (and (>= (get lowValue minerStats) winningValue) (<= (get highValue minerStats) winningValue))
       (err ERR_MINER_DID_NOT_WIN))
-    ;; TODO: call to update data in core contract
+    (try! (contract-call? .citycoin-core set-mining-reward-claimed userId minerBlockHeight))
     (ok true)
   )
 )

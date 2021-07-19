@@ -294,7 +294,8 @@
   {
     ustx: uint,
     lowValue: uint,
-    highValue: uint
+    highValue: uint,
+    winner: bool
   }
 )
 
@@ -360,6 +361,7 @@
         rewardClaimed: false
       }
     )
+    ;; TODO: use MERGE instead?
     (map-set MinersAtBlock
       {
         stacksHeight: stacksHeight,
@@ -368,7 +370,8 @@
       {
         ustx: amountUstx,
         lowValue: (+ minerLowVal u1),
-        highValue: (+ minerLowVal amountUstx)
+        highValue: (+ minerLowVal amountUstx),
+        winner: false
       }
     )
     (map-set MinersAtBlockHighValue
@@ -400,9 +403,18 @@
   )
 )
 
-(define-public (set-mining-reward-claimed)
-  ;; TODO: only allow calls by active logic contract
-  (ok true)
+(define-public (set-mining-reward-claimed (userId uint) (minerBlockHeight uint))
+  (let
+    (
+      (blockStats (unwrap-panic (get-mining-stats-at-block minerBlockHeight)))
+      (minerStats (unwrap-panic (get-miner-at-block minerBlockHeight userId)))
+    )
+    ;; TODO: only allow calls by active logic contract
+    (asserts! true (err u0))
+    (merge blockStats { rewardClaimed: true })
+    (merge minerStats { winner: true })
+    (ok true)
+  )
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
