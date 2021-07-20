@@ -191,8 +191,7 @@
 )
 
 ;; registers users that signal activation of contract until threshold is met
-;; TODO: change to string so message is easy to read?
-(define-public (register-user (memo (optional (buff 34))))
+(define-public (register-user (memo (optional (string-utf8 50))))
   (let
     (
       (newId (+ u1 (var-get usersNonce)))
@@ -212,10 +211,7 @@
       none
     )
 
-    ;; TODO: replace with get-or-create-user-id ?
-    (map-set Users newId tx-sender)
-    (map-set UserIds tx-sender newId)
-    (var-set usersNonce newId)
+    (get-or-create-user-id tx-sender)
 
     (if (is-eq newId threshold)
       (let 
@@ -361,7 +357,6 @@
         rewardClaimed: false
       }
     )
-    ;; TODO: use MERGE instead?
     (map-set MinersAtBlock
       {
         stacksHeight: stacksHeight,
@@ -378,7 +373,6 @@
       stacksHeight
       (+ minerLowVal amountUstx)
     )
-    ;; TODO: use MERGE instead?
     (map-set StackingStatsAtCycle
       stacksHeight
       {
@@ -426,7 +420,6 @@
 ;; - how many Stackers were there
 ;; - what is the total uSTX submitted by miners
 ;; - what is the total amount of tokens stacked
-;; TODO: could use a map-insert to track number of stackers in cycle?
 (define-map StackingStatsAtCycle
   uint
   {
@@ -635,7 +628,6 @@
 )
 
 ;; mint new tokens for claimant who won at given Stacks block height
-;; TODO: verify access to function only available by core
 (define-private (mint-coinbase (recipient principal) (stacksHeight uint))
   (contract-call? .citycoin-token mint (get-coinbase-amount stacksHeight) recipient)
 )

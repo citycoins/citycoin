@@ -29,10 +29,13 @@
 (define-constant ERR_CANNOT_STACK u2011)
 (define-constant ERR_REWARD_CYCLE_NOT_COMPLETED u2012)
 (define-constant ERR_NOTHING_TO_REDEEM u2013)
+(define-constant ERR_UNAUTHORIZED u2014)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CORE FUNCTIONS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define-data-var trustedCaller principal .citycoin-core)
 
 (define-private (get-activation-status)
   (contract-call? .citycoin-core get-activation-status)
@@ -104,7 +107,7 @@
       )
       (toStackers (- amountUstx toCity))
     )
-    ;; TODO: only allow calls from core contract
+    (asserts! (is-eq contract-caller (var-get trustedCaller)) (err ERR_UNAUTHORIZED))
     (asserts! (get-activation-status) (err ERR_CONTRACT_NOT_ACTIVATED))
     (asserts! (not (has-mined-at-block stacksHeight userId)) (err ERR_USER_ALREADY_MINED))
     (asserts! (> amountUstx u0) (err ERR_INSUFFICIENT_COMMITMENT))
@@ -139,7 +142,7 @@
       (commitTotal (get-last-high-value-at-block minerBlockHeight))
       (winningValue (mod vrfSample commitTotal))
     )
-    ;; TODO: only allow calls from core contract
+    (asserts! (is-eq contract-caller (var-get trustedCaller)) (err ERR_UNAUTHORIZED))
     (asserts! (> stacksHeight maturityHeight) (err ERR_CLAIMED_BEFORE_MATURITY))
     (asserts! (has-mined-at-block stacksHeight userId) (err ERR_USER_DID_NOT_MINE_IN_BLOCK))
     (asserts! (not (get rewardClaimed blockStats)) (err ERR_REWARD_ALREADY_CLAIMED))
@@ -170,6 +173,7 @@
         last: (+ targetCycle lockPeriod)
       })
     )
+    (asserts! (is-eq contract-caller (var-get trustedCaller)) (err ERR_UNAUTHORIZED))
     (asserts! (and (> lockPeriod u0) (<= lockPeriod MAX_REWARD_CYCLES))
       (err ERR_CANNOT_STACK))
     (asserts! (> amountTokens u0) (err ERR_CANNOT_STACK))
@@ -280,7 +284,7 @@
       (stackerAtCycle (get-stacker-at-cycle-or-default targetCycle userId))
       (toReturn (get toReturn stackerAtCycle))
     )
-    ;; TODO: only allow calls from core contract
+    (asserts! (is-eq contract-caller (var-get trustedCaller)) (err ERR_UNAUTHORIZED))
     (asserts! (> currentCycle targetCycle) (err ERR_REWARD_CYCLE_NOT_COMPLETED))
     (asserts! (or (> toReturn u0) (> entitledUstx u0)) (err ERR_NOTHING_TO_REDEEM))
     (try! (contract-call? .citycoin-core return-stacked-tokens-and-rewards userId targetCycle toReturn entitledUstx))
