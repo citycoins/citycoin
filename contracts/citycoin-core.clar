@@ -383,7 +383,6 @@
     (map-set StackingStatsAtCycle
       stacksHeight
       {
-        stackersCount: (get stackersCount rewardCycleStats),
         amountUstx: (+ (get amountUstx rewardCycleStats) toStackers),
         amountToken: (get amountToken rewardCycleStats)
       }
@@ -425,19 +424,6 @@
 ;; how long a reward cycle is
 (define-data-var rewardCycleLength uint u2100)
 
-;; For a given user ID
-;; - are their tokens currently locked
-;; - what reward cycle will the tokens unlock
-;; - what is the total amount of tokens stacked
-(define-map StackerStatus
-  uint
-  {
-    locked: bool,
-    unlockAt: uint,
-    amountToken: uint
-  }
-)
-
 ;; At a given reward cycle:
 ;; - how many Stackers were there
 ;; - what is the total uSTX submitted by miners
@@ -445,7 +431,6 @@
 (define-map StackingStatsAtCycle
   uint
   {
-    stackersCount: uint,
     amountUstx: uint,
     amountToken: uint
   }
@@ -454,7 +439,7 @@
 ;; returns the total stacked tokens and committed uSTX for a given reward cycle
 ;; or, an empty structure
 (define-read-only (get-stacking-stats-at-cycle-or-default (rewardCycle uint))
-  (default-to { stackersCount: u0, amountUstx: u0, amountToken: u0 }
+  (default-to { amountUstx: u0, amountToken: u0 }
     (map-get? StackingStatsAtCycle rewardCycle))
 )
 
@@ -520,19 +505,30 @@
 (define-public (set-tokens-stacked (userId uint) (targetCycle uint) (amountStacked uint) (toReturn uint) (totalStacked uint))
   (let
     (
+      (rewardCycleStats (unwrap-panic (get-stacking-stats-at-cycle targetCycle)))
       (stackerAtCycle (unwrap-panic (get-stacker-at-cycle targetCycle userId)))
-      (stackingStatsAtCycle (unwrap-panic (get-stacking-stats-at-cycle targetCycle)))
     )
     ;; TODO: only allow calls by active logic contract
     (asserts! true (err u0))
+    (map-set StackingStatsAtCycle
+      targetCycle
+      {
+        amountUstx: (get amountUstx rewardCycleStats),
+        amountToken: (+ amountStacked (get amountToken rewardCycleStats))
+      }
+    )
+    (map-set StackerAtCycle
+      {
+        rewardCycle: targetCycle,
+        userId: userId
+      }
+      {
+        amountStacked: (+ amountStacked (get amountStacked stackerAtCycle)),
+        toReturn: (+ toReturn (get toReturn stackerAtCycle))
+      }
+    )
     (ok true)
   )
-  ;; update stackerAtCycle
-    ;; amountStacked += amountToken
-    ;; (check if unlocked) toReturn += amountToken or u0
-  ;; update stackingStatsAtCycle
-    ;; totalStacked
-  
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -190,14 +190,15 @@
       (amountStacked (get amountStacked stackerAtCycle))
       (toReturn (get toReturn stackerAtCycle))
       (stackingStatsAtCycle (get-stacking-stats-at-cycle-or-default targetCycle))
-      (totalStacked (get amountToken stackingStatsAtCycle))
     )
     (begin
       (if (and (>= targetCycle firstCycle) (< targetCycle lastCycle))
         (begin
           (if (is-eq targetCycle (- lastCycle u1))
-            (try! (contract-call? .citycoin-core set-tokens-stacked stackerId targetCycle amountStacked (+ toReturn amountToken) totalStacked))
-            (try! (contract-call? .citycoin-core set-tokens-stacked stackerId targetCycle amountStacked toReturn totalStacked))
+            (print "yes")
+            ;; (try! (contract-call? .citycoin-core set-tokens-stacked stackerId targetCycle amountStacked (+ toReturn amountToken)))
+            (print "no")
+            ;; (try! (contract-call? .citycoin-core set-tokens-stacked stackerId targetCycle amountStacked toReturn))
           )
           true
         )
