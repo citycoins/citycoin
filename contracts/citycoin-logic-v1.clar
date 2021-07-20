@@ -195,11 +195,10 @@
     (begin
       (if (and (>= targetCycle firstCycle) (< targetCycle lastCycle))
         (begin
-          ;; update stackerAtCycle
-            ;; amountStacked += amountToken
-            ;; (check if unlocked) toReturn += amountToken 
-          ;; update stackingStatsAtCycle
-            ;; totalStacked
+          (if (is-eq targetCycle (- lastCycle u1))
+            (try! (contract-call? .citycoin-core set-tokens-stacked stackerId targetCycle amountStacked (+ toReturn amountToken) totalStacked))
+            (try! (contract-call? .citycoin-core set-tokens-stacked stackerId targetCycle amountStacked toReturn totalStacked))
+          )
           true
         )
         false

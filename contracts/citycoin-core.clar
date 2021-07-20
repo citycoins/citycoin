@@ -458,6 +458,12 @@
     (map-get? StackingStatsAtCycle rewardCycle))
 )
 
+;; returns the total stacked tokens and committed uSTX for a given reward cycle
+;; or, an empty structure
+(define-read-only (get-stacking-stats-at-cycle (rewardCycle uint))
+  (map-get? StackingStatsAtCycle rewardCycle)
+)
+
 ;; At a given reward cycle and user ID:
 ;; - what is the total tokens Stacked?
 ;; - how many tokens should be returned? (based on Stacking period)
@@ -475,6 +481,10 @@
 (define-read-only (get-stacker-at-cycle-or-default (rewardCycle uint) (userId uint))
   (default-to { amountStacked: u0, toReturn: u0 }
     (map-get? StackerAtCycle { rewardCycle: rewardCycle, userId: userId }))
+)
+
+(define-read-only (get-stacker-at-cycle (rewardCycle uint) (userId uint))
+  (map-get? StackerAtCycle { rewardCycle: rewardCycle, userId: userId })
 )
 
 ;; get the reward cycle for a given Stacks block height
@@ -507,8 +517,22 @@
   )
 )
 
-(define-public (set-tokens-stacked)
-  (ok true)
+(define-public (set-tokens-stacked (userId uint) (targetCycle uint) (amountStacked uint) (toReturn uint) (totalStacked uint))
+  (let
+    (
+      (stackerAtCycle (unwrap-panic (get-stacker-at-cycle targetCycle userId)))
+      (stackingStatsAtCycle (unwrap-panic (get-stacking-stats-at-cycle targetCycle)))
+    )
+    ;; TODO: only allow calls by active logic contract
+    (asserts! true (err u0))
+    (ok true)
+  )
+  ;; update stackerAtCycle
+    ;; amountStacked += amountToken
+    ;; (check if unlocked) toReturn += amountToken or u0
+  ;; update stackingStatsAtCycle
+    ;; totalStacked
+  
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
