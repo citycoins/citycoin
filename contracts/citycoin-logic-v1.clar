@@ -215,7 +215,6 @@
         (stackerAtCycle (get-stacker-at-cycle-or-default targetCycle stackerId))
         (amountStacked (get amountStacked stackerAtCycle))
         (toReturn (get toReturn stackerAtCycle))
-        (stackingStatsAtCycle (get-stacking-stats-at-cycle-or-default targetCycle))
       )
       (begin
         (if (and (>= targetCycle firstCycle) (< targetCycle lastCycle))
