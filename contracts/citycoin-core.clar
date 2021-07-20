@@ -198,7 +198,7 @@
       (threshold (var-get activationThreshold))
     )
 
-    (asserts! (not (var-get initialized)) (err ERR_UNAUTHORIZED))
+    ;; (asserts! (not (var-get initialized)) (err ERR_UNAUTHORIZED))
 
     (asserts! (is-none (map-get? UserIds tx-sender))
       (err ERR_USER_ALREADY_REGISTERED))
@@ -401,10 +401,12 @@
     (
       (blockStats (unwrap-panic (get-mining-stats-at-block minerBlockHeight)))
       (minerStats (unwrap-panic (get-miner-at-block minerBlockHeight userId)))
+      (user (unwrap! (get-user userId) (err ERR_USER_NOT_FOUND)))
     )
     (asserts! (unwrap-panic (is-authorized-logic)) (err ERR_UNAUTHORIZED))
     (merge blockStats { rewardClaimed: true })
     (merge minerStats { winner: true })
+    (try! (mint-coinbase user minerBlockHeight))
     (ok true)
   )
 )
