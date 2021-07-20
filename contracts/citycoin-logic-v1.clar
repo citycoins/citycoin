@@ -153,6 +153,12 @@
     (
       (currentCycle (unwrap! (get-reward-cycle startHeight) (err ERR_STACKING_NOT_AVAILABLE)))
       (targetCycle (+ u1 currentCycle))
+      (commitment {
+        stackerId: userId,
+        amount: amountTokens,
+        first: targetCycle,
+        last: (+ targetCycle lockPeriod)
+      })
     )
     (asserts! (and (> lockPeriod u0) (<= lockPeriod MAX_REWARD_CYCLES))
       (err ERR_CANNOT_STACK))
@@ -160,55 +166,60 @@
     (asserts! (<= amountTokens (unwrap-panic (contract-call? .citycoin-token get-balance user)))
       (err ERR_INSUFFICIENT_BALANCE))
     (try! (contract-call? .citycoin-token transfer amountTokens tx-sender .citycoin-core none))
-    (fold stack-tokens-closure REWARD_CYCLE_INDEXES
-      {
-        stackerId: userId,
-        amount: amountTokens,
-        first: targetCycle,
-        last: (+ targetCycle lockPeriod)
-      })
-    (ok true)
+    
+    (match (fold stack-tokens-closure REWARD_CYCLE_INDEXES (ok commitment))
+      okValue (ok true)
+      errValue (err errValue)
+    )
   )
 )
 
 (define-private (stack-tokens-closure (rewardCycleIdx uint)
-  (commitment {
-    stackerId: uint,
-    amount: uint,
-    first: uint,
-    last: uint
-  }))
+  (commitmentResponse (response 
+    {
+      stackerId: uint,
+      amount: uint,
+      first: uint,
+      last: uint
+    }
+    uint
+  )))
 
-  (let
-    (
-      (stackerId (get stackerId commitment))
-      (amountToken (get amount commitment))
-      (firstCycle (get first commitment))
-      (lastCycle (get last commitment))
-      (targetCycle (+ firstCycle rewardCycleIdx))
-      (stackerAtCycle (get-stacker-at-cycle-or-default targetCycle stackerId))
-      (amountStacked (get amountStacked stackerAtCycle))
-      (toReturn (get toReturn stackerAtCycle))
-      (stackingStatsAtCycle (get-stacking-stats-at-cycle-or-default targetCycle))
-    )
-    (begin
-      (if (and (>= targetCycle firstCycle) (< targetCycle lastCycle))
-        (begin
-          (if (is-eq targetCycle (- lastCycle u1))
-            (print "yes")
-            ;; (try! (contract-call? .citycoin-core set-tokens-stacked stackerId targetCycle amountStacked (+ toReturn amountToken)))
-            (print "no")
-            ;; (try! (contract-call? .citycoin-core set-tokens-stacked stackerId targetCycle amountStacked toReturn))
-          )
-          true
-        )
-        false
+  (match commitmentResponse
+    commitment 
+    (let
+      (
+        (stackerId (get stackerId commitment))
+        (amountToken (get amount commitment))
+        (firstCycle (get first commitment))
+        (lastCycle (get last commitment))
+        (targetCycle (+ firstCycle rewardCycleIdx))
+        (stackerAtCycle (get-stacker-at-cycle-or-default targetCycle stackerId))
+        (amountStacked (get amountStacked stackerAtCycle))
+        (toReturn (get toReturn stackerAtCycle))
+        (stackingStatsAtCycle (get-stacking-stats-at-cycle-or-default targetCycle))
       )
-      { stackerId: stackerId, amount: amountStacked, first: firstCycle, last: lastCycle }
+      (begin
+        (if (and (>= targetCycle firstCycle) (< targetCycle lastCycle))
+          (begin
+            (if (is-eq targetCycle (- lastCycle u1))
+              (try! (set-tokens-stacked stackerId targetCycle amountStacked (+ toReturn amountToken)))
+              (try! (set-tokens-stacked stackerId targetCycle amountStacked toReturn))
+            )
+            true
+          )
+          false
+        )
+        commitmentResponse
+      )
     )
+    errValue commitmentResponse
   )
 )
 
+(define-private (set-tokens-stacked (stackerId uint) (targetCycle uint) (amountStacked uint) (toReturn uint))
+  (contract-call? .citycoin-core set-tokens-stacked stackerId targetCycle amountStacked toReturn)
+)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; STACKING REWARD CLAIMS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

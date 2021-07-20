@@ -502,7 +502,7 @@
   )
 )
 
-(define-public (set-tokens-stacked (userId uint) (targetCycle uint) (amountStacked uint) (toReturn uint) (totalStacked uint))
+(define-public (set-tokens-stacked (userId uint) (targetCycle uint) (amountStacked uint) (toReturn uint))
   (let
     (
       (rewardCycleStats (unwrap-panic (get-stacking-stats-at-cycle targetCycle)))
