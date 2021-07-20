@@ -25,6 +25,8 @@
 (define-constant ERR_REWARD_ALREADY_CLAIMED u2007)
 (define-constant ERR_MINER_DID_NOT_WIN u2008)
 (define-constant ERR_NO_VRF_SEED_FOUND u2009)
+(define-constant ERR_STACKING_NOT_AVAILABLE u2010)
+(define-constant ERR_CANNOT_STACK u2011)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CORE FUNCTIONS
@@ -55,11 +57,19 @@
 )
 
 (define-private (get-reward-cycle (stacksHeight uint))
-  (default-to u0 (contract-call? .citycoin-core get-reward-cycle stacksHeight))
+  (contract-call? .citycoin-core get-reward-cycle stacksHeight)
 )
 
 (define-private (stacking-active-at-cycle (rewardCycle uint))
   (contract-call? .citycoin-core stacking-active-at-cycle rewardCycle)
+)
+
+(define-private (get-stacking-stats-at-cycle-or-default (rewardCycle uint))
+  (contract-call? .citycoin-core get-stacking-stats-at-cycle-or-default rewardCycle)
+)
+
+(define-private (get-stacker-at-cycle-or-default (rewardCycle uint) (userId uint))
+  (contract-call? .citycoin-core get-stacker-at-cycle-or-default rewardCycle userId)
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -73,7 +83,7 @@
 (define-public (mine-tokens-at-block (userId uint) (stacksHeight uint) (amountUstx uint) (memo (optional (buff 34))))
   (let
     (
-      (rewardCycle (get-reward-cycle stacksHeight))
+      (rewardCycle (default-to u0 (get-reward-cycle stacksHeight)))
       (stackingActive (stacking-active-at-cycle rewardCycle))
       (cityWallet (contract-call? .citycoin-core get-city-wallet))
       (toCity
@@ -134,3 +144,67 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; STACKING
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define-constant MAX_REWARD_CYCLES u32)
+(define-constant REWARD_CYCLE_INDEXES (list u0 u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 u13 u14 u15 u16 u17 u18 u19 u20 u21 u22 u23 u24 u25 u26 u27 u28 u29 u30 u31))
+
+(define-public (stack-tokens-at-cycle (user principal) (userId uint) (amountTokens uint) (startHeight uint) (lockPeriod uint))
+  (let
+    (
+      (currentCycle (unwrap! (get-reward-cycle startHeight) (err ERR_STACKING_NOT_AVAILABLE)))
+      (targetCycle (+ u1 currentCycle))
+    )
+    (asserts! (and (> lockPeriod u0) (<= lockPeriod MAX_REWARD_CYCLES))
+      (err ERR_CANNOT_STACK))
+    (asserts! (> amountTokens u0) (err ERR_CANNOT_STACK))
+    (asserts! (<= amountTokens (unwrap-panic (contract-call? .citycoin-token get-balance user)))
+      (err ERR_INSUFFICIENT_BALANCE))
+    (try! (contract-call? .citycoin-token transfer amountTokens tx-sender .citycoin-core none))
+    (fold stack-tokens-closure REWARD_CYCLE_INDEXES
+      {
+        stackerId: userId,
+        amount: amountTokens,
+        first: targetCycle,
+        last: (+ targetCycle lockPeriod)
+      })
+    (ok true)
+  )
+)
+
+(define-private (stack-tokens-closure (rewardCycleIdx uint)
+  (commitment {
+    stackerId: uint,
+    amount: uint,
+    first: uint,
+    last: uint
+  }))
+
+  (let
+    (
+      (stackerId (get stackerId commitment))
+      (amountToken (get amount commitment))
+      (firstCycle (get first commitment))
+      (lastCycle (get last commitment))
+      (targetCycle (+ firstCycle rewardCycleIdx))
+      (stackerAtCycle (get-stacker-at-cycle-or-default targetCycle stackerId))
+      (amountStacked (get amountStacked stackerAtCycle))
+      (toReturn (get toReturn stackerAtCycle))
+      (stackingStatsAtCycle (get-stacking-stats-at-cycle-or-default targetCycle))
+      (totalStacked (get amountToken stackingStatsAtCycle))
+    )
+    (begin
+      (if (and (>= targetCycle firstCycle) (< targetCycle lastCycle))
+        (begin
+          ;; update stackerAtCycle
+            ;; amountStacked += amountToken
+            ;; (check if unlocked) toReturn += amountToken 
+          ;; update stackingStatsAtCycle
+            ;; totalStacked
+          true
+        )
+        false
+      )
+      { stackerId: stackerId, amount: amountStacked, first: firstCycle, last: lastCycle }
+    )
+  )
+)

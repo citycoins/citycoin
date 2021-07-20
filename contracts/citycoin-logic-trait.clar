@@ -17,6 +17,10 @@
   (claim-mining-reward-at-block (principal uint uint)
     (response bool uint)
   )
+
+  (stack-tokens-at-cycle (principal uint uint uint uint)
+    (response bool uint)
+  )
   
 ))
 

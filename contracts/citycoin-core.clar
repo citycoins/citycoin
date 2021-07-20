@@ -191,6 +191,7 @@
 )
 
 ;; registers users that signal activation of contract until threshold is met
+;; TODO: change to string so message is easy to read?
 (define-public (register-user (memo (optional (buff 34))))
   (let
     (
@@ -347,7 +348,7 @@
       (newMinersCount (+ (get minersCount blockStats) u1))
       (minerLowVal (get-last-high-value-at-block stacksHeight))
       (rewardCycle (default-to u0 (get-reward-cycle stacksHeight)))
-      (rewardCycleStats (get-stacking-stats-at-cycle rewardCycle))
+      (rewardCycleStats (get-stacking-stats-at-cycle-or-default rewardCycle))
     )
     ;; TODO: only allow calls by active logic contract
     (asserts! true (err u0))
@@ -424,10 +425,23 @@
 ;; how long a reward cycle is
 (define-data-var rewardCycleLength uint u2100)
 
+;; For a given user ID
+;; - are their tokens currently locked
+;; - what reward cycle will the tokens unlock
+;; - what is the total amount of tokens stacked
+(define-map StackerStatus
+  uint
+  {
+    locked: bool,
+    unlockAt: uint,
+    amountToken: uint
+  }
+)
+
 ;; At a given reward cycle:
 ;; - how many Stackers were there
 ;; - what is the total uSTX submitted by miners
-;; - what is the total tokens Stacked?
+;; - what is the total amount of tokens stacked
 (define-map StackingStatsAtCycle
   uint
   {
@@ -439,7 +453,7 @@
 
 ;; returns the total stacked tokens and committed uSTX for a given reward cycle
 ;; or, an empty structure
-(define-read-only (get-stacking-stats-at-cycle (rewardCycle uint))
+(define-read-only (get-stacking-stats-at-cycle-or-default (rewardCycle uint))
   (default-to { stackersCount: u0, amountUstx: u0, amountToken: u0 }
     (map-get? StackingStatsAtCycle rewardCycle))
 )
@@ -447,7 +461,7 @@
 ;; At a given reward cycle and user ID:
 ;; - what is the total tokens Stacked?
 ;; - how many tokens should be returned? (based on Stacking period)
-(define-map StackersAtCycle
+(define-map StackerAtCycle
   {
     rewardCycle: uint,
     userId: uint
@@ -458,11 +472,9 @@
   }
 )
 
-;; returns the total stacked tokens and amount to return for a given reward cycle and user
-;; or, an empty structure
-(define-read-only (get-stacker-info-at-cycle (rewardCycle uint) (userId uint))
+(define-read-only (get-stacker-at-cycle-or-default (rewardCycle uint) (userId uint))
   (default-to { amountStacked: u0, toReturn: u0 }
-    (map-get? StackersAtCycle { rewardCycle: rewardCycle, userId: userId }))
+    (map-get? StackerAtCycle { rewardCycle: rewardCycle, userId: userId }))
 )
 
 ;; get the reward cycle for a given Stacks block height
@@ -483,6 +495,20 @@
   (is-some
     (get amountToken (map-get? StackingStatsAtCycle rewardCycle))
   )
+)
+
+(define-public (stack-tokens (logicTrait <logic>) (amountTokens uint) (lockPeriod uint))
+  (let
+    (
+      (userId (get-or-create-user-id tx-sender))
+    )
+    (try! (contract-call? logicTrait stack-tokens-at-cycle tx-sender userId amountTokens block-height lockPeriod))
+    (ok true)
+  )
+)
+
+(define-public (set-tokens-stacked)
+  (ok true)
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
