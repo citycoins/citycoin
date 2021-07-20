@@ -343,7 +343,7 @@
       (rewardCycle (default-to u0 (get-reward-cycle stacksHeight)))
       (rewardCycleStats (get-stacking-stats-at-cycle-or-default rewardCycle))
     )
-    (asserts! (unwrap-panic (is-authorized-logic)) (err ERR_UNAUTHORIZED))
+    (try! (is-authorized-logic))
     (map-set MiningStatsAtBlock
       stacksHeight
       {
@@ -396,11 +396,11 @@
 (define-public (set-mining-reward-claimed (userId uint) (minerBlockHeight uint))
   (let
     (
-      (blockStats (unwrap-panic (get-mining-stats-at-block minerBlockHeight)))
-      (minerStats (unwrap-panic (get-miner-at-block minerBlockHeight userId)))
+      (blockStats (get-mining-stats-at-block-or-default minerBlockHeight))
+      (minerStats (get-miner-at-block-or-default minerBlockHeight userId))
       (user (unwrap! (get-user userId) (err ERR_USER_NOT_FOUND)))
     )
-    (asserts! (unwrap-panic (is-authorized-logic)) (err ERR_UNAUTHORIZED))
+    (try! (is-authorized-logic))
     (merge blockStats { rewardClaimed: true })
     (merge minerStats { winner: true })
     (try! (mint-coinbase user minerBlockHeight))
@@ -495,10 +495,10 @@
 (define-public (set-tokens-stacked (userId uint) (targetCycle uint) (amountStacked uint) (toReturn uint))
   (let
     (
-      (rewardCycleStats (unwrap-panic (get-stacking-stats-at-cycle targetCycle)))
-      (stackerAtCycle (unwrap-panic (get-stacker-at-cycle targetCycle userId)))
+      (rewardCycleStats (get-stacking-stats-at-cycle-or-default targetCycle))
+      (stackerAtCycle (get-stacker-at-cycle-or-default targetCycle userId))
     )
-    (asserts! (unwrap-panic (is-authorized-logic)) (err ERR_UNAUTHORIZED))
+    (try! (is-authorized-logic))
     (map-set StackingStatsAtCycle
       targetCycle
       {
@@ -537,7 +537,7 @@
     (
       (user (unwrap! (get-user userId) (err ERR_USER_NOT_FOUND)))
     )
-    (asserts! (unwrap-panic (is-authorized-logic)) (err ERR_UNAUTHORIZED))
+    (try! (is-authorized-logic))
     ;; disable ability to claim again
     (map-set StackerAtCycle
       {
@@ -649,6 +649,7 @@
 (define-private (is-authorized-logic)
   (begin
     (asserts! (var-get initialized) (err ERR_CONTRACT_NOT_ACTIVATED))
-    (ok (is-eq contract-caller (get-active-contract)))
+    (asserts! (is-eq contract-caller (get-active-contract)) (err ERR_UNAUTHORIZED))
+    (ok true)
   )
 )
