@@ -350,8 +350,7 @@
       (rewardCycle (default-to u0 (get-reward-cycle stacksHeight)))
       (rewardCycleStats (get-stacking-stats-at-cycle-or-default rewardCycle))
     )
-    ;; TODO: only allow calls by active logic contract
-    (asserts! true (err u0))
+    (asserts! (unwrap-panic (is-authorized-logic)) (err ERR_UNAUTHORIZED))
     (map-set MiningStatsAtBlock
       stacksHeight
       {
@@ -409,8 +408,7 @@
       (blockStats (unwrap-panic (get-mining-stats-at-block minerBlockHeight)))
       (minerStats (unwrap-panic (get-miner-at-block minerBlockHeight userId)))
     )
-    ;; TODO: only allow calls by active logic contract
-    (asserts! true (err u0))
+    (asserts! (unwrap-panic (is-authorized-logic)) (err ERR_UNAUTHORIZED))
     (merge blockStats { rewardClaimed: true })
     (merge minerStats { winner: true })
     (ok true)
@@ -508,8 +506,7 @@
       (rewardCycleStats (unwrap-panic (get-stacking-stats-at-cycle targetCycle)))
       (stackerAtCycle (unwrap-panic (get-stacker-at-cycle targetCycle userId)))
     )
-    ;; TODO: only allow calls by active logic contract
-    (asserts! true (err u0))
+    (asserts! (unwrap-panic (is-authorized-logic)) (err ERR_UNAUTHORIZED))
     (map-set StackingStatsAtCycle
       targetCycle
       {
@@ -548,8 +545,7 @@
     (
       (user (unwrap! (get-user userId) (err ERR_USER_NOT_FOUND)))
     )
-    ;; TODO: only allow calls by active logic contract
-    (asserts! true (err u0))
+    (asserts! (unwrap-panic (is-authorized-logic)) (err ERR_UNAUTHORIZED))
     ;; disable ability to claim again
     (map-set StackerAtCycle
       {
@@ -580,8 +576,6 @@
   ;; - entitled uSTX
   
 )
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TOKEN
@@ -658,4 +652,12 @@
 ;; check if contract caller is contract owner
 (define-private (is-authorized-owner)
   (is-eq contract-caller CONTRACT_OWNER)
+)
+
+;; check if contract caller is active logic contract
+(define-private (is-authorized-logic)
+  (begin
+    (asserts! (var-get initialized) (err ERR_CONTRACT_NOT_ACTIVATED))
+    (ok (is-eq contract-caller (get-active-contract)))
+  )
 )
