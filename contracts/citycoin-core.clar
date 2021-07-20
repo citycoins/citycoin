@@ -532,6 +532,30 @@
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; STACKING REWARD CLAIMS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define-read-only (get-stacking-reward (userId uint) (targetCycle uint) (stacksHeight uint))
+  (let
+    (
+      (rewardCycleStats (unwrap-panic (get-stacking-stats-at-cycle targetCycle)))
+      (stackerAtCycle (unwrap-panic (get-stacker-at-cycle targetCycle userId)))
+      (totalTokensThisCycle (get amountToken rewardCycleStats))
+      (stackedThisCycle (get amountStacked stackerAtCycle))
+    )
+    (ok true)
+  )
+)
+
+;; calls function to claim stacking reward in active logic contract
+(define-public (claim-stacking-reward (logicTrait <logic>) (targetCycle uint))
+  (begin
+    (try! (contract-call? logicTrait claim-stacking-reward-at-cycle tx-sender block-height targetCycle))
+    (ok true)
+  )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TOKEN
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

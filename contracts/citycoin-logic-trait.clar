@@ -21,6 +21,10 @@
   (stack-tokens-at-cycle (principal uint uint uint uint)
     (response bool uint)
   )
+
+  (claim-stacking-reward-at-cycle (principal uint uint)
+    (response bool uint)
+  )
   
 ))
 

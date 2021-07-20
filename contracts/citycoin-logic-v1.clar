@@ -208,3 +208,16 @@
     )
   )
 )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; STACKING REWARD CLAIMS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define-public (claim-stacking-reward-at-cycle (user principal) (stacksHeight uint) (targetCycle uint))
+  (let
+    (
+      (currentCycle (unwrap! (get-reward-cycle stacksHeight) (err ERR_STACKING_NOT_AVAILABLE)))
+    )
+    (ok true)
+  )
+)
