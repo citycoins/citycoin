@@ -328,10 +328,7 @@
     (
       (userId (get-or-create-user-id tx-sender))
     )
-    (if (is-some memo)
-      (try! (contract-call? logicTrait mine-tokens-at-block userId block-height amountUstx memo))
-      (try! (contract-call? logicTrait mine-tokens-at-block userId block-height amountUstx none))
-    )
+    (try! (contract-call? logicTrait mine-tokens-at-block userId block-height amountUstx memo))
     (ok true)
   )
 )

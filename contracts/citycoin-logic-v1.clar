@@ -113,12 +113,15 @@
     (asserts! (> amountUstx u0) (err ERR_INSUFFICIENT_COMMITMENT))
     (asserts! (>= (stx-get-balance tx-sender) amountUstx) (err ERR_INSUFFICIENT_BALANCE))
     (try! (contract-call? .citycoin-core set-tokens-mined userId stacksHeight amountUstx toStackers toCity))
+    (if (is-some memo)
+      (print memo)
+      none
+    )
     (if stackingActive
       (try! (stx-transfer? toStackers tx-sender .citycoin-core))
       false
     )
     (try! (stx-transfer? toCity tx-sender cityWallet))
-    (print stacksHeight)
     (ok true)
   )
 )
