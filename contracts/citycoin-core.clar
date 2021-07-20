@@ -428,6 +428,7 @@
 ;; - how many Stackers were there
 ;; - what is the total uSTX submitted by miners
 ;; - what is the total amount of tokens stacked
+;; TODO: could use a map-insert to track number of stackers in cycle?
 (define-map StackingStatsAtCycle
   uint
   {
@@ -444,7 +445,6 @@
 )
 
 ;; returns the total stacked tokens and committed uSTX for a given reward cycle
-;; or, an empty structure
 (define-read-only (get-stacking-stats-at-cycle (rewardCycle uint))
   (map-get? StackingStatsAtCycle rewardCycle)
 )
@@ -535,18 +535,6 @@
 ;; STACKING REWARD CLAIMS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define-read-only (get-stacking-reward (userId uint) (targetCycle uint) (stacksHeight uint))
-  (let
-    (
-      (rewardCycleStats (unwrap-panic (get-stacking-stats-at-cycle targetCycle)))
-      (stackerAtCycle (unwrap-panic (get-stacker-at-cycle targetCycle userId)))
-      (totalTokensThisCycle (get amountToken rewardCycleStats))
-      (stackedThisCycle (get amountStacked stackerAtCycle))
-    )
-    (ok true)
-  )
-)
-
 ;; calls function to claim stacking reward in active logic contract
 (define-public (claim-stacking-reward (logicTrait <logic>) (targetCycle uint))
   (begin
@@ -554,6 +542,46 @@
     (ok true)
   )
 )
+
+(define-public (return-stacked-tokens-and-rewards (userId uint) (targetCycle uint) (toReturn uint) (entitledUstx uint))
+  (let
+    (
+      (user (unwrap! (get-user userId) (err ERR_USER_NOT_FOUND)))
+    )
+    ;; TODO: only allow calls by active logic contract
+    (asserts! true (err u0))
+    ;; disable ability to claim again
+    (map-set StackerAtCycle
+      {
+        rewardCycle: targetCycle,
+        userId: userId
+      }
+      {
+        amountStacked: u0,
+        toReturn: u0
+      }
+    )
+    ;; send back tokens if user was eligible
+    (if (> toReturn u0)
+      (try! (as-contract (contract-call? .citycoin-token transfer toReturn tx-sender user none)))
+      true
+    )
+    ;; send back rewards if user was eligible
+    (if (> entitledUstx u0)
+      (try! (as-contract (stx-transfer? entitledUstx tx-sender user)))
+      true
+    )
+    (ok true)
+  )
+
+  ;; disable ability to claim again in core
+  ;; initiate transfer in core
+  ;; - stacked tokens if unlocked
+  ;; - entitled uSTX
+  
+)
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TOKEN

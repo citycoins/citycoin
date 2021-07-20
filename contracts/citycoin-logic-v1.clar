@@ -27,6 +27,8 @@
 (define-constant ERR_NO_VRF_SEED_FOUND u2009)
 (define-constant ERR_STACKING_NOT_AVAILABLE u2010)
 (define-constant ERR_CANNOT_STACK u2011)
+(define-constant ERR_REWARD_CYCLE_NOT_COMPLETED u2012)
+(define-constant ERR_NOTHING_TO_REDEEM u2013)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CORE FUNCTIONS
@@ -68,8 +70,16 @@
   (contract-call? .citycoin-core get-stacking-stats-at-cycle-or-default rewardCycle)
 )
 
+(define-private (get-stacking-stats-at-cycle (rewardCycle uint))
+  (contract-call? .citycoin-core get-stacking-stats-at-cycle rewardCycle)
+)
+
 (define-private (get-stacker-at-cycle-or-default (rewardCycle uint) (userId uint))
   (contract-call? .citycoin-core get-stacker-at-cycle-or-default rewardCycle userId)
+)
+
+(define-private (get-stacker-at-cycle (rewardCycle uint) (userId uint))
+  (contract-call? .citycoin-core get-stacker-at-cycle rewardCycle userId)
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -220,6 +230,43 @@
 (define-private (set-tokens-stacked (stackerId uint) (targetCycle uint) (amountStacked uint) (toReturn uint))
   (contract-call? .citycoin-core set-tokens-stacked stackerId targetCycle amountStacked toReturn)
 )
+
+;; getter for get-entitled-stacking-reward that specifies block height
+(define-read-only (get-stacking-reward (userId uint) (targetCycle uint))
+  (get-entitled-stacking-reward userId targetCycle block-height)
+)
+
+;; get uSTX a Stacker can claim, given reward cycle they stacked in and current block height
+;; this method only returns a positive value if:
+;; - the current block height is in a subsequent reward cycle
+;; - the stacker actually locked up tokens in the target reward cycle
+;; - the stacker locked up _enough_ tokens to get at least one uSTX
+;; it is possible to Stack tokens and not receive uSTX:
+;; - if no miners commit during this reward cycle
+;; - the amount stacked by user is too few that you'd be entitled to less than 1 uSTX
+(define-private (get-entitled-stacking-reward (userId uint) (targetCycle uint) (stacksHeight uint))
+  (let
+    (
+      (rewardCycleStats (unwrap-panic (get-stacking-stats-at-cycle targetCycle)))
+      (stackerAtCycle (unwrap-panic (get-stacker-at-cycle targetCycle userId)))
+      (totalUstxThisCycle (get amountUstx rewardCycleStats))
+      (totalStackedThisCycle (get amountToken rewardCycleStats))
+      (userStackedThisCycle (get amountStacked stackerAtCycle))
+    )
+    (match (get-reward-cycle stacksHeight)
+      currentCycle
+      (if (or (<= currentCycle targetCycle) (is-eq u0 userStackedThisCycle))
+        ;; this cycle hasn't finished, or Stacker contributed nothing
+        u0
+        ;; (totalUstxThisCycle * userStackedThisCycle) / totalStackedThisCycle
+        (/ (* totalUstxThisCycle userStackedThisCycle) totalStackedThisCycle)
+      )
+      ;; before first reward cycle
+      u0
+    )
+  )
+)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; STACKING REWARD CLAIMS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -228,7 +275,15 @@
   (let
     (
       (currentCycle (unwrap! (get-reward-cycle stacksHeight) (err ERR_STACKING_NOT_AVAILABLE)))
+      (userId (unwrap! (get-user-id user) (err ERR_USER_ID_NOT_FOUND)))
+      (entitledUstx (get-entitled-stacking-reward userId targetCycle stacksHeight))
+      (stackerAtCycle (get-stacker-at-cycle-or-default targetCycle userId))
+      (toReturn (get toReturn stackerAtCycle))
     )
+    ;; TODO: only allow calls from core contract
+    (asserts! (> currentCycle targetCycle) (err ERR_REWARD_CYCLE_NOT_COMPLETED))
+    (asserts! (or (> toReturn u0) (> entitledUstx u0)) (err ERR_NOTHING_TO_REDEEM))
+    (try! (contract-call? .citycoin-core return-stacked-tokens-and-rewards userId targetCycle toReturn entitledUstx))
     (ok true)
   )
 )
