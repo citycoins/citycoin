@@ -304,9 +304,20 @@
 )
 
 ;; returns map MinersAtBlock at a given Stacks block height for a user ID
-;; or, an empty structure
 (define-read-only (get-miner-at-block (stacksHeight uint) (userId uint))
   (map-get? MinersAtBlock { stacksHeight: stacksHeight, userId: userId })
+)
+
+;; returns map MinersAtBlock at a given Stacks block height for a user ID
+;; or, an empty structure
+(define-read-only (get-miner-at-block-or-default (stacksHeight uint) (userId uint))
+  (default-to {
+    highValue: u0,
+    lowValue: u0,
+    ustx: u0,
+    winner: false
+  }
+    (map-get? MinersAtBlock { stacksHeight: stacksHeight, userId: userId }))
 )
 
 ;; At a given Stacks block height:
