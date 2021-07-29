@@ -1,31 +1,57 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CITYCOIN VRF CONTRACT
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; VRF
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define-map BUFF_TO_UINT
+  (buff 1)
+  uint
+)
 
 ;; Read the on-chain VRF and turn the lower 16 bytes into a uint, in order to sample the set of miners and determine
 ;; which one may claim the token batch for the given block height.
 (define-read-only (get-random-uint-at-block (stacksBlock uint))
-  (let (
-    (vrf-lower-uint-opt
-      (match (get-block-info? vrf-seed stacksBlock)
-        vrf-seed (some (buff-to-uint-le (lower-16-le vrf-seed)))
-        none))
+  (match (get-block-info? vrf-seed stacksBlock)
+    vrfSeed (some (get-random-from-vrf-seed vrfSeed u16))
+    none
   )
-  vrf-lower-uint-opt)
 )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; UTILITIES
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Read the on-chain VRF and turn the lower [bytes] bytes into a uint, in order to sample the set of miners and determine
+;; which one may claim the token batch for the given block height.
+(define-read-only (get-random-uint-at-block-prec (stacksBlock uint) (bytes uint))
+  (match (get-block-info? vrf-seed stacksBlock)
+    vrfSeed (some (get-random-from-vrf-seed vrfSeed bytes))
+    none
+  )
+)
 
-;; lookup table for converting 1-byte buffers to uints via index-of
-(define-constant BUFF_TO_BYTE (list 
+;; Turn lower [bytes] bytes into uint.
+(define-read-only (get-random-from-vrf-seed (vrfSeed (buff 32)) (bytes uint))
+  (+
+    (if (>= bytes u16) (convert-to-le (element-at vrfSeed u16) u15) u0)
+    (if (>= bytes u15) (convert-to-le (element-at vrfSeed u17) u14) u0)
+    (if (>= bytes u14) (convert-to-le (element-at vrfSeed u18) u13) u0)
+    (if (>= bytes u13) (convert-to-le (element-at vrfSeed u19) u12) u0)
+    (if (>= bytes u12) (convert-to-le (element-at vrfSeed u20) u11) u0)
+    (if (>= bytes u11) (convert-to-le (element-at vrfSeed u21) u10) u0)
+    (if (>= bytes u10) (convert-to-le (element-at vrfSeed u22) u9) u0)
+    (if (>= bytes u9) (convert-to-le (element-at vrfSeed u23) u8) u0)
+    (if (>= bytes u8) (convert-to-le (element-at vrfSeed u24) u7) u0)
+    (if (>= bytes u7) (convert-to-le (element-at vrfSeed u25) u6) u0)
+    (if (>= bytes u6) (convert-to-le (element-at vrfSeed u26) u5) u0)
+    (if (>= bytes u5) (convert-to-le (element-at vrfSeed u27) u4) u0)
+    (if (>= bytes u4) (convert-to-le (element-at vrfSeed u28) u3) u0)
+    (if (>= bytes u3) (convert-to-le (element-at vrfSeed u29) u2) u0)
+    (if (>= bytes u2) (convert-to-le (element-at vrfSeed u30) u1) u0)
+    (if (>= bytes u1) (convert-to-le (element-at vrfSeed u31) u0) u0)
+  )
+)
+
+(define-private (convert-to-le (byte (optional (buff 1))) (pos uint))
+  (*
+    (unwrap-panic (map-get? BUFF_TO_UINT (unwrap-panic byte)))
+    (pow u2 (* u8 pos))
+  )
+)
+
+;; initialize
+(fold fill-buff-to-uint (list 
     0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b 0x0c 0x0d 0x0e 0x0f
     0x10 0x11 0x12 0x13 0x14 0x15 0x16 0x17 0x18 0x19 0x1a 0x1b 0x1c 0x1d 0x1e 0x1f
     0x20 0x21 0x22 0x23 0x24 0x25 0x26 0x27 0x28 0x29 0x2a 0x2b 0x2c 0x2d 0x2e 0x2f
@@ -42,50 +68,12 @@
     0xd0 0xd1 0xd2 0xd3 0xd4 0xd5 0xd6 0xd7 0xd8 0xd9 0xda 0xdb 0xdc 0xdd 0xde 0xdf
     0xe0 0xe1 0xe2 0xe3 0xe4 0xe5 0xe6 0xe7 0xe8 0xe9 0xea 0xeb 0xec 0xed 0xee 0xef
     0xf0 0xf1 0xf2 0xf3 0xf4 0xf5 0xf6 0xf7 0xf8 0xf9 0xfa 0xfb 0xfc 0xfd 0xfe 0xff
-))
+) u0)
 
-;; Convert a 1-byte buffer into its uint representation.
-(define-private (buff-to-u8 (byte (buff 1)))
-  (unwrap-panic (index-of BUFF_TO_BYTE byte))
-)
 
-;; Convert a little-endian 16-byte buff into a uint.
-(define-private (buff-to-uint-le (word (buff 16)))
-  (get acc
-    (fold add-and-shift-uint-le (list u0 u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 u13 u14 u15) { acc: u0, data: word })
+(define-private (fill-buff-to-uint (byte (buff 1)) (val uint))
+  (begin
+    (map-insert BUFF_TO_UINT byte val)
+    (+ val u1)
   )
-)
-
-;; Inner fold function for converting a 16-byte buff into a uint.
-(define-private (add-and-shift-uint-le (idx uint) (input { acc: uint, data: (buff 16) }))
-  (let (
-    (acc (get acc input))
-    (data (get data input))
-    (byte (buff-to-u8 (unwrap-panic (element-at data idx))))
-  )
-  {
-    ;; acc = byte * (2**(8 * (15 - idx))) + acc
-    acc: (+ (* byte (pow u2 (* u8 (- u15 idx)))) acc),
-    data: data
-  })
-)
-
-;; Convert the lower 16 bytes of a buff into a little-endian uint.
-(define-private (lower-16-le (input (buff 32)))
-  (get acc
-    (fold lower-16-le-closure (list u16 u17 u18 u19 u20 u21 u22 u23 u24 u25 u26 u27 u28 u29 u30 u31) { acc: 0x, data: input })
-  )
-)
-
-;; Inner closure for obtaining the lower 16 bytes of a 32-byte buff
-(define-private (lower-16-le-closure (idx uint) (input { acc: (buff 16), data: (buff 32) }))
-  (let (
-    (acc (get acc input))
-    (data (get data input))
-    (byte (unwrap-panic (element-at data idx)))
-  )
-  {
-    acc: (unwrap-panic (as-max-len? (concat acc byte) u16)),
-    data: data
-  })
 )
