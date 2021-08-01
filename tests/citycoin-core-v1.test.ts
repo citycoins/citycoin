@@ -486,10 +486,31 @@ describe("[CityCoin Core]", () => {
     });
 
     describe("mine-many()", () => {
-      it("throws ERR_STACKING_NOT_AVAILABLE", (chain, accounts, clients) => {
+      it("throws ERR_CONTRACT_NOT_ACTIVATED while trying to mine before reaching activation threshold", (chain, accounts, clients) => {
+        // arrange
+        const miner = accounts.get("wallet_2")!;
+        const amounts = [1, 2, 3, 4];
+
+        // act
+        const receipt = chain.mineBlock([clients.core.mineMany(amounts, miner)])
+          .receipts[0];
+
+        // assert
+        receipt.result
+          .expectErr()
+          .expectUint(CoreClient.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
+      });
+
+      it("throws ERR_STACKING_NOT_AVAILABLE while trying to mine before activation period end", (chain, accounts, clients) => {
         // arrange
         const miner = accounts.get("wallet_1")!;
         const amounts = [1, 2, 3, 4];
+        chain.mineBlock([
+          clients.core.testInitializeCore(clients.core.getContractAddress()),
+          clients.core.unsafeSetActivationThreshold(1),
+          clients.core.registerUser(miner),
+        ]);
+
         // act
         const receipt = chain.mineBlock([clients.core.mineMany(amounts, miner)])
           .receipts[0];
