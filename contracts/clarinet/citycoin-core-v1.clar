@@ -300,6 +300,7 @@
 
 (define-public (mine-many (amounts (list 200 uint)))
   (begin
+    (asserts! (get-activation-status) (err ERR_CONTRACT_NOT_ACTIVATED))
     (asserts! (> (len amounts) u0) (err ERR_INSUFFICIENT_COMMITMENT))
     (match (fold mine-single amounts (ok { userId: (get-or-create-user-id tx-sender), toStackers: u0, toCity: u0, stacksHeight: block-height }))
       okReturn 
