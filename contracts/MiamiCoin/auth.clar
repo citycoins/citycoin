@@ -1,15 +1,13 @@
+;; MIAMICOIN AUTH CONTRACT
+
 (define-constant CONTRACT_OWNER tx-sender)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TRAIT DEFINITIONS
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-trait coreTrait 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.citycoin-core-trait.citycoin-core)
 (use-trait tokenTrait 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.citycoin-token-trait.citycoin-token)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ERRORS
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define-constant ERR_UNKNOWN_JOB u6000)
 (define-constant ERR_UNAUTHORIZED u6001)
@@ -23,9 +21,7 @@
 (define-constant ERR_CORE_CONTRACT_NOT_FOUND u6009)
 (define-constant ERR_UNKNOWN_ARGUMENT u6010)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; JOB MANAGEMENT
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define-constant REQUIRED_APPROVALS u3)
 
@@ -80,6 +76,7 @@
 )
 
 ;; FUNCTIONS
+
 (define-read-only (get-last-job-id)
   (var-get lastJobId)
 )
@@ -299,6 +296,7 @@
 )
 
 ;; PRIVATE FUNCTIONS
+
 (define-read-only  (is-approver (user principal))
   (default-to false (map-get? Approvers user))
 )
@@ -328,9 +326,7 @@
   )
 )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CONTRACT MANAGEMENT
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; initial value for active core contract
 ;; set to deployer address at startup to prevent
@@ -484,9 +480,7 @@
   )
 )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CITY WALLET MANAGEMENT
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; initial value for city wallet
 (define-data-var cityWallet principal 'SM2MARAVW6BEJCD13YV2RHGYHQWT7TDDNMNRB1MVT)
@@ -531,9 +525,7 @@
   (is-eq contract-caller (var-get cityWallet))
 )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TOKEN MANAGEMENT
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define-public (set-token-uri (targetContract <tokenTrait>) (newUri (optional (string-utf8 256))))
   (begin
@@ -543,9 +535,7 @@
   )
 )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; APPROVERS MANAGEMENT
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define-public (execute-replace-approver-job (jobId uint))
   (let
@@ -560,9 +550,7 @@
   )
 )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CONTRACT INITIALIZATION
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (map-insert Approvers 'SP372JVX6EWE2M0XPA84MWZYRRG2M6CAC4VVC12V1 true)
 (map-insert Approvers 'SP2R0DQYR7XHD161SH2GK49QRP1YSV7HE9JSG7W6G true)
