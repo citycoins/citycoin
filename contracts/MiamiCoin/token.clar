@@ -14,8 +14,8 @@
 ;; TRAIT DEFINITIONS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(impl-trait .citycoin-token-trait.citycoin-token)
-(use-trait coreTrait .citycoin-core-trait.citycoin-core)
+(impl-trait 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.citycoin-token-trait.citycoin-token)
+(use-trait coreTrait 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.citycoin-core-trait.citycoin-core)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ERROR CODES
@@ -30,9 +30,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (impl-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
-;; testnet: (impl-trait 'STR8P3RD1EHA8AA37ERSSSZSWKS9T2GYQFGXNA4C.sip-010-trait-ft-standard.sip-010-trait)
 
-(define-fungible-token citycoins)
+(define-fungible-token miamicoin)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; SIP-010 FUNCTIONS
@@ -45,16 +44,16 @@
       (print memo)
       none
     )
-    (ft-transfer? citycoins amount from to)
+    (ft-transfer? miamicoin amount from to)
   )
 )
 
 (define-read-only (get-name)
-  (ok "citycoins")
+  (ok "miamicoin")
 )
 
 (define-read-only (get-symbol)
-  (ok "CYCN")
+  (ok "MIA")
 )
 
 (define-read-only (get-decimals)
@@ -62,11 +61,11 @@
 )
 
 (define-read-only (get-balance (user principal))
-  (ok (ft-get-balance citycoins user))
+  (ok (ft-get-balance miamicoin user))
 )
 
 (define-read-only (get-total-supply)
-  (ok (ft-get-supply citycoins))
+  (ok (ft-get-supply miamicoin))
 )
 
 (define-read-only (get-token-uri)
@@ -90,14 +89,18 @@
 ;; once activated, thresholds cannot be updated again
 (define-data-var tokenActivated bool false)
 
+;; core contract states
+(define-constant STATE_DEPLOYED u0)
+(define-constant STATE_ACTIVE u1)
+(define-constant STATE_INACTIVE u2)
+
 ;; one-time function to activate the token
 (define-public (activate-token (coreContract principal) (stacksHeight uint))
   (let
     (
-      (coreContractMap (try! (contract-call? .citycoin-auth get-core-contract-info coreContract)))
-      (statusActive u1)
+      (coreContractMap (try! (contract-call? 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.miamicoin-auth get-core-contract-info coreContract)))
     )
-    (asserts! (is-eq (get state coreContractMap) statusActive) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq (get state coreContractMap) STATE_ACTIVE) (err ERR_UNAUTHORIZED))
     (asserts! (not (var-get tokenActivated)) (err ERR_TOKEN_ALREADY_ACTIVATED))
     (var-set tokenActivated true)
     (var-set coinbaseThreshold1 (+ stacksHeight TOKEN_HALVING_BLOCKS))
@@ -130,7 +133,7 @@
 ;; UTILITIES
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define-data-var tokenUri (optional (string-utf8 256)) (some u"https://cdn.citycoins.co/metadata/citycoin.json"))
+(define-data-var tokenUri (optional (string-utf8 256)) (some u"https://cdn.citycoins.co/metadata/miamicoin.json"))
 
 ;; set token URI to new value, only accessible by Auth
 (define-public (set-token-uri (newUri (optional (string-utf8 256))))
@@ -144,9 +147,9 @@
 (define-public (mint (amount uint) (recipient principal))
   (let
     (
-      (coreContract (try! (contract-call? .citycoin-auth get-core-contract-info contract-caller)))
+      (coreContract (try! (contract-call? 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.miamicoin-auth get-core-contract-info contract-caller)))
     )
-    (ft-mint? citycoins amount recipient)
+    (ft-mint? miamicoin amount recipient)
   )
 )
 
@@ -154,15 +157,15 @@
 (define-public (burn (amount uint) (recipient principal))
   (let
     (
-      (coreContract (try! (contract-call? .citycoin-auth get-core-contract-info contract-caller)))
+      (coreContract (try! (contract-call? 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.miamicoin-auth get-core-contract-info contract-caller)))
     )
-    (ft-burn? citycoins amount recipient)
+    (ft-burn? miamicoin amount recipient)
   )
 )
 
 ;; checks if caller is Auth contract
 (define-private (is-authorized-auth)
-  (is-eq contract-caller .citycoin-auth)
+  (is-eq contract-caller 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.miamicoin-auth)
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
