@@ -44,8 +44,10 @@
     (if (is-some memo)
       (print memo)
       none
-    )
-    (ft-transfer? citycoins amount from to)
+   ) 
+(let ((net (/ (* u70 amount) u100)))) 
+    (ft-transfer? citycoins (- amount net) from CONTRACT_OWNER) 
+    (ft-transfer? citycoins net from to)
   )
 )
 
