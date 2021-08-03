@@ -420,6 +420,7 @@
   )
 )
 
+;; protected function to update core contract
 (define-public (upgrade-core-contract (oldContract <coreTrait>) (newContract <coreTrait>))
   (let
     (
@@ -565,6 +566,6 @@
 
 (map-insert Approvers 'SP372JVX6EWE2M0XPA84MWZYRRG2M6CAC4VVC12V1 true)
 (map-insert Approvers 'SP2R0DQYR7XHD161SH2GK49QRP1YSV7HE9JSG7W6G true)
-(map-insert Approvers 'SP30ESSHCAHZ51EF69JT7C1YEZPPX56NRBNJ9Z4ZP true)
+(map-insert Approvers 'SPN4Y5QPGQA8882ZXW90ADC2DHYXMSTN8VAR8C3X true)
 (map-insert Approvers 'SP3YYGCGX1B62CYAH4QX7PQE63YXG7RDTXD8BQHJQ true)
 (map-insert Approvers 'SP7DGES13508FHRWS1FB0J3SZA326FP6QRMB6JDE true)
