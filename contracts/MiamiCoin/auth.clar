@@ -393,6 +393,10 @@
   )
 )
 
+(define-read-only (is-initialized)
+  (var-get initialized)
+)
+
 ;; function to activate core contract through registration
 ;; - check that target is in core contract map
 ;; - check that caller is core contract

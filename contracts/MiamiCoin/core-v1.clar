@@ -131,7 +131,10 @@
     (
       (newId (+ u1 (var-get usersNonce)))
       (threshold (var-get activationThreshold))
+      (activated (contract-call? 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.miamicoin-auth is-activated))
     )
+
+    (asserts! (activated) (err ERR_CONTRACT_NOT_ACTIVATED))
 
     (asserts! (is-none (map-get? UserIds tx-sender))
       (err ERR_USER_ALREADY_REGISTERED))
