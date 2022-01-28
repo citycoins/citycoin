@@ -1,5 +1,8 @@
 [project]
 name = "citycoin"
+requirements = []
+costs_version = 2
+analysis = ["all"]
 
 [contracts.citycoin-vrf]
 path = "contracts/clarinet/citycoin-vrf.clar"
@@ -29,13 +32,14 @@ depends_on = ["citycoin-auth", "citycoin-token", "citycoin-vrf", "citycoin-core-
 path = "contracts/clarinet/citycoin-core-v2.clar"
 depends_on = ["citycoin-auth", "citycoin-token", "citycoin-vrf", "citycoin-core-trait"]
 
-# contracts listed below are used only in testing
+#
+# contracts listed below are used only in test suite
+#
 
 [contracts.sip-010-trait]
 path = "contracts/clarinet/sip-10-ft-standard.clar"
 depends_on = []
 
-# contracts listed below are used only in test suite
 [contracts.test-utils]
 path = "contracts/clarinet/test-utils.clar"
 depends_on = ["citycoin-core-v1"]
