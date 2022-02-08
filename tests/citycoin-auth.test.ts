@@ -1087,6 +1087,42 @@ describe("[CityCoin Auth]", () => {
           .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
 
+      it("throws ERR_UNAUTHORIZED if new contract is not in STATE_DEPLOYED", () => {
+        // arrange
+        const sender = accounts.get("city_wallet")!;
+        const contract = core.address;
+
+        chain.mineBlock([
+          core.testInitializeCore(contract),
+          core.unsafeSetActivationThreshold(1),
+          core.registerUser(sender),
+        ]);
+
+        // act
+        const testActive = chain.mineBlock([
+          auth.testSetCoreContractState(contract, AuthModel.ContractState.STATE_ACTIVE, sender),
+        ]);
+        const receiptActive = chain.mineBlock([
+          auth.activateCoreContract(contract, testActive.height, sender)
+        ]).receipts[0];
+
+        const testInactive = chain.mineBlock([
+          auth.testSetCoreContractState(contract, AuthModel.ContractState.STATE_INACTIVE, sender),
+        ]);
+        const receiptInactive = chain.mineBlock([
+          auth.activateCoreContract(contract, testInactive.height, sender)
+        ]).receipts[0];
+
+        // assert
+        receiptActive.result
+          .expectErr()
+          .expectUint(AuthModel.ErrCode.ERR_INCORRECT_CONTRACT_STATE);
+
+        receiptInactive.result
+          .expectErr()
+          .expectUint(AuthModel.ErrCode.ERR_INCORRECT_CONTRACT_STATE);
+      });
+
       it("succeeds and updates core contract map", () => {
         // arrange
         const sender = accounts.get("deployer")!;

@@ -26,3 +26,26 @@
 (define-public (test-set-active-core-contract)
   (ok (var-set activeCoreContract .citycoin-core-v1))
 )
+
+;; core contract states
+;; (define-constant STATE_DEPLOYED u0)
+;; (define-constant STATE_ACTIVE u1)
+;; (define-constant STATE_INACTIVE u2)
+
+(define-public (test-set-core-contract-state (coreContract <coreTrait>) (state uint))
+  (let
+    (
+      (coreContractAddress (contract-of coreContract))
+    )
+    (asserts! (or (>= state u0) (<= state STATE_INACTIVE)) (err ERR_UNAUTHORIZED))
+    (map-set CoreContracts
+      coreContractAddress
+      {
+        state: state,
+        startHeight: u0,
+        endHeight: u0
+      }
+    )
+    (ok true)
+  )
+)

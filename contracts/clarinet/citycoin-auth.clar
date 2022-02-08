@@ -20,6 +20,7 @@
 (define-constant ERR_NO_ACTIVE_CORE_CONTRACT u6008)
 (define-constant ERR_CORE_CONTRACT_NOT_FOUND u6009)
 (define-constant ERR_UNKNOWN_ARGUMENT u6010)
+(define-constant ERR_INCORRECT_CONTRACT_STATE u6011)
 
 ;; JOB MANAGEMENT
 
@@ -400,6 +401,7 @@
 ;; function to activate core contract through registration
 ;; - check that target is in core contract map
 ;; - check that caller is core contract
+;; - check that target is in STATE_DEPLOYED
 ;; - set active in core contract map
 ;; - set as activeCoreContract
 (define-public (activate-core-contract (targetContract principal) (stacksHeight uint))
@@ -407,6 +409,7 @@
     (
       (coreContract (unwrap! (map-get? CoreContracts targetContract) (err ERR_CORE_CONTRACT_NOT_FOUND)))
     )
+    (asserts! (is-eq (get state coreContract) STATE_DEPLOYED) (err ERR_INCORRECT_CONTRACT_STATE))
     (asserts! (is-eq contract-caller targetContract) (err ERR_UNAUTHORIZED))
     (map-set CoreContracts
       targetContract
@@ -588,4 +591,27 @@
 
 (define-public (test-set-active-core-contract)
   (ok (var-set activeCoreContract .citycoin-core-v1))
+)
+
+;; core contract states
+;; (define-constant STATE_DEPLOYED u0)
+;; (define-constant STATE_ACTIVE u1)
+;; (define-constant STATE_INACTIVE u2)
+
+(define-public (test-set-core-contract-state (coreContract <coreTrait>) (state uint))
+  (let
+    (
+      (coreContractAddress (contract-of coreContract))
+    )
+    (asserts! (or (>= state u0) (<= state STATE_INACTIVE)) (err ERR_UNAUTHORIZED))
+    (map-set CoreContracts
+      coreContractAddress
+      {
+        state: state,
+        startHeight: u0,
+        endHeight: u0
+      }
+    )
+    (ok true)
+  )
 )
