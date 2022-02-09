@@ -21,6 +21,7 @@
 (define-constant ERR_CORE_CONTRACT_NOT_FOUND u6009)
 (define-constant ERR_UNKNOWN_ARGUMENT u6010)
 (define-constant ERR_INCORRECT_CONTRACT_STATE u6011)
+(define-constant ERR_CONTRACT_ALREADY_EXISTS u6012)
 
 ;; JOB MANAGEMENT
 
@@ -431,7 +432,8 @@
       (oldContractMap (unwrap! (map-get? CoreContracts oldContractAddress) (err ERR_CORE_CONTRACT_NOT_FOUND)))
       (newContractAddress (contract-of newContract))
     )
-    (asserts! (not (is-eq oldContractAddress newContractAddress)) (err ERR_UNAUTHORIZED))
+    (asserts! (not (is-eq oldContractAddress newContractAddress)) (err ERR_CONTRACT_ALREADY_EXISTS))
+    (asserts! (is-none (map-get? CoreContracts newContractAddress)) (err ERR_CONTRACT_ALREADY_EXISTS))
     (asserts! (is-authorized-city) (err ERR_UNAUTHORIZED))
     (map-set CoreContracts
       oldContractAddress
@@ -466,6 +468,7 @@
     (asserts! (is-approver contract-caller) (err ERR_UNAUTHORIZED))
     (asserts! (and (is-eq oldContractArg oldContractAddress) (is-eq newContractArg newContractAddress)) (err ERR_UNAUTHORIZED))
     (asserts! (not (is-eq oldContractAddress newContractAddress)) (err ERR_UNAUTHORIZED))
+    (asserts! (is-none (map-get? CoreContracts newContractAddress)) (err ERR_CONTRACT_ALREADY_EXISTS))
     (map-set CoreContracts
       oldContractAddress
       {
@@ -603,7 +606,7 @@
     (
       (coreContractAddress (contract-of coreContract))
     )
-    (asserts! (or (>= state u0) (<= state STATE_INACTIVE)) (err ERR_UNAUTHORIZED))
+    (asserts! (or (>= state STATE_DEPLOYED) (<= state STATE_INACTIVE)) (err ERR_UNAUTHORIZED))
     (map-set CoreContracts
       coreContractAddress
       {

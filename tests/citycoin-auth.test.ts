@@ -1087,7 +1087,7 @@ describe("[CityCoin Auth]", () => {
           .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
 
-      it("throws ERR_UNAUTHORIZED if new contract is not in STATE_DEPLOYED", () => {
+      it("throws ERR_INCORRECT_CONTRACT_STATE if new contract is not in STATE_DEPLOYED", () => {
         // arrange
         const sender = accounts.get("city_wallet")!;
         const contract = core.address;
@@ -1169,7 +1169,7 @@ describe("[CityCoin Auth]", () => {
       });
       it("throws ERR_UNAUTHORIZED if old and new contract are the same", () => {
         // arrange
-        const sender = accounts.get("wallet_1")!;
+        const sender = accounts.get("city_wallet")!;
         const oldContract = core.address;
         const newContract = core.address;
 
@@ -1187,7 +1187,30 @@ describe("[CityCoin Auth]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(AuthModel.ErrCode.ERR_CONTRACT_ALREADY_EXISTS);
+      });
+      it("throws ERR_CONTRACT_ALREADY_EXISTS if called with a target contract already in core contracts map", () => {
+        // arrange
+        const sender = accounts.get("city_wallet")!;
+        const oldContract = core.address;
+        const newContract = core2.address;
+
+        chain.mineBlock([
+          core.testInitializeCore(core.address),
+          core.unsafeSetActivationThreshold(1),
+          core.registerUser(sender),
+          auth.testSetCoreContractState(newContract, AuthModel.ContractState.STATE_INACTIVE, sender),
+        ]);
+
+        // act
+        const receipt = chain.mineBlock([
+          auth.upgradeCoreContract(oldContract, newContract, sender),
+        ]).receipts[0];
+
+        // assert
+        receipt.result
+          .expectErr()
+          .expectUint(AuthModel.ErrCode.ERR_CONTRACT_ALREADY_EXISTS);
       });
       it("throws ERR_UNAUTHORIZED if not called by city wallet", () => {
         // arrange
