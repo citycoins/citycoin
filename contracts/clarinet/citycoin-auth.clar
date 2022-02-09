@@ -467,7 +467,7 @@
     )
     (asserts! (is-approver contract-caller) (err ERR_UNAUTHORIZED))
     (asserts! (and (is-eq oldContractArg oldContractAddress) (is-eq newContractArg newContractAddress)) (err ERR_UNAUTHORIZED))
-    (asserts! (not (is-eq oldContractAddress newContractAddress)) (err ERR_UNAUTHORIZED))
+    (asserts! (not (is-eq oldContractAddress newContractAddress)) (err ERR_CONTRACT_ALREADY_EXISTS))
     (asserts! (is-none (map-get? CoreContracts newContractAddress)) (err ERR_CONTRACT_ALREADY_EXISTS))
     (map-set CoreContracts
       oldContractAddress

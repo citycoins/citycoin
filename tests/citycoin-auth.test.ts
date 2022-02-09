@@ -9,6 +9,7 @@ let chain: Chain;
 let accounts: Accounts;
 let core: CoreModel;
 let core2: CoreModel;
+let core3: CoreModel;
 let auth: AuthModel;
 let token: TokenModel;
 
@@ -18,7 +19,8 @@ beforeEach(() => {
   accounts = ctx.accounts;
   auth = ctx.models.get(AuthModel);
   core = ctx.models.get(CoreModel, "citycoin-core-v1");
-  core2 = ctx.models.get(CoreModel, "citycoin-core-v2")
+  core2 = ctx.models.get(CoreModel, "citycoin-core-v2");
+  core3 = ctx.models.get(CoreModel, "citycoin-core-mal");
   token = ctx.models.get(TokenModel);
 })
 
@@ -1167,7 +1169,7 @@ describe("[CityCoin Auth]", () => {
           .expectErr()
           .expectUint(AuthModel.ErrCode.ERR_CORE_CONTRACT_NOT_FOUND);
       });
-      it("throws ERR_UNAUTHORIZED if old and new contract are the same", () => {
+      it("throws ERR_CONTRACT_ALREADY_EXISTS if old and new contract are the same", () => {
         // arrange
         const sender = accounts.get("city_wallet")!;
         const oldContract = core.address;
@@ -1281,7 +1283,222 @@ describe("[CityCoin Auth]", () => {
         assertEquals(actualNewContractData, expectedNewContractData);
       });
     });
+
     describe("execute-upgrade-core-contract-job()", () => {
+      it("throws ERR_UNAUTHORIZED if contract-caller is not an approver", () => {
+        // arrange
+        const jobId = 1;
+        const sender = accounts.get("wallet_1")!;
+        const approver1 = accounts.get("wallet_2")!;
+        const approver2 = accounts.get("wallet_3")!;
+        const approver3 = accounts.get("wallet_4")!;
+        const invalidApprover = accounts.get("wallet_6")!;
+        const oldContract = core.address;
+        const newContract = core2.address;
+
+        chain.mineBlock([
+          core.testInitializeCore(oldContract),
+          core.unsafeSetActivationThreshold(1),
+          core.registerUser(sender),
+          auth.createJob(
+            "upgrade core",
+            auth.address,
+            sender
+          ),
+          auth.addPrincipalArgument(
+            jobId,
+            "oldContract",
+            oldContract,
+            sender
+          ),
+          auth.addPrincipalArgument(
+            jobId,
+            "newContract",
+            newContract,
+            sender
+          ),
+          auth.activateJob(jobId, sender),
+          auth.approveJob(jobId, approver1),
+          auth.approveJob(jobId, approver2),
+          auth.approveJob(jobId, approver3),
+        ]);
+
+        // act
+        const blockUpgrade = chain.mineBlock([
+          auth.executeUpgradeCoreContractJob(
+            jobId,
+            oldContract,
+            newContract,
+            invalidApprover
+          ),
+        ]);
+
+        // assert
+        blockUpgrade.receipts[0].result
+          .expectErr()
+          .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
+      });
+
+      it("throws ERR_UNAUTHORIZED if submitted trait principal does not match job principal", () => {
+        // arrange
+        const jobId = 1;
+        const sender = accounts.get("wallet_1")!;
+        const approver1 = accounts.get("wallet_2")!;
+        const approver2 = accounts.get("wallet_3")!;
+        const approver3 = accounts.get("wallet_4")!;
+        const oldContract = core.address;
+        const newContract = core2.address;
+        const invalidContract = core3.address;
+
+        chain.mineBlock([
+          core.testInitializeCore(oldContract),
+          core.unsafeSetActivationThreshold(1),
+          core.registerUser(sender),
+          auth.createJob(
+            "upgrade core",
+            auth.address,
+            sender
+          ),
+          auth.addPrincipalArgument(
+            jobId,
+            "oldContract",
+            oldContract,
+            sender
+          ),
+          auth.addPrincipalArgument(
+            jobId,
+            "newContract",
+            newContract,
+            sender
+          ),
+          auth.activateJob(jobId, sender),
+          auth.approveJob(jobId, approver1),
+          auth.approveJob(jobId, approver2),
+          auth.approveJob(jobId, approver3),
+        ]);
+
+        // act
+        const blockUpgrade = chain.mineBlock([
+          auth.executeUpgradeCoreContractJob(
+            jobId,
+            oldContract,
+            invalidContract,
+            sender
+          ),
+        ]);
+
+        // assert
+        blockUpgrade.receipts[0].result
+          .expectErr()
+          .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
+      });
+
+      it("throws ERR_CONTRACT_ALREADY_EXISTS if old and new contract are the same", () => {
+        // arrange
+        const jobId = 1;
+        const sender = accounts.get("wallet_1")!;
+        const approver1 = accounts.get("wallet_2")!;
+        const approver2 = accounts.get("wallet_3")!;
+        const approver3 = accounts.get("wallet_4")!;
+        const oldContract = core.address;
+
+        chain.mineBlock([
+          core.testInitializeCore(oldContract),
+          core.unsafeSetActivationThreshold(1),
+          core.registerUser(sender),
+          auth.createJob(
+            "upgrade core",
+            auth.address,
+            sender
+          ),
+          auth.addPrincipalArgument(
+            jobId,
+            "oldContract",
+            oldContract,
+            sender
+          ),
+          auth.addPrincipalArgument(
+            jobId,
+            "newContract",
+            oldContract,
+            sender
+          ),
+          auth.activateJob(jobId, sender),
+          auth.approveJob(jobId, approver1),
+          auth.approveJob(jobId, approver2),
+          auth.approveJob(jobId, approver3),
+        ]);
+
+        // act
+        const blockUpgrade = chain.mineBlock([
+          auth.executeUpgradeCoreContractJob(
+            jobId,
+            oldContract,
+            oldContract,
+            sender
+          ),
+        ]);
+
+        // assert
+        blockUpgrade.receipts[0].result
+          .expectErr()
+          .expectUint(AuthModel.ErrCode.ERR_CONTRACT_ALREADY_EXISTS);
+      });
+
+      it("throws ERR_CONTRACT_ALREADY_EXISTS if called with a target contract already in core contracts map", () => {
+        // arrange
+        const jobId = 1;
+        const sender = accounts.get("wallet_1")!;
+        const approver1 = accounts.get("wallet_2")!;
+        const approver2 = accounts.get("wallet_3")!;
+        const approver3 = accounts.get("wallet_4")!;
+        const oldContract = core.address;
+        const newContract = core2.address;
+
+        chain.mineBlock([
+          core.testInitializeCore(oldContract),
+          core.unsafeSetActivationThreshold(1),
+          core.registerUser(sender),
+          auth.testSetCoreContractState(newContract, AuthModel.ContractState.STATE_INACTIVE, sender),
+          auth.createJob(
+            "upgrade core",
+            auth.address,
+            sender
+          ),
+          auth.addPrincipalArgument(
+            jobId,
+            "oldContract",
+            oldContract,
+            sender
+          ),
+          auth.addPrincipalArgument(
+            jobId,
+            "newContract",
+            newContract,
+            sender
+          ),
+          auth.activateJob(jobId, sender),
+          auth.approveJob(jobId, approver1),
+          auth.approveJob(jobId, approver2),
+          auth.approveJob(jobId, approver3),
+        ]);
+
+        // act
+        const blockUpgrade = chain.mineBlock([
+          auth.executeUpgradeCoreContractJob(
+            jobId,
+            oldContract,
+            newContract,
+            sender
+          ),
+        ]);
+
+        // assert
+        blockUpgrade.receipts[0].result
+          .expectErr()
+          .expectUint(AuthModel.ErrCode.ERR_CONTRACT_ALREADY_EXISTS);
+      });
+
       it("succeeds and updates core contract map and active variable", () => {
         // arrange
         const jobId = 1;
