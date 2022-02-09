@@ -37,7 +37,7 @@
     (
       (coreContractAddress (contract-of coreContract))
     )
-    (asserts! (or (>= state u0) (<= state STATE_INACTIVE)) (err ERR_UNAUTHORIZED))
+    (asserts! (or (>= state STATE_DEPLOYED) (<= state STATE_INACTIVE)) (err ERR_UNAUTHORIZED))
     (map-set CoreContracts
       coreContractAddress
       {
