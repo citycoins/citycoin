@@ -1,7 +1,5 @@
 ;; NEWYORKCITYCOIN TOKEN CONTRACT
-;; CityCoins Protocol Version 1.0.1
-
-;; CONTRACT OWNER
+;; CityCoins Protocol Version 1.0.2
 
 (define-constant CONTRACT_OWNER tx-sender)
 

@@ -1,5 +1,5 @@
 ;; NEWYORKCITYCOIN AUTH CONTRACT
-;; CityCoins Protocol Version 1.0.1
+;; CityCoins Protocol Version 1.0.2
 
 (define-constant CONTRACT_OWNER tx-sender)
 
@@ -21,6 +21,8 @@
 (define-constant ERR_NO_ACTIVE_CORE_CONTRACT u6008)
 (define-constant ERR_CORE_CONTRACT_NOT_FOUND u6009)
 (define-constant ERR_UNKNOWN_ARGUMENT u6010)
+(define-constant ERR_INCORRECT_CONTRACT_STATE u6011)
+(define-constant ERR_CONTRACT_ALREADY_EXISTS u6012)
 
 ;; JOB MANAGEMENT
 
@@ -401,6 +403,7 @@
 ;; function to activate core contract through registration
 ;; - check that target is in core contract map
 ;; - check that caller is core contract
+;; - check that target is in STATE_DEPLOYED
 ;; - set active in core contract map
 ;; - set as activeCoreContract
 (define-public (activate-core-contract (targetContract principal) (stacksHeight uint))
@@ -408,6 +411,7 @@
     (
       (coreContract (unwrap! (map-get? CoreContracts targetContract) (err ERR_CORE_CONTRACT_NOT_FOUND)))
     )
+    (asserts! (is-eq (get state coreContract) STATE_DEPLOYED) (err ERR_INCORRECT_CONTRACT_STATE))
     (asserts! (is-eq contract-caller targetContract) (err ERR_UNAUTHORIZED))
     (map-set CoreContracts
       targetContract
@@ -429,7 +433,8 @@
       (oldContractMap (unwrap! (map-get? CoreContracts oldContractAddress) (err ERR_CORE_CONTRACT_NOT_FOUND)))
       (newContractAddress (contract-of newContract))
     )
-    (asserts! (not (is-eq oldContractAddress newContractAddress)) (err ERR_UNAUTHORIZED))
+    (asserts! (not (is-eq oldContractAddress newContractAddress)) (err ERR_CONTRACT_ALREADY_EXISTS))
+    (asserts! (is-none (map-get? CoreContracts newContractAddress)) (err ERR_CONTRACT_ALREADY_EXISTS))
     (asserts! (is-authorized-city) (err ERR_UNAUTHORIZED))
     (map-set CoreContracts
       oldContractAddress
@@ -463,7 +468,8 @@
     )
     (asserts! (is-approver contract-caller) (err ERR_UNAUTHORIZED))
     (asserts! (and (is-eq oldContractArg oldContractAddress) (is-eq newContractArg newContractAddress)) (err ERR_UNAUTHORIZED))
-    (asserts! (not (is-eq oldContractAddress newContractAddress)) (err ERR_UNAUTHORIZED))
+    (asserts! (not (is-eq oldContractAddress newContractAddress)) (err ERR_CONTRACT_ALREADY_EXISTS))
+    (asserts! (is-none (map-get? CoreContracts newContractAddress)) (err ERR_CONTRACT_ALREADY_EXISTS))
     (map-set CoreContracts
       oldContractAddress
       {
