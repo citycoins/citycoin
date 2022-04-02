@@ -1,6 +1,5 @@
 ;; MIAMICOIN TOKEN CONTRACT
-
-;; CONTRACT OWNER
+;; CityCoins Protocol Version 1.0.2
 
 (define-constant CONTRACT_OWNER tx-sender)
 
