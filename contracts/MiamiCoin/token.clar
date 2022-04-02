@@ -134,13 +134,10 @@
   )
 )
 
-;; burn tokens, only accessible by a Core contract
-(define-public (burn (amount uint) (recipient principal))
-  (let
-    (
-      (coreContract (try! (contract-call? 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.miamicoin-auth get-core-contract-info contract-caller)))
-    )
-    (ft-burn? miamicoin amount recipient)
+(define-public (burn (amount uint) (owner principal))
+  (begin
+    (asserts! (is-eq tx-sender owner) (err ERR_UNAUTHORIZED))
+    (ft-burn? miamicoin amount owner)
   )
 )
 

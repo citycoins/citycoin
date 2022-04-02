@@ -29,6 +29,7 @@
 (define-constant ERR_NOTHING_TO_REDEEM u1018)
 (define-constant ERR_UNABLE_TO_FIND_CITY_WALLET u1019)
 (define-constant ERR_CLAIM_IN_WRONG_CONTRACT u1020)
+(define-constant ERR_BLOCK_HEIGHT_IN_PAST u1021)
 
 ;; CITY WALLET MANAGEMENT
 
@@ -301,8 +302,8 @@
         )
         (try! (stx-transfer? (get toCity okReturn) tx-sender (var-get cityWallet)))
         (print { 
-          firstBlock: block-height, 
-          lastBlock: (- (+ block-height (len amounts)) u1) 
+          firstBlock: block-height,
+          lastBlock: (- (+ block-height (len amounts)) u1)
         })
         (ok true)
       )
@@ -883,6 +884,8 @@
 ;; in preparation for a core upgrade
 (define-public (shutdown-contract (stacksHeight uint))
   (begin
+    ;; make sure block height is in the future
+    (asserts! (>= stacksHeight block-height) (err ERR_BLOCK_HEIGHT_IN_PAST))
     ;; only allow shutdown request from AUTH
     (asserts! (is-authorized-auth) (err ERR_UNAUTHORIZED))
     ;; set variables to disable mining/stacking in CORE
