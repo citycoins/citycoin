@@ -9,6 +9,9 @@ CityCoins give communities the power to improve and program their cities.
 - [Contributing](#contributing)
 - [Testing](#testing)
 - [Definitions, Resources, and Links](#definitions-resources-and-links)
+  - [CityCoins v1.0.0 Audit](#citycoins-v100-audit)
+  - [CityCoins Resources](#citycoins-resources)
+  - [Additional Resources](#additional-resources)
 - [References](#references)
 
 ## Contributing
@@ -52,13 +55,21 @@ A bash script is provided to prepare the tests as part of `clarinet:prepare`, an
 
 ## Definitions, Resources, and Links
 
-CityCoins Resources
+### CityCoins v1.0.0 Audit
+
+CoinFabrik [completed an audit on v1.0.0 of the protocol](https://blog.coinfabrik.com/smart-contract-en/citycoins-audit/) on March 14, 2022.
+
+The [resulting audit report](./audit/coinfabrik-citycoins-audit-v1.0.0.pdf) is available in this repo, as well as the [CityCoins developer responses](./audit/coinfabrik-citycoins-audit-v1.0.0-developer-responses.pdf).
+
+### CityCoins Resources
 
 - [CityCoins Website](https://citycoins.co)
 - [CityCoins API](https://api.citycoins.co/docs)
 - [CityCoins Documentation](https://docs.citycoins.co)
 - [CityCoins Discord](https://chat.citycoins.co)
 - [CityCoins Twitter](https://twitter.com/mineCityCoins)
+
+### Additional Resources
 
 Some quick definitions and additional resources related to the technology behind the project.
 
