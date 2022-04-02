@@ -1,21 +1,17 @@
-# CityCoins on Stacks
+# CityCoins <!-- omit in TOC -->
 
 [![Contract Tests](https://github.com/citycoins/citycoin/actions/workflows/test-contract.yaml/badge.svg)](https://github.com/citycoins/citycoin/actions/workflows/test-contract.yaml) [![codecov.io](https://codecov.io/github/citycoins/citycoin/coverage.svg?branch=main)](https://codecov.io/github/citycoins/citycoin?branch=main) [![Discord Chat](https://img.shields.io/discord/856920147381190717?label=Discord)](https://discord.com/invite/tANUVBz9bk)
 
-## Abstract
+## Introduction <!-- omit in TOC -->
 
-Support a city by mining, buying, or holding their CityCoin!
+CityCoins give communities the power to improve and program their cities.
 
-- [CityCoins on Stacks](#citycoins-on-stacks)
-  - [Abstract](#abstract)
-  - [Contributing](#contributing)
-  - [Testing](#testing)
-  - [Definitions, Resources, and Links](#definitions-resources-and-links)
-  - [References](#references)
+- [Contributing](#contributing)
+- [Testing](#testing)
+- [Definitions, Resources, and Links](#definitions-resources-and-links)
+- [References](#references)
 
 ## Contributing
-
-For more information on the project, its goals, and technical details, please review the [Product Requirements Document](./citycoin-prd.md).
 
 PRs are welcome! Please see the [open issues](https://github.com/citycoins/citycoin/issues) and comment if interested, or submit a PR for review.
 
@@ -23,7 +19,7 @@ All code submitted should be thoroughly commented and tested where applicable.
 
 ## Testing
 
-Contracts are tested via [clarinet](https://github.com/hirosystems/clarinet) and typescript.
+Contracts are tested via [clarinet](https://github.com/hirosystems/clarinet) using typescript.
 
 To test the contract using `clarinet`, first [install the tool](https://github.com/hirosystems/clarinet#installation) to make it available on your system.
 
@@ -59,6 +55,7 @@ A bash script is provided to prepare the tests as part of `clarinet:prepare`, an
 CityCoins Resources
 
 - [CityCoins Website](https://citycoins.co)
+- [CityCoins API](https://api.citycoins.co/docs)
 - [CityCoins Documentation](https://docs.citycoins.co)
 - [CityCoins Discord](https://chat.citycoins.co)
 - [CityCoins Twitter](https://twitter.com/mineCityCoins)
@@ -74,6 +71,6 @@ Some quick definitions and additional resources related to the technology behind
 ## References
 
 - [Stacks 2.0 Whitepaper](https://gaia.blockstack.org/hub/1AxyPunHHAHiEffXWESKfbvmBpGQv138Fp/stacks.pdf)
-- [Clarity Language Reference](https://docs.stacks.co/references/language-overview)
-- [Clarity Function Reference](https://docs.stacks.co/references/language-functions)
+- [Clarity Language Reference](https://docs.stacks.co/write-smart-contracts/language-overview)
+- [Clarity Function Reference](https://docs.stacks.co/write-smart-contracts/language-functions)
 - [Build apps with Stacks](https://docs.stacks.co/build-apps/overview)
