@@ -32,7 +32,7 @@ depends_on = ["citycoin-auth", "citycoin-token", "citycoin-vrf", "citycoin-core-
 path = "contracts/clarinet/citycoin-core-v2.clar"
 depends_on = ["citycoin-auth", "citycoin-token", "citycoin-vrf", "citycoin-core-trait"]
 
-[contracts.citycoin-core-mal]
+[contracts.citycoin-core-v3]
 path = "contracts/clarinet/citycoin-core-v2.clar"
 depends_on = ["citycoin-auth", "citycoin-token", "citycoin-vrf", "citycoin-core-trait"]
 
