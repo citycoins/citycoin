@@ -1,5 +1,5 @@
 ;; NEWYORKCITYCOIN CORE CONTRACT
-;; CityCoins Protocol Version 1.0.2
+;; CityCoins Protocol Version 1.2.0
 
 ;; GENERAL CONFIGURATION
 
