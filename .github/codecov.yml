@@ -23,5 +23,4 @@ comment:
 
 ignore:
   - "contracts/clarinet/citycoin-tardis-v1.clar"
-  - "contracts/clarinet/citycoin-tardis-v1-mainnet.clar"
   - "contracts/clarinet/citycoin-core-v2.clar"
