@@ -341,6 +341,11 @@
   (map-get? ProposalVotes VOTE_PROPOSAL_ID)
 )
 
+;; returns the voter index for assigning voter IDs
+(define-read-only (get-voter-index)
+  (var-get voterIndex)
+)
+
 ;; returns the voter principal for a given voter ID
 (define-read-only (get-voter (voterId uint))
   (map-get? Voters voterId)

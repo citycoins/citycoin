@@ -749,6 +749,62 @@ describe("[CityCoin Vote]", () => {
         })
       });
     });
+
+    describe("get-voter-index()", () => {
+      it("succeeds and returns the voter index", () => {
+        // arrange
+        const wallet_1 = accounts.get("wallet_1")!;
+        const wallet_2 = accounts.get("wallet_2")!;
+        const wallet_3 = accounts.get("wallet_3")!;
+        // initialize the vote contract
+        const deployer = accounts.get("deployer")!;
+        const startHeight = 8500;
+        const endHeight = 10600;
+        const amountCycle1 = 1000;
+        const amountCycle2 = 2000;
+        const lockPeriod = 5;
+        const block = chain.mineBlock([
+          core.testInitializeCore(core.address),
+          core.unsafeSetActivationThreshold(1),
+          core.registerUser(wallet_1),
+          token.ftMint(amountCycle1 + amountCycle2, wallet_1),
+          token.ftMint(amountCycle1 + amountCycle2, wallet_2),
+          token.ftMint(amountCycle1 + amountCycle2, wallet_3),
+        ]);
+        const activationBlockHeight =
+          block.height + CoreModel.ACTIVATION_DELAY - 1;
+        chain.mineEmptyBlockUntil(activationBlockHeight);
+  
+        // stack in cycles 2-3
+        chain.mineEmptyBlock(CoreModel.REWARD_CYCLE_LENGTH);
+        chain.mineBlock([
+          core.stackTokens(amountCycle1, lockPeriod, wallet_1),
+          core.stackTokens(amountCycle1, lockPeriod, wallet_2),
+          core.stackTokens(amountCycle1, lockPeriod, wallet_3),
+        ]);
+        chain.mineEmptyBlock(CoreModel.REWARD_CYCLE_LENGTH);
+        chain.mineBlock([
+          core.stackTokens(amountCycle2, lockPeriod, wallet_1),
+          core.stackTokens(amountCycle2, lockPeriod, wallet_2),
+          core.stackTokens(amountCycle2, lockPeriod, wallet_3),
+        ]);
+        // initialize voting contract
+        chain.mineBlock([
+          vote.initializeContract(startHeight, endHeight, deployer)
+        ]);
+        // register voters
+        chain.mineEmptyBlockUntil(VoteModel.VOTE_START_BLOCK + 1);
+        chain.mineBlock([
+          vote.voteOnProposal(true, wallet_1),
+          vote.voteOnProposal(false, wallet_2),
+          vote.voteOnProposal(true, wallet_3)
+        ]);
+        // act
+        const result = vote.getVoterIndex().result;
+        // assert
+        result.expectUint(3);
+      });
+    });
   
     describe("get-voter()", () => {
       it("succeeds and returns none if voter not found", () => {
