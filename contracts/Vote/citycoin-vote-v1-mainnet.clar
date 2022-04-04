@@ -245,7 +245,7 @@
     (
       ;; MIA Cycle 12
       ;; first block: 49,697
-      ;; target block: 49,700 
+      ;; target block: 49,700
       (userCycle12 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v2 get-historical-stacker-stats-or-default-mia u49700 user)))
       (stackedCycle12 (get amountStacked userCycle12))
       ;; MIA Cycle 13
