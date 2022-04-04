@@ -246,12 +246,12 @@
       ;; MIA Cycle 12
       ;; first block: 49,697
       ;; target block: 49,700 
-      (userCycle12 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v2 get-historical-stacker-stats-or-default u49700 user)))
+      (userCycle12 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v2 get-historical-stacker-stats-or-default-mia u49700 user)))
       (stackedCycle12 (get amountStacked userCycle12))
       ;; MIA Cycle 13
       ;; first block: 51,797
       ;; target block: 51,800
-      (userCycle13 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v2 get-historical-stacker-stats-or-default u51800 user)))
+      (userCycle13 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v2 get-historical-stacker-stats-or-default-mia u51800 user)))
       (stackedCycle13 (get amountStacked userCycle13))
       ;; MIA vote calculation
       (avgStackedMia (/ (+ (scale-up stackedCycle12) (scale-up stackedCycle13)) u2))
@@ -272,12 +272,12 @@
       ;; NYC Cycle 6
       ;; first block: 50,049
       ;; target block: 50,050
-      (userCycle6 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v2 get-historical-stacker-stats-or-default u50050 user)))
+      (userCycle6 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v2 get-historical-stacker-stats-or-default-nyc u50050 user)))
       (stackedCycle6 (get amountStacked userCycle6))
       ;; NYC Cycle 7
       ;; first block: 52,149
       ;; target block: 52,150
-      (userCycle7 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v2 get-historical-stacker-stats-or-default u52150 user)))
+      (userCycle7 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v2 get-historical-stacker-stats-or-default-nyc u52150 user)))
       (stackedCycle7 (get amountStacked userCycle7))
       ;; NYC vote calculation
       (nycVote (/ (+ (scale-up stackedCycle6) (scale-up stackedCycle7)) u2))
