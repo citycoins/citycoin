@@ -1,8 +1,6 @@
 [project]
 name = "citycoin"
 requirements = []
-costs_version = 2
-analysis = ["all"]
 
 [contracts.citycoin-vrf]
 path = "contracts/clarinet/citycoin-vrf.clar"
@@ -57,3 +55,7 @@ depends_on = []
 [contracts.test-utils]
 path = "contracts/clarinet/test-utils.clar"
 depends_on = ["citycoin-core-v1"]
+
+[repl.analysis]
+passes = ["check_checker"]
+costs_version = 2
