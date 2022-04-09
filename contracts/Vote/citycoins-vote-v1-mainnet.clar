@@ -29,21 +29,21 @@
 ;; VARIABLES
 
 (define-data-var initialized bool false)
-(define-data-var voteStartBlock uint u0) ;; u8500 used in tests
-(define-data-var voteEndBlock uint u0)   ;; u10600 used in tests
+(define-data-var voteStartBlock uint u0)
+(define-data-var voteEndBlock uint u0)
 
 ;; PROPOSALS
 
 (define-constant CCIP_008 {
   name: "CityCoins SIP-010 Token v2",
   link: "https://github.com/citycoins/governance/blob/feat/community-upgrade-1/ccips/ccip-008/ccip-008-citycoins-sip-010-token-v2.md",
-  hash: "6313738548af393a93f1184f459aa2300fc7a37f"
+  hash: "280010978431ef4eaadbaeaa8d72263ebbeb464d"
 })
 
 (define-constant CCIP_009 {
   name: "CityCoins VRF v2",
   link: "https://github.com/citycoins/governance/blob/feat/community-upgrade-1/ccips/ccip-009/ccip-009-citycoins-vrf-v2.md",
-  hash: "7438ad926d6094e241ea6586eed398378cf09041"
+  hash: "f4f44b8e6e3cc5cb7ef68d215c29c2cf1676f06f"
 })
 
 (define-constant CCIP_010 {
@@ -245,13 +245,13 @@
     (
       ;; MIA Cycle 12
       ;; first block: 49,697
-      ;; target block: 49,700 
-      (userCycle12 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v2 get-historical-stacker-stats-or-default u49700 user)))
+      ;; target block: 49,700
+      (userCycle12 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v2 get-historical-stacker-stats-or-default-mia u49700 user)))
       (stackedCycle12 (get amountStacked userCycle12))
       ;; MIA Cycle 13
       ;; first block: 51,797
       ;; target block: 51,800
-      (userCycle13 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v2 get-historical-stacker-stats-or-default u51800 user)))
+      (userCycle13 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v2 get-historical-stacker-stats-or-default-mia u51800 user)))
       (stackedCycle13 (get amountStacked userCycle13))
       ;; MIA vote calculation
       (avgStackedMia (/ (+ (scale-up stackedCycle12) (scale-up stackedCycle13)) u2))
@@ -272,12 +272,12 @@
       ;; NYC Cycle 6
       ;; first block: 50,049
       ;; target block: 50,050
-      (userCycle6 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v2 get-historical-stacker-stats-or-default u50050 user)))
+      (userCycle6 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v2 get-historical-stacker-stats-or-default-nyc u50050 user)))
       (stackedCycle6 (get amountStacked userCycle6))
       ;; NYC Cycle 7
       ;; first block: 52,149
       ;; target block: 52,150
-      (userCycle7 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v2 get-historical-stacker-stats-or-default u52150 user)))
+      (userCycle7 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v2 get-historical-stacker-stats-or-default-nyc u52150 user)))
       (stackedCycle7 (get amountStacked userCycle7))
       ;; NYC vote calculation
       (nycVote (/ (+ (scale-up stackedCycle6) (scale-up stackedCycle7)) u2))
