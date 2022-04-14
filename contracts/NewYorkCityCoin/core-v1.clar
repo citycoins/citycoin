@@ -707,9 +707,6 @@
         (firstCycle (get first commitment))
         (lastCycle (get last commitment))
         (targetCycle (+ firstCycle rewardCycleIdx))
-        (stackerAtCycle (get-stacker-at-cycle-or-default targetCycle stackerId))
-        (amountStacked (get amountStacked stackerAtCycle))
-        (toReturn (get toReturn stackerAtCycle))
       )
       (begin
         (if (and (>= targetCycle firstCycle) (< targetCycle lastCycle))
