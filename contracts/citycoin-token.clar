@@ -158,8 +158,9 @@
 )
 
 (define-private (check-err (result (response bool uint)) (prior (response bool uint)))
-  (match prior ok-value result
-               err-value (err err-value)
+  (match prior ok-value
+    result
+    err-value (err err-value)
   )
 )
 
