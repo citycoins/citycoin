@@ -121,14 +121,14 @@
 
 ;; CONVERSION
 
-(define-public (convert-to-v2)
-  (let
-    (
-      (owner tx-sender)
-      (v1-balance (try! (contract-call? .citycoin-token get-balance)))
-    )
-  )
-)
+;;(define-public (convert-to-v2)
+;;  (let
+;;    (
+;;      (owner tx-sender)
+;;      (v1-balance (try! (contract-call? .citycoin-token get-balance)))
+;;    )
+;;  )
+;;)
 
 ;; UTILITIES
 

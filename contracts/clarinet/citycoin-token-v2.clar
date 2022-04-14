@@ -121,14 +121,14 @@
 
 ;; CONVERSION
 
-(define-public (convert-to-v2)
-  (let
-    (
-      (owner tx-sender)
-      (v1-balance (try! (contract-call? .citycoin-token get-balance)))
-    )
-  )
-)
+;;(define-public (convert-to-v2)
+;;  (let
+;;    (
+;;      (owner tx-sender)
+;;      (v1-balance (try! (contract-call? .citycoin-token get-balance)))
+;;    )
+;;  )
+;;)
 
 ;; UTILITIES
 
@@ -191,4 +191,16 @@
     )
     (ok transferOk)
   )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; FUNCTIONS ONLY USED DURING TESTS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define-public (test-mint (amount uint) (recipient principal))
+  (ft-mint? citycoins amount recipient)
+)
+
+(define-public (test-set-token-activation)
+  (ok (var-set tokenActivated true))
 )

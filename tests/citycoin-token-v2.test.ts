@@ -1,6 +1,6 @@
 import { describe, assertEquals, types, Account, run, Chain, it, beforeEach} from "../deps.ts";
 import { CoreModel } from "../models/core.model.ts";
-import { SendManyRecord, TokenModel } from "../models/token.model.ts";
+import { SendManyRecord, TokenModel } from "../models/token-v2.model.ts";
 import { Accounts, Context } from "../src/context.ts";
 
 let ctx: Context;
@@ -140,10 +140,10 @@ describe("[CityCoin Token]", () => {
     });
 
     describe("get-decimals()", () => {
-      it("succeeds and returns 0", () => {
+      it("succeeds and returns 6", () => {
         const result = token.getDecimals().result;
 
-        result.expectOk().expectUint(0);
+        result.expectOk().expectUint(6);
       });
     });
 
