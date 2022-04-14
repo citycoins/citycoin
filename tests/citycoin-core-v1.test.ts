@@ -1677,7 +1677,79 @@ describe("[CityCoin Core]", () => {
   // STACKING CONFIGURATION
   //////////////////////////////////////////////////
 
-  // describe("STACKING CONFIGURATION", () => {});
+  describe("STACKING CONFIGURATION", () => {
+    describe("get-first-stacks-block-in-reward-cycle()", () => {
+      it("succeeds and returns the first block in the reward cycle", () => {
+        // arrange
+        const user = accounts.get("wallet_1")!;
+        const setupBlock = chain.mineBlock([
+          core.testInitializeCore(core.address),
+          core.unsafeSetActivationThreshold(1),
+          core.registerUser(user),
+        ]);
+        const activationBlockHeight =
+          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+        chain.mineEmptyBlockUntil(activationBlockHeight);
+        // act
+        const result1 = core.getFirstStacksBlockInRewardCycle(0).result;
+        const result2 = core.getFirstStacksBlockInRewardCycle(1).result;
+        const result3 = core.getFirstStacksBlockInRewardCycle(2).result;
+        // assert
+        result1.expectUint(activationBlockHeight);
+        result2.expectUint(activationBlockHeight + CoreModel.REWARD_CYCLE_LENGTH);
+        result3.expectUint(activationBlockHeight + CoreModel.REWARD_CYCLE_LENGTH * 2);
+      });
+    });
+    describe("get-entitled-stacking-reward()", () => {
+      it("succeeds and returns 0 if user did not stack CityCoins", () => {
+        // arrange
+        const stacker = accounts.get("wallet_2")!;
+        const stackerId = 1;
+        const targetCycle = 1;
+        const amountTokens = 200;
+        const setupBlock = chain.mineBlock([
+          core.testInitializeCore(core.address),
+          core.unsafeSetActivationThreshold(1),
+          core.registerUser(stacker),
+          token.ftMint(amountTokens, stacker),
+        ]);
+        chain.mineEmptyBlockUntil(
+          setupBlock.height + CoreModel.ACTIVATION_DELAY + 1
+        );
+        chain.mineEmptyBlock(CoreModel.REWARD_CYCLE_LENGTH * 2);
+        // act
+        const result = core.getStackingReward(stackerId, targetCycle).result;
+        // assert
+        result.expectUint(0);
+      });
+      it("succeeds and returns the correct amount of uSTX user can claim", () => {
+        // arrange
+        const miner = accounts.get("wallet_1")!;
+        const amountUstx = 1000;
+        const stacker = accounts.get("wallet_2")!;
+        const stackerId = 1;
+        const targetCycle = 1;
+        const amountTokens = 200;
+        const setupBlock = chain.mineBlock([
+          core.testInitializeCore(core.address),
+          core.unsafeSetActivationThreshold(1),
+          core.registerUser(stacker),
+          token.ftMint(amountTokens, stacker),
+        ]);
+        chain.mineEmptyBlockUntil(
+          setupBlock.height + CoreModel.ACTIVATION_DELAY + 1
+        );
+        chain.mineBlock([core.stackTokens(amountTokens, 1, stacker)]);
+        chain.mineEmptyBlock(CoreModel.REWARD_CYCLE_LENGTH);
+        chain.mineBlock([core.mineTokens(amountUstx, miner)]);
+        chain.mineEmptyBlock(CoreModel.REWARD_CYCLE_LENGTH);
+        // act
+        const result = core.getStackingReward(stackerId, targetCycle).result;
+        // assert
+        result.expectUint(amountUstx * 0.7);
+      });
+    });
+  });
 
   //////////////////////////////////////////////////
   // STACKING ACTIONS
