@@ -140,10 +140,10 @@ describe("[CityCoin Token]", () => {
     });
 
     describe("get-decimals()", () => {
-      it("succeeds and returns 0", () => {
+      it("succeeds and returns 6", () => {
         const result = token.getDecimals().result;
 
-        result.expectOk().expectUint(0);
+        result.expectOk().expectUint(6);
       });
     });
 

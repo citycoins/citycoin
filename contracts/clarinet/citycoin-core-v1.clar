@@ -852,9 +852,9 @@
     ;; defined in CCIP-008 https://github.com/citycoins/governance
     (asserts! (> minerBlockHeight (var-get coinbaseThreshold1))
       (if (<= (- minerBlockHeight (var-get activationBlock)) TOKEN_BONUS_PERIOD)
-        ;; bonus reward first 10,000 blocks
+        ;; bonus reward for initial miners
         u250000
-        ;; standard reward remaining 200,000 blocks until 1st halving
+        ;; standard reward
         u100000
       )
     )

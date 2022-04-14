@@ -1125,6 +1125,8 @@ describe("[CityCoin Core]", () => {
         );
       });
 
+      // (ok {coinbaseThreshold1: u35150, coinbaseThreshold2: u60150, coinbaseThreshold3: u85150, coinbaseThreshold4: u110150, coinbaseThreshold5: u135150})
+
       it("succeeds and mints 50000 tokens in 2nd issuance cycle", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
@@ -1138,7 +1140,7 @@ describe("[CityCoin Core]", () => {
           setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(
-          activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS + 1
+          activationBlockHeight + CoreModel.BONUS_PERIOD_LENGTH + CoreModel.TOKEN_EPOCH_LENGTH + 1
         );
 
         const block = chain.mineBlock([core.mineTokens(amount, miner)]);
@@ -1174,7 +1176,7 @@ describe("[CityCoin Core]", () => {
           setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(
-          activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS * 2 + 1
+          activationBlockHeight + CoreModel.BONUS_PERIOD_LENGTH + CoreModel.TOKEN_EPOCH_LENGTH * 2 + 1
         );
 
         const block = chain.mineBlock([core.mineTokens(amount, miner)]);
@@ -1210,7 +1212,7 @@ describe("[CityCoin Core]", () => {
           setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(
-          activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS * 3 + 1
+          activationBlockHeight + CoreModel.BONUS_PERIOD_LENGTH + CoreModel.TOKEN_EPOCH_LENGTH * 3 + 1
         );
 
         const block = chain.mineBlock([core.mineTokens(amount, miner)]);
@@ -1246,7 +1248,7 @@ describe("[CityCoin Core]", () => {
           setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(
-          activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS * 4 + 1
+          activationBlockHeight + CoreModel.BONUS_PERIOD_LENGTH + CoreModel.TOKEN_EPOCH_LENGTH * 4 + 1
         );
 
         const block = chain.mineBlock([core.mineTokens(amount, miner)]);
@@ -1282,7 +1284,7 @@ describe("[CityCoin Core]", () => {
           setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(
-          activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS * 5 + 1
+          activationBlockHeight + CoreModel.BONUS_PERIOD_LENGTH + CoreModel.TOKEN_EPOCH_LENGTH * 5 + 1
         );
 
         const block = chain.mineBlock([core.mineTokens(amount, miner)]);
