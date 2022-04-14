@@ -156,7 +156,7 @@
           (activationBlockVal (+ block-height (var-get activationDelay)))
         )
         (try! (contract-call? .citycoin-auth activate-core-contract (as-contract tx-sender) activationBlockVal))
-        (try! (contract-call? .citycoin-token activate-token (as-contract tx-sender) activationBlockVal))
+        (try! (contract-call? .citycoin-token-v2 activate-token (as-contract tx-sender) activationBlockVal))
         (try! (set-coinbase-thresholds))
         (var-set activationReached true)
         (var-set activationBlock activationBlockVal)
@@ -674,7 +674,7 @@
     (asserts! (and (> lockPeriod u0) (<= lockPeriod MAX_REWARD_CYCLES))
       (err ERR_CANNOT_STACK))
     (asserts! (> amountTokens u0) (err ERR_CANNOT_STACK))
-    (try! (contract-call? .citycoin-token transfer amountTokens tx-sender (as-contract tx-sender) none))
+    (try! (contract-call? .citycoin-token-v2 transfer amountTokens tx-sender (as-contract tx-sender) none))
     (print {
       firstCycle: targetCycle, 
       lastCycle: (- (+ targetCycle lockPeriod) u1)
@@ -788,7 +788,7 @@
     )
     ;; send back tokens if user was eligible
     (if (> toReturn u0)
-      (try! (as-contract (contract-call? .citycoin-token transfer toReturn tx-sender user none)))
+      (try! (as-contract (contract-call? .citycoin-token-v2 transfer toReturn tx-sender user none)))
       true
     )
     ;; send back rewards if user was eligible
@@ -815,7 +815,7 @@
 (define-private (set-coinbase-thresholds)
   (let
     (
-      (coinbaseAmounts (try! (contract-call? .citycoin-token get-coinbase-thresholds)))
+      (coinbaseAmounts (try! (contract-call? .citycoin-token-v2 get-coinbase-thresholds)))
     )
     (var-set coinbaseThreshold1 (get coinbaseThreshold1 coinbaseAmounts))
     (var-set coinbaseThreshold2 (get coinbaseThreshold2 coinbaseAmounts))
@@ -870,7 +870,7 @@
 
 ;; mint new tokens for claimant who won at given Stacks block height
 (define-private (mint-coinbase (recipient principal) (stacksHeight uint))
-  (as-contract (contract-call? .citycoin-token mint (get-coinbase-amount stacksHeight) recipient))
+  (as-contract (contract-call? .citycoin-token-v2 mint (get-coinbase-amount stacksHeight) recipient))
 )
 
 ;; UTILITIES
