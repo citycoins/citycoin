@@ -44,7 +44,7 @@
 )
 
 (define-read-only (get-decimals)
-  (ok u6)
+  (ok u0)
 )
 
 (define-read-only (get-balance (user principal))
@@ -61,12 +61,8 @@
 
 ;; TOKEN CONFIGURATION
 
-;; define bonus period and initial epoch length
-(define-constant TOKEN_BONUS_PERIOD u10000)
-(define-constant TOKEN_EPOCH_LENGTH u25000)
-
-;; REMOVE how many blocks until the next halving occurs
-;; REMOVE (define-constant TOKEN_HALVING_BLOCKS u210000)
+;; how many blocks until the next halving occurs
+(define-constant TOKEN_HALVING_BLOCKS u210000)
 
 ;; store block height at each halving, set by register-user in core contract 
 (define-data-var coinbaseThreshold1 uint u0)
@@ -92,11 +88,11 @@
     (asserts! (is-eq (get state coreContractMap) STATE_ACTIVE) (err ERR_UNAUTHORIZED))
     (asserts! (not (var-get tokenActivated)) (err ERR_TOKEN_ALREADY_ACTIVATED))
     (var-set tokenActivated true)
-    (var-set coinbaseThreshold1 (+ stacksHeight TOKEN_BONUS_PERIOD TOKEN_EPOCH_LENGTH))        ;; 35,000 blocks
-    (var-set coinbaseThreshold2 (+ stacksHeight TOKEN_BONUS_PERIOD (* u2 TOKEN_EPOCH_LENGTH))) ;; 85,000 blocks
-    (var-set coinbaseThreshold3 (+ stacksHeight TOKEN_BONUS_PERIOD (* u3 TOKEN_EPOCH_LENGTH))) ;; 185,000 blocks
-    (var-set coinbaseThreshold4 (+ stacksHeight TOKEN_BONUS_PERIOD (* u4 TOKEN_EPOCH_LENGTH))) ;; 385,000 blocks
-    (var-set coinbaseThreshold5 (+ stacksHeight TOKEN_BONUS_PERIOD (* u5 TOKEN_EPOCH_LENGTH))) ;; 785,000 blocks
+    (var-set coinbaseThreshold1 (+ stacksHeight TOKEN_HALVING_BLOCKS))
+    (var-set coinbaseThreshold2 (+ stacksHeight (* u2 TOKEN_HALVING_BLOCKS)))
+    (var-set coinbaseThreshold3 (+ stacksHeight (* u3 TOKEN_HALVING_BLOCKS)))
+    (var-set coinbaseThreshold4 (+ stacksHeight (* u4 TOKEN_HALVING_BLOCKS)))
+    (var-set coinbaseThreshold5 (+ stacksHeight (* u5 TOKEN_HALVING_BLOCKS)))
     (ok true)
   )
 )
@@ -162,9 +158,8 @@
 )
 
 (define-private (check-err (result (response bool uint)) (prior (response bool uint)))
-  (match prior ok-value
-    result
-    err-value (err err-value)
+  (match prior ok-value result
+               err-value (err err-value)
   )
 )
 
