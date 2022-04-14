@@ -290,14 +290,51 @@ describe("[CityCoin Token v2]", () => {
     });
 
     describe("convert-to-v2()", () => {
-      it("fails with ERR_UNAUTHORIZED when owner is different than transaction sender", () => {
+      it("fails with ERR_V1_BALANCE_NOT_FOUND when sender has no v1 tokens", () => {
         // arrange
-        const owner = accounts.get("wallet_1")!;
-        const sender = accounts.get("wallet_2")!;
+        const sender = accounts.get("wallet_1")!;
+        const amount = 100;
 
+        // act
+        const receipt = chain.mineBlock([
+          tokenv2.convertToV2(sender),
+        ]).receipts[0];
+
+        // assert
+        receipt.result.expectErr().expectUint(TokenModelV2.ErrCode.ERR_V1_BALANCE_NOT_FOUND);
+        
       });
-      it("fails with ERR_V1_BALANCE_NOT_FOUND when sender has no v1 tokens");
-      it("succeeds then burns v1 tokens and mints v2 tokens");
+      it("succeeds then burns v1 tokens and mints v2 tokens with correct decimals", () => {
+        // arrange
+        const sender = accounts.get("wallet_1")!;
+        const amount = 100;
+        chain.mineBlock([
+          tokenv1.ftMint(amount, sender)
+        ]);
+
+        // act
+        const receipt = chain.mineBlock([
+          tokenv2.convertToV2(sender),
+        ]).receipts[0];
+
+        // assert
+        receipt.result.expectOk();
+
+        assertEquals(receipt.events.length, 2);
+
+        receipt.events.expectFungibleTokenBurnEvent(
+          amount,
+          sender.address,
+          "citycoins"
+        );
+
+        receipt.events.expectFungibleTokenMintEvent(
+          amount * TokenModelV2.MICRO_CITYCOINS,
+          sender.address,
+          "citycoins"
+        );
+        
+      });
     });
   });
 

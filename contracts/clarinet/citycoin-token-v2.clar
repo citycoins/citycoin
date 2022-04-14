@@ -25,6 +25,7 @@
 (define-fungible-token citycoins)
 
 (define-constant DECIMALS u6)
+(define-constant MICRO_CITYCOINS (pow u10 DECIMALS))
 
 ;; SIP-010 FUNCTIONS
 
@@ -124,6 +125,7 @@
 
 ;; CONVERSION
 
+;; TODO: consider tx-sender vs contract-caller
 (define-public (convert-to-v2)
   (let
     (
@@ -131,13 +133,12 @@
     )
     ;; verify positive balance
     (asserts! (> balanceV1 u0) (err ERR_V1_BALANCE_NOT_FOUND))
-    
     ;; burn old
     ;; TODO: MIA will need to call from core contract
     (try! (contract-call? .citycoin-token burn balanceV1 tx-sender))
-
     ;; create new
-    (ft-mint? citycoins (* balanceV1 DECIMALS) tx-sender)
+    (ft-mint? citycoins (* balanceV1 MICRO_CITYCOINS) tx-sender)
+    ;; TODO add printing!
   )
 )
 
