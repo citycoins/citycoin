@@ -15,6 +15,7 @@
 (define-constant ERR_UNAUTHORIZED u2000)
 (define-constant ERR_TOKEN_NOT_ACTIVATED u2001)
 (define-constant ERR_TOKEN_ALREADY_ACTIVATED u2002)
+(define-constant ERR_V1_BALANCE_NOT_FOUND u2003)
 
 ;; SIP-010 DEFINITION
 
@@ -22,6 +23,8 @@
 ;; testnet: (impl-trait 'STR8P3RD1EHA8AA37ERSSSZSWKS9T2GYQFGXNA4C.sip-010-trait-ft-standard.sip-010-trait)
 
 (define-fungible-token citycoins)
+
+(define-constant DECIMALS u6)
 
 ;; SIP-010 FUNCTIONS
 
@@ -45,7 +48,7 @@
 )
 
 (define-read-only (get-decimals)
-  (ok u6)
+  (ok DECIMALS)
 )
 
 (define-read-only (get-balance (user principal))
@@ -121,14 +124,20 @@
 
 ;; CONVERSION
 
-;;(define-public (convert-to-v2)
-;;  (let
-;;    (
-;;      (owner tx-sender)
-;;      (v1-balance (try! (contract-call? .citycoin-token get-balance)))
-;;    )
-;;  )
-;;)
+(define-public (convert-to-v2)
+  (let
+    (
+      (balanceV1 (unwrap! (contract-call? .citycoin-token get-balance tx-sender) (err ERR_V1_BALANCE_NOT_FOUND)))
+    )
+    ;; verify positive balance
+    (asserts! (> balanceV1 u0) (err ERR_V1_BALANCE_NOT_FOUND))
+    ;; burn old
+    ;; TODO: MIA will need to call from core contract
+    (try! (contract-call? .citycoin-token burn balanceV1 tx-sender))
+    ;; create new
+    (ft-mint? citycoins (* balanceV1 DECIMALS) tx-sender)
+  )
+)
 
 ;; UTILITIES
 
