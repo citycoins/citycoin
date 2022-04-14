@@ -17,7 +17,7 @@ beforeEach(() => {
   core = ctx.models.get(CoreModel);
 })
 
-describe("[CityCoin Token]", () => {
+describe("[CityCoin Token v2]", () => {
   describe("SIP-010 FUNCTIONS", () => {
     describe("transfer()", () => {
       it("succeeds with no memo supplied", () => {
