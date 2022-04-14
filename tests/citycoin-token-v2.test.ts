@@ -1,19 +1,22 @@
 import { describe, assertEquals, types, Account, run, Chain, it, beforeEach} from "../deps.ts";
 import { CoreModel } from "../models/core.model.ts";
-import { SendManyRecord, TokenModel } from "../models/token-v2.model.ts";
+import { TokenModel as TokenModelV1 } from "../models/token.model.ts";
+import { SendManyRecord, TokenModel as TokenModelV2 } from "../models/token-v2.model.ts";
 import { Accounts, Context } from "../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let token: TokenModel;
+let tokenv1: TokenModelV1;
+let tokenv2: TokenModelV2;
 let core: CoreModel;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  token = ctx.models.get(TokenModel);
+  tokenv1 = ctx.models.get(TokenModelV1);
+  tokenv2 = ctx.models.get(TokenModelV2);
   core = ctx.models.get(CoreModel);
 })
 
@@ -25,10 +28,10 @@ describe("[CityCoin Token v2]", () => {
         const to = accounts.get("wallet_2")!;
         const amount = 100;
 
-        chain.mineBlock([token.ftMint(amount, from)]);
+        chain.mineBlock([tokenv2.ftMint(amount, from)]);
 
         const block = chain.mineBlock([
-          token.transfer(amount, from, to, from),
+          tokenv2.transfer(amount, from, to, from),
         ]);
 
         assertEquals(block.receipts.length, 1);
@@ -49,10 +52,10 @@ describe("[CityCoin Token v2]", () => {
           "MiamiCoin is the first CityCoin"
         );
 
-        chain.mineBlock([token.ftMint(amount, from)]);
+        chain.mineBlock([tokenv2.ftMint(amount, from)]);
 
         const block = chain.mineBlock([
-          token.transfer(amount, from, to, from, memo),
+          tokenv2.transfer(amount, from, to, from, memo),
         ]);
 
         assertEquals(block.receipts.length, 1);
@@ -61,7 +64,7 @@ describe("[CityCoin Token v2]", () => {
         const expectedEvent = {
           type: "contract_event",
           contract_event: {
-            contract_identifier: token.address,
+            contract_identifier: tokenv2.address,
             topic: "print",
             value: types.some(types.buff(memo)),
           },
@@ -83,7 +86,7 @@ describe("[CityCoin Token v2]", () => {
         const to = accounts.get("wallet_2")!;
 
         const block = chain.mineBlock([
-          token.transfer(100, from, to, from),
+          tokenv2.transfer(100, from, to, from),
         ]);
 
         assertEquals(block.receipts.length, 1);
@@ -94,10 +97,10 @@ describe("[CityCoin Token v2]", () => {
         const from = accounts.get("wallet_1")!;
         const to = accounts.get("wallet_1")!;
 
-        chain.mineBlock([token.ftMint(100, from)]);
+        chain.mineBlock([tokenv2.ftMint(100, from)]);
 
         const block = chain.mineBlock([
-          token.transfer(100, from, to, from),
+          tokenv2.transfer(100, from, to, from),
         ]);
 
         assertEquals(block.receipts.length, 1);
@@ -110,22 +113,22 @@ describe("[CityCoin Token v2]", () => {
         const sender = accounts.get("wallet_3")!;
         const amount = 100;
 
-        chain.mineBlock([token.ftMint(amount, from)]);
+        chain.mineBlock([tokenv2.ftMint(amount, from)]);
 
         const block = chain.mineBlock([
-          token.transfer(amount, from, to, sender),
+          tokenv2.transfer(amount, from, to, sender),
         ]);
 
         assertEquals(block.receipts.length, 1);
         block.receipts[0].result
           .expectErr()
-          .expectUint(TokenModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(TokenModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
     });
 
     describe("get-name()", () => {
       it("succeeds and returns 'citycoins'", () => {
-        const result = token.getName().result;
+        const result = tokenv2.getName().result;
 
         result.expectOk().expectAscii("citycoins");
       });
@@ -133,7 +136,7 @@ describe("[CityCoin Token v2]", () => {
 
     describe("get-symbol()", () => {
       it("succeeds and returns 'CYCN'", () => {
-        const result = token.getSymbol().result;
+        const result = tokenv2.getSymbol().result;
 
         result.expectOk().expectAscii("CYCN");
       });
@@ -141,7 +144,7 @@ describe("[CityCoin Token v2]", () => {
 
     describe("get-decimals()", () => {
       it("succeeds and returns 6", () => {
-        const result = token.getDecimals().result;
+        const result = tokenv2.getDecimals().result;
 
         result.expectOk().expectUint(6);
       });
@@ -150,16 +153,16 @@ describe("[CityCoin Token v2]", () => {
     describe("get-balance()", () => {
       it("succeeds and returns 0 when no tokens are minted", () => {
         const wallet_1 = accounts.get("wallet_1")!;
-        const result = token.getBalance(wallet_1).result;
+        const result = tokenv2.getBalance(wallet_1).result;
 
         result.expectOk().expectUint(0);
       });
 
       it("succeeds and returns 100 after 100 tokens are minted to a wallet", () => {
         const wallet_1 = accounts.get("wallet_1")!;
-        chain.mineBlock([token.ftMint(100, wallet_1)]);
+        chain.mineBlock([tokenv2.ftMint(100, wallet_1)]);
 
-        const result = token.getBalance(wallet_1).result;
+        const result = tokenv2.getBalance(wallet_1).result;
 
         result.expectOk().expectUint(100);
       });
@@ -167,23 +170,23 @@ describe("[CityCoin Token v2]", () => {
 
     describe("get-total-supply()", () => {
       it("succeeds and returns 0 when no tokens are minted", () => {
-        const result = token.getTotalSupply().result;
+        const result = tokenv2.getTotalSupply().result;
 
         result.expectOk().expectUint(0);
       });
 
       it("succeeds and returns 100 after 100 tokens are minted", () => {
         const wallet_1 = accounts.get("wallet_1")!;
-        chain.mineBlock([token.ftMint(100, wallet_1)]);
+        chain.mineBlock([tokenv2.ftMint(100, wallet_1)]);
 
-        const result = token.getTotalSupply().result;
+        const result = tokenv2.getTotalSupply().result;
 
         result.expectOk().expectUint(100);
       });
     });
     describe("get-token-uri()", () => {
       it("succeds and returns correct uri", () => {
-        const result = token.getTokenUri().result;
+        const result = tokenv2.getTokenUri().result;
         const tokenUri = "https://cdn.citycoins.co/metadata/citycoin.json";
 
         console.log(`\n  URI: ${tokenUri}`);
@@ -197,14 +200,14 @@ describe("[CityCoin Token v2]", () => {
       it("fails with ERR_CORE_CONTRACT_NOT_FOUND if called by an unapproved sender", () => {
         const wallet_2 = accounts.get("wallet_2")!;
         let block = chain.mineBlock([
-          token.mint(200, wallet_2, wallet_2),
+          tokenv2.mint(200, wallet_2, wallet_2),
         ]);
 
         let receipt = block.receipts[0];
 
         receipt.result
           .expectErr()
-          .expectUint(TokenModel.ErrCode.ERR_CORE_CONTRACT_NOT_FOUND);
+          .expectUint(TokenModelV2.ErrCode.ERR_CORE_CONTRACT_NOT_FOUND);
       });
 
       it("succeeds when called by trusted caller and mints requested amount of tokens", () => {
@@ -239,13 +242,13 @@ describe("[CityCoin Token v2]", () => {
         const amount = 500;
 
         // act
-        const receipt = chain.mineBlock([token.burn(amount, owner, sender)])
+        const receipt = chain.mineBlock([tokenv2.burn(amount, owner, sender)])
           .receipts[0];
 
         // assert
         receipt.result
           .expectErr()
-          .expectUint(TokenModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(TokenModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
 
       it("fails with u1 when sender is trying to burn more tokens than they own", () => {
@@ -254,7 +257,7 @@ describe("[CityCoin Token v2]", () => {
 
         // act
         const receipt = chain.mineBlock([
-          token.burn(amount, owner, owner),
+          tokenv2.burn(amount, owner, owner),
         ]).receipts[0];
 
         receipt.result.expectErr().expectUint(1); // 1 is standard ft-burn error code
@@ -265,12 +268,12 @@ describe("[CityCoin Token v2]", () => {
         const owner = accounts.get("wallet_1")!;
         const amount = 300;
         chain.mineBlock([
-          token.ftMint(amount, owner)
+          tokenv2.ftMint(amount, owner)
         ]);
 
         // act
         const receipt = chain.mineBlock([
-          token.burn(amount, owner, owner),
+          tokenv2.burn(amount, owner, owner),
         ]).receipts[0];
 
         // assert
@@ -285,6 +288,17 @@ describe("[CityCoin Token v2]", () => {
         );
       });
     });
+
+    describe("convert-to-v2()", () => {
+      it("fails with ERR_UNAUTHORIZED when owner is different than transaction sender", () => {
+        // arrange
+        const owner = accounts.get("wallet_1")!;
+        const sender = accounts.get("wallet_2")!;
+
+      });
+      it("fails with ERR_V1_BALANCE_NOT_FOUND when sender has no v1 tokens");
+      it("succeeds then burns v1 tokens and mints v2 tokens");
+    });
   });
 
   describe("TOKEN CONFIGURATION", () => {
@@ -292,12 +306,12 @@ describe("[CityCoin Token v2]", () => {
       it("fails with ERR_UNAUTHORIZED if called by an unapproved sender", () => {
         const wallet_2 = accounts.get("wallet_2")!;
         const block = chain.mineBlock([
-          token.activateToken(wallet_2, 10),
+          tokenv2.activateToken(wallet_2, 10),
         ]);
         const receipt = block.receipts[0];
         receipt.result
           .expectErr()
-          .expectUint(TokenModel.ErrCode.ERR_CORE_CONTRACT_NOT_FOUND);
+          .expectUint(TokenModelV2.ErrCode.ERR_CORE_CONTRACT_NOT_FOUND);
       });
     });
   });
@@ -342,10 +356,10 @@ describe("[CityCoin Token v2]", () => {
 
         // act
 
-        chain.mineBlock([token.ftMint(amountTotal, from)]);
+        chain.mineBlock([tokenv2.ftMint(amountTotal, from)]);
 
         const block = chain.mineBlock([
-          token.sendMany(sendManyRecords, from),
+          tokenv2.sendMany(sendManyRecords, from),
         ]);
 
         // assert
@@ -360,7 +374,7 @@ describe("[CityCoin Token v2]", () => {
         receipt.events.forEach((event, n) => {
           if (typeof sendManyRecords[sendManyIdx].memo !== "undefined") {
             receipt.events.expectPrintEvent(
-              token.address,
+              tokenv2.address,
               types.some(
                 types.buff(<ArrayBuffer>sendManyRecords[sendManyIdx].memo)
               )
@@ -409,10 +423,10 @@ describe("[CityCoin Token v2]", () => {
 
         // act
 
-        chain.mineBlock([token.ftMint(amountTotal, from)]);
+        chain.mineBlock([tokenv2.ftMint(amountTotal, from)]);
 
         const block = chain.mineBlock([
-          token.sendMany(sendManyRecords, from),
+          tokenv2.sendMany(sendManyRecords, from),
         ]);
 
         // assert
@@ -427,7 +441,7 @@ describe("[CityCoin Token v2]", () => {
         receipt.events.forEach((event, n) => {
           if (typeof sendManyRecords[sendManyIdx].memo !== "undefined") {
             receipt.events.expectPrintEvent(
-              token.address,
+              tokenv2.address,
               types.some(
                 types.buff(<ArrayBuffer>sendManyRecords[sendManyIdx].memo)
               )
@@ -484,10 +498,10 @@ describe("[CityCoin Token v2]", () => {
 
         // act
 
-        chain.mineBlock([token.ftMint(amountTotal, from)]);
+        chain.mineBlock([tokenv2.ftMint(amountTotal, from)]);
 
         const block = chain.mineBlock([
-          token.sendMany(sendManyRecords, from),
+          tokenv2.sendMany(sendManyRecords, from),
         ]);
 
         // assert
@@ -502,7 +516,7 @@ describe("[CityCoin Token v2]", () => {
         receipt.events.forEach((event, n) => {
           if (typeof sendManyRecords[sendManyIdx].memo !== "undefined") {
             receipt.events.expectPrintEvent(
-              token.address,
+              tokenv2.address,
               types.some(
                 types.buff(<ArrayBuffer>sendManyRecords[sendManyIdx].memo)
               )
