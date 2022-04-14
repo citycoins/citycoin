@@ -802,6 +802,9 @@
 
 ;; TOKEN CONFIGURATION
 
+;; define bonus period and initial epoch length
+(define-constant TOKEN_BONUS_PERIOD u10000)
+
 ;; store block height at each halving, set by register-user in core contract
 (define-data-var coinbaseThreshold1 uint u0)
 (define-data-var coinbaseThreshold2 uint u0)
@@ -845,11 +848,10 @@
   (begin
     ;; if contract is not active, return 0
     (asserts! (>= minerBlockHeight (var-get activationBlock)) u0)
-    ;; if contract is active, return based on issuance schedule
-    ;; halvings occur every 210,000 blocks for 1,050,000 Stacks blocks
-    ;; then mining continues indefinitely with 3,125 tokens as the reward
+    ;; if contract is active, return based on emissions schedule
+    ;; defined in CCIP-008 https://github.com/citycoins/governance
     (asserts! (> minerBlockHeight (var-get coinbaseThreshold1))
-      (if (<= (- minerBlockHeight (var-get activationBlock)) u10000)
+      (if (<= (- minerBlockHeight (var-get activationBlock)) TOKEN_BONUS_PERIOD)
         ;; bonus reward first 10,000 blocks
         u250000
         ;; standard reward remaining 200,000 blocks until 1st halving
