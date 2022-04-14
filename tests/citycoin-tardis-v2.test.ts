@@ -1,6 +1,6 @@
 import { describe, assertEquals, types, Account, run, Chain, it, beforeEach} from "../deps.ts";
 import { CoreModel } from "../models/core.model.ts";
-import { TokenModel } from "../models/token.model.ts";
+import { TokenModel } from "../models/token-v2.model.ts";
 import { TardisModel } from "../models/tardis.model.ts";
 import { Accounts, Context } from "../src/context.ts";
 

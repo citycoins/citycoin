@@ -27,7 +27,7 @@
   (let 
     (
       (blockHash (unwrap! (get-block-hash blockHeight) (err ERR_INVALID_BLOCK)))
-      (balance (unwrap! (at-block blockHash (contract-call? .citycoin-token get-balance address)) (err ERR_BALANCE_NOT_FOUND)))
+      (balance (unwrap! (at-block blockHash (contract-call? .citycoin-token-v2 get-balance address)) (err ERR_BALANCE_NOT_FOUND)))
     )
     (ok balance)
   )
@@ -43,7 +43,7 @@
   (let 
     (
       (blockHash (unwrap! (get-block-hash blockHeight) (err ERR_INVALID_BLOCK)))
-      (supply (unwrap! (at-block blockHash (contract-call? .citycoin-token get-total-supply)) (err ERR_SUPPLY_NOT_FOUND)))
+      (supply (unwrap! (at-block blockHash (contract-call? .citycoin-token-v2 get-total-supply)) (err ERR_SUPPLY_NOT_FOUND)))
     )
     (ok supply)
   )
