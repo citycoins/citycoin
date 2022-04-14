@@ -189,6 +189,10 @@ export class CoreModel extends Model {
     return this.callReadOnly("get-reward-cycle", [types.uint(blockHeight)]);
   }
 
+  getStackingReward(userId: number, targetCycle: number): ReadOnlyFn {
+    return this.callReadOnly("get-stacking-reward", [types.uint(userId), types.uint(targetCycle)]);
+  }
+
   //////////////////////////////////////////////////
   // STACKING ACTIONS
   //////////////////////////////////////////////////
@@ -216,6 +220,10 @@ export class CoreModel extends Model {
   //////////////////////////////////////////////////
   // TOKEN CONFIGURATION
   //////////////////////////////////////////////////
+
+  getCoinbaseThresholds(): ReadOnlyFn {
+    return this.callReadOnly("get-coinbase-thresholds");
+  }
 
   //////////////////////////////////////////////////
   // UTILITIES
