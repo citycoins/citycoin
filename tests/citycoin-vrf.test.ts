@@ -42,6 +42,7 @@ describe("[CityCoin VRF]", () => {
     // ]).receipts[0];
     // assert
     result.expectErr().expectUint(VrfModelV2.ErrCode.ERR_FAIL);
+    // receipt.result.expectErr().expectUint(VrfModelV2.ErrCode.ERR_FAIL);
   });
 
   it("succeeds and returns the same value from v1 and v2", () => {
