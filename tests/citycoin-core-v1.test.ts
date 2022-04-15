@@ -2530,11 +2530,11 @@ describe("[CityCoin Core]", () => {
         const result = core.getCoinbaseThresholds().result;
         // assert
         const expectedResult = {
-          coinbaseThreshold1: types.uint(activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS),     // 210151
-          coinbaseThreshold2: types.uint(activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS * 2), // 420151
-          coinbaseThreshold3: types.uint(activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS * 3), // 630151
-          coinbaseThreshold4: types.uint(activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS * 4), // 840151
-          coinbaseThreshold5: types.uint(activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS * 5)  // 1050151
+          coinbaseThreshold1: types.uint(activationBlockHeight + CoreModel.BONUS_PERIOD_LENGTH + CoreModel.TOKEN_EPOCH_LENGTH),     // 210151
+          coinbaseThreshold2: types.uint(activationBlockHeight + CoreModel.BONUS_PERIOD_LENGTH + CoreModel.TOKEN_EPOCH_LENGTH * 2), // 420151
+          coinbaseThreshold3: types.uint(activationBlockHeight + CoreModel.BONUS_PERIOD_LENGTH + CoreModel.TOKEN_EPOCH_LENGTH * 3), // 630151
+          coinbaseThreshold4: types.uint(activationBlockHeight + CoreModel.BONUS_PERIOD_LENGTH + CoreModel.TOKEN_EPOCH_LENGTH * 4), // 840151
+          coinbaseThreshold5: types.uint(activationBlockHeight + CoreModel.BONUS_PERIOD_LENGTH + CoreModel.TOKEN_EPOCH_LENGTH * 5)  // 1050151
         };
         assertEquals(result.expectOk().expectTuple(), expectedResult);
       });
