@@ -6,6 +6,10 @@ requirements = []
 path = "contracts/clarinet/citycoin-vrf.clar"
 depends_on = []
 
+[contracts.citycoin-vrf-v2]
+path = "contracts/clarinet/citycoin-vrf-v2.clar"
+depends_on = []
+
 [contracts.citycoin-core-trait]
 path = "contracts/clarinet/citycoin-core-trait.clar"
 depends_on = []
