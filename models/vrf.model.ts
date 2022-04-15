@@ -1,24 +1,11 @@
-import { Account, ReadOnlyFn, Tx, types } from "../deps.ts";
+import { ReadOnlyFn, types } from "../deps.ts";
 import { Model } from "../src/model.ts";
 
-enum ErrCode {
-  ERR_FAIL = 3000,
-}
+export class VrfModelV1 extends Model {
+  name = "citycoin-vrf";
 
-export class VrfModel extends Model {
-  name = "citycoin-vrf-v2";
-  static readonly ErrCode = ErrCode;
-
-  getSaveRnd(blockHeight: number, sender: Account): Tx {
-    return this.callPublic(
-      "get-save-rnd",
-      [types.uint(blockHeight)],
-      sender.address
-    );
-  }
-
-  getRnd(blockHeight: number): ReadOnlyFn {
-    return this.callReadOnly("get-rnd", [types.uint(blockHeight)]);
+  getRandomUintAtBlock(blockheight: number): ReadOnlyFn {
+    return this.callReadOnly("get-random-uint-at-block", [types.uint(blockheight)]);
   }
 
 }
