@@ -10,9 +10,9 @@
 
 ;; ERROR CODES
 
-(define-constant ERR_UNAUTHORIZED u2000)
-(define-constant ERR_TOKEN_NOT_ACTIVATED u2001)
-(define-constant ERR_TOKEN_ALREADY_ACTIVATED u2002)
+(define-constant ERR_UNAUTHORIZED (err u2000))
+(define-constant ERR_TOKEN_NOT_ACTIVATED (err u2001))
+(define-constant ERR_TOKEN_ALREADY_ACTIVATED (err u2002))
 
 ;; SIP-010 DEFINITION
 
@@ -24,7 +24,7 @@
 
 (define-public (transfer (amount uint) (from principal) (to principal) (memo (optional (buff 34))))
   (begin
-    (asserts! (is-eq from tx-sender) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq from tx-sender) ERR_UNAUTHORIZED)
     (if (is-some memo)
       (print memo)
       none
@@ -83,8 +83,8 @@
     (
       (coreContractMap (try! (contract-call? 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.miamicoin-auth get-core-contract-info coreContract)))
     )
-    (asserts! (is-eq (get state coreContractMap) STATE_ACTIVE) (err ERR_UNAUTHORIZED))
-    (asserts! (not (var-get tokenActivated)) (err ERR_TOKEN_ALREADY_ACTIVATED))
+    (asserts! (is-eq (get state coreContractMap) STATE_ACTIVE) ERR_UNAUTHORIZED)
+    (asserts! (not (var-get tokenActivated)) ERR_TOKEN_ALREADY_ACTIVATED)
     (var-set tokenActivated true)
     (var-set coinbaseThreshold1 (+ stacksHeight TOKEN_HALVING_BLOCKS))
     (var-set coinbaseThreshold2 (+ stacksHeight (* u2 TOKEN_HALVING_BLOCKS)))
@@ -101,7 +101,7 @@
     (
       (activated (var-get tokenActivated))
     )
-    (asserts! activated (err ERR_TOKEN_NOT_ACTIVATED))
+    (asserts! activated ERR_TOKEN_NOT_ACTIVATED)
     (ok {
       coinbaseThreshold1: (var-get coinbaseThreshold1),
       coinbaseThreshold2: (var-get coinbaseThreshold2),
@@ -119,7 +119,7 @@
 ;; set token URI to new value, only accessible by Auth
 (define-public (set-token-uri (newUri (optional (string-utf8 256))))
   (begin
-    (asserts! (is-authorized-auth) (err ERR_UNAUTHORIZED))
+    (asserts! (is-authorized-auth) ERR_UNAUTHORIZED)
     (ok (var-set tokenUri newUri))
   )
 )
@@ -136,7 +136,7 @@
 
 (define-public (burn (amount uint) (owner principal))
   (begin
-    (asserts! (is-eq tx-sender owner) (err ERR_UNAUTHORIZED))
+    (asserts! (is-eq tx-sender owner) ERR_UNAUTHORIZED)
     (ft-burn? miamicoin amount owner)
   )
 )
