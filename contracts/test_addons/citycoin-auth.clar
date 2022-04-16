@@ -8,8 +8,8 @@
     (
       (coreContractAddress (contract-of coreContract))
     )
-    ;; (asserts! (is-eq contract-caller CONTRACT_OWNER) (err ERR_UNAUTHORIZED))
-    (asserts! (not (var-get initialized)) (err ERR_UNAUTHORIZED))
+    ;; (asserts! (is-eq contract-caller CONTRACT_OWNER) ERR_UNAUTHORIZED)
+    (asserts! (not (var-get initialized)) ERR_UNAUTHORIZED)
     (map-set CoreContracts
       coreContractAddress
       {
@@ -37,7 +37,7 @@
     (
       (coreContractAddress (contract-of coreContract))
     )
-    (asserts! (or (>= state STATE_DEPLOYED) (<= state STATE_INACTIVE)) (err ERR_UNAUTHORIZED))
+    (asserts! (or (>= state STATE_DEPLOYED) (<= state STATE_INACTIVE)) ERR_UNAUTHORIZED)
     (map-set CoreContracts
       coreContractAddress
       {
