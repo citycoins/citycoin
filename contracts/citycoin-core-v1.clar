@@ -306,7 +306,7 @@
         })
         (ok true)
       )
-      errReturn ERRReturn)
+      errReturn (err errReturn)
     )
   )
 )
@@ -348,7 +348,7 @@
         }
       ))
     )
-    errReturn ERRReturn)
+    errReturn (err errReturn)
   ) 
 )
 
@@ -681,7 +681,7 @@
     })
     (match (fold stack-tokens-closure REWARD_CYCLE_INDEXES (ok commitment))
       okValue (ok true)
-      errValue ERRValue)
+      errValue (err errValue)
     )
   )
 )
