@@ -177,15 +177,26 @@
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; FUNCTIONS ONLY USED DURING TESTS
+;; TESTING FUNCTIONS
+;; DELETE BEFORE DEPLOYING TO MAINNET
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; used in core, tardis, token, and vote tests
-(define-public (test-mint (amount uint) (recipient principal))
-  (ft-mint? citycoins amount recipient)
+(define-constant DEPLOYED_AT block-height)
+
+(define-private (is-test-env)
+  (is-eq DEPLOYED_AT u0)
 )
 
-;; rename test-activate-token
+(define-public (test-mint (amount uint) (recipient principal))
+  (begin
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
+    (ft-mint? citycoins amount recipient)
+  )
+)
+
 (define-public (test-set-token-activation)
-  (ok (var-set tokenActivated true))
+  (begin
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
+    (ok (var-set tokenActivated true))
+  )
 )

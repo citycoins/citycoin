@@ -909,24 +909,35 @@
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; FUNCTIONS ONLY USED DURING TESTS
+;; TESTING FUNCTIONS
+;; DELETE BEFORE DEPLOYING TO MAINNET
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; used by citycoin-core-v1.test.ts (and v2)
-(define-public (test-unsafe-set-city-wallet (newCityWallet principal))
-  (ok (var-set cityWallet newCityWallet))
-)
+(define-constant DEPLOYED_AT block-height)
 
-;; used by citycoin-core-v1.test.ts (and v2)
-(define-public (test-set-activation-threshold (newThreshold uint))
-  (ok (var-set activationThreshold newThreshold))
+(define-private (is-test-env)
+  (is-eq DEPLOYED_AT u0)
 )
 
 (use-trait coreTrait .citycoin-core-trait.citycoin-core)
 
-;; used in auth, core, tardis, token, and vote tests
+(define-public (test-unsafe-set-city-wallet (newCityWallet principal))
+  (begin
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
+    (ok (var-set cityWallet newCityWallet))
+  )
+)
+
+(define-public (test-set-activation-threshold (newThreshold uint))
+  (begin
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
+    (ok (var-set activationThreshold newThreshold))
+  )
+)
+
 (define-public (test-initialize-core (coreContract <coreTrait>))
   (begin
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
     (var-set activationThreshold u1)
     (try! (contract-call? .citycoin-auth test-initialize-contracts coreContract))
     (ok true)

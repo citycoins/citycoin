@@ -567,3 +567,60 @@
 (map-insert Approvers 'ST21HMSJATHZ888PD0S0SSTWP4J61TCRJYEVQ0STB true)
 (map-insert Approvers 'ST2QXSK64YQX3CQPC530K79XWQ98XFAM9W3XKEH3N true)
 (map-insert Approvers 'ST3DG3R65C9TTEEW5BC5XTSY0M1JM7NBE7GVWKTVJ true)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; TESTING FUNCTIONS
+;; DELETE BEFORE DEPLOYING TO MAINNET
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define-constant DEPLOYED_AT block-height)
+
+(define-private (is-test-env)
+  (is-eq DEPLOYED_AT u0)
+)
+
+(define-public (test-initialize-contracts (coreContract <coreTrait>))
+  (let
+    (
+      (coreContractAddress (contract-of coreContract))
+    )
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
+    (asserts! (not (var-get initialized)) ERR_UNAUTHORIZED)
+    (map-set CoreContracts
+      coreContractAddress
+      {
+        state: STATE_DEPLOYED,
+        startHeight: u0,
+        endHeight: u0
+      })
+    (try! (contract-call? coreContract set-city-wallet (var-get cityWallet)))
+    (var-set initialized true)
+    (ok true)
+  )
+)
+
+(define-public (test-set-active-core-contract)
+  (begin
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
+    (ok (var-set activeCoreContract .citycoin-core-v1))
+  )
+)
+
+(define-public (test-set-core-contract-state (coreContract <coreTrait>) (state uint))
+  (let
+    (
+      (coreContractAddress (contract-of coreContract))
+    )
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
+    (asserts! (or (>= state STATE_DEPLOYED) (<= state STATE_INACTIVE)) ERR_UNAUTHORIZED)
+    (map-set CoreContracts
+      coreContractAddress
+      {
+        state: state,
+        startHeight: u0,
+        endHeight: u0
+      }
+    )
+    (ok true)
+  )
+)

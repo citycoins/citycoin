@@ -569,16 +569,22 @@
 (map-insert Approvers 'ST3DG3R65C9TTEEW5BC5XTSY0M1JM7NBE7GVWKTVJ true)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; FUNCTIONS ONLY USED DURING TESTS
+;; TESTING FUNCTIONS
+;; DELETE BEFORE DEPLOYING TO MAINNET
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; used by add-on for citycoin-core-v1 test-initialize-core
+(define-constant DEPLOYED_AT block-height)
+
+(define-private (is-test-env)
+  (is-eq DEPLOYED_AT u0)
+)
+
 (define-public (test-initialize-contracts (coreContract <coreTrait>))
   (let
     (
       (coreContractAddress (contract-of coreContract))
     )
-    ;; (asserts! (is-eq contract-caller CONTRACT_OWNER) ERR_UNAUTHORIZED)
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
     (asserts! (not (var-get initialized)) ERR_UNAUTHORIZED)
     (map-set CoreContracts
       coreContractAddress
@@ -593,22 +599,19 @@
   )
 )
 
-;; used by citycoin-auth.test.ts
 (define-public (test-set-active-core-contract)
-  (ok (var-set activeCoreContract .citycoin-core-v1))
+  (begin
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
+    (ok (var-set activeCoreContract .citycoin-core-v1))
+  )
 )
 
-;; core contract states
-;; (define-constant STATE_DEPLOYED u0)
-;; (define-constant STATE_ACTIVE u1)
-;; (define-constant STATE_INACTIVE u2)
-
-;; used by citycoin-auth.test.ts
 (define-public (test-set-core-contract-state (coreContract <coreTrait>) (state uint))
   (let
     (
       (coreContractAddress (contract-of coreContract))
     )
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
     (asserts! (or (>= state STATE_DEPLOYED) (<= state STATE_INACTIVE)) ERR_UNAUTHORIZED)
     (map-set CoreContracts
       coreContractAddress

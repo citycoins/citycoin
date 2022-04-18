@@ -175,3 +175,28 @@
     (ok transferOk)
   )
 )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; TESTING FUNCTIONS
+;; DELETE BEFORE DEPLOYING TO MAINNET
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define-constant DEPLOYED_AT block-height)
+
+(define-private (is-test-env)
+  (is-eq DEPLOYED_AT u0)
+)
+
+(define-public (test-mint (amount uint) (recipient principal))
+  (begin
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
+    (ft-mint? citycoins amount recipient)
+  )
+)
+
+(define-public (test-set-token-activation)
+  (begin
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
+    (ok (var-set tokenActivated true))
+  )
+)
