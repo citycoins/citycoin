@@ -3,15 +3,14 @@
   "version": "1.1.0",
   "description": "A smart contract implementation of the Proof of Transfer consensus mechanism, allowing for the mining and Stacking of a new fungible token on the Stacks blockchain with a portion of miner rewards going to a custodied account for a city to claim the protocol contribution.",
   "scripts": {
-    "test": "npm run clarinet:test",
-    "test:token": "npm run clarinet:prepare && clarinet test ./tests/citycoin-token.test.ts",
-    "test:core": "npm run clarinet:prepare && clarinet test ./tests/citycoin-core-v1.test.ts",
-    "test:auth": "npm run clarinet:prepare && clarinet test ./tests/citycoin-auth.test.ts",
-    "clarinet:check": "npm run clarinet:prepare && clarinet check",
-    "clarinet:test": "npm run clarinet:prepare && clarinet test",
-    "clarinet:codecov": "npm run clarinet:prepare && clarinet test --coverage",
-    "clarinet:console": "npm run clarinet:prepare && clarinet console",
-    "clarinet:prepare": "./scripts/clarinet-prepare.sh",
-    "console": "npm run clarinet:console"
+    "test": "clarinet test",
+    "test:token": "clarinet test ./tests/citycoin-token.test.ts",
+    "test:core": "clarinet test ./tests/citycoin-core-v1.test.ts",
+    "test:auth": "clarinet test ./tests/citycoin-auth.test.ts",
+    "clarinet:check": "clarinet check",
+    "clarinet:test": "clarinet test",
+    "clarinet:codecov": "clarinet test --coverage",
+    "clarinet:console": "clarinet console",
+    "console": "clarinet:console"
   }
 }

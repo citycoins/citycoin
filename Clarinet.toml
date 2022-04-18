@@ -3,57 +3,57 @@ name = "citycoin"
 requirements = []
 
 [contracts.citycoin-vrf]
-path = "contracts/clarinet/citycoin-vrf.clar"
+path = "contracts/citycoin-vrf.clar"
 depends_on = []
 
 [contracts.citycoin-core-trait]
-path = "contracts/clarinet/citycoin-core-trait.clar"
+path = "contracts/citycoin-core-trait.clar"
 depends_on = []
 
 [contracts.citycoin-token-trait]
-path = "contracts/clarinet/citycoin-token-trait.clar"
+path = "contracts/citycoin-token-trait.clar"
 depends_on = []
 
 [contracts.citycoin-auth]
-path = "contracts/clarinet/citycoin-auth.clar"
+path = "contracts/citycoin-auth.clar"
 depends_on = ["citycoin-core-trait", "citycoin-token-trait"]
 
 [contracts.citycoin-token]
-path = "contracts/clarinet/citycoin-token.clar"
+path = "contracts/citycoin-token.clar"
 depends_on = ["sip-010-trait", "citycoin-auth", "citycoin-token-trait"]
 
 [contracts.citycoin-core-v1]
-path = "contracts/clarinet/citycoin-core-v1.clar"
+path = "contracts/citycoin-core-v1.clar"
 depends_on = ["citycoin-auth", "citycoin-token", "citycoin-vrf", "citycoin-core-trait"]
 
 [contracts.citycoin-vote-v1]
-path = "contracts/clarinet/citycoin-vote-v1.clar"
+path = "contracts/citycoin-vote-v1.clar"
 depends_on = ["citycoin-core-v1"]
 
 [contracts.citycoin-tardis-v1]
-path = "contracts/clarinet/citycoin-tardis-v1.clar"
+path = "contracts/citycoin-tardis-v1.clar"
 depends_on = ["citycoin-core-v1"]
 
 [contracts.citycoin-tardis-v2]
-path = "contracts/clarinet/citycoin-tardis-v2.clar"
+path = "contracts/citycoin-tardis-v2.clar"
 depends_on = ["citycoin-core-v1"]
 
 # contracts listed below are used only in test suite
 
 [contracts.citycoin-core-v2]
-path = "contracts/clarinet/citycoin-core-v2.clar"
+path = "contracts/citycoin-core-v2.clar"
 depends_on = ["citycoin-auth", "citycoin-token", "citycoin-vrf", "citycoin-core-trait"]
 
 [contracts.citycoin-core-v3]
-path = "contracts/clarinet/citycoin-core-v2.clar"
+path = "contracts/citycoin-core-v2.clar"
 depends_on = ["citycoin-auth", "citycoin-token", "citycoin-vrf", "citycoin-core-trait"]
 
 [contracts.sip-010-trait]
-path = "contracts/clarinet/sip-10-ft-standard.clar"
+path = "contracts/sip-10-ft-standard.clar"
 depends_on = []
 
 [contracts.test-utils]
-path = "contracts/clarinet/test-utils.clar"
+path = "contracts/test-utils.clar"
 depends_on = ["citycoin-core-v1"]
 
 [repl.analysis]
