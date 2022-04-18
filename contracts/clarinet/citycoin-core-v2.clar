@@ -921,7 +921,7 @@
 
 (use-trait coreTrait .citycoin-core-trait.citycoin-core)
 
-(define-public (test-unsafe-set-city-wallet (newCityWallet principal))
+(define-public (test-set-city-wallet (newCityWallet principal))
   (begin
     (asserts! (is-test-env) ERR_UNAUTHORIZED)
     (ok (var-set cityWallet newCityWallet))

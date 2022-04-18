@@ -30,11 +30,11 @@ describe("[CityCoin Tardis]", () => {
 
         chain.mineEmptyBlock(100);
         chain.mineBlock([
-          token.ftMint(mintAmount, wallet_1)
+          token.testMint(mintAmount, wallet_1)
         ]);
         chain.mineEmptyBlock(100);
         chain.mineBlock([
-          token.ftMint(mintAmount, wallet_1)
+          token.testMint(mintAmount, wallet_1)
         ]);
 
         // act
@@ -57,11 +57,11 @@ describe("[CityCoin Tardis]", () => {
 
         chain.mineEmptyBlock(100);
         chain.mineBlock([
-          token.ftMint(mintAmount, wallet_1)
+          token.testMint(mintAmount, wallet_1)
         ]);
         chain.mineEmptyBlock(100);
         chain.mineBlock([
-          token.ftMint(mintAmount, wallet_1)
+          token.testMint(mintAmount, wallet_1)
         ]);
         
         // act
@@ -84,7 +84,7 @@ describe("[CityCoin Tardis]", () => {
 
         const setupBlock = chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(wallet_1),
         ]);
         const activationBlockHeight =
@@ -106,9 +106,9 @@ describe("[CityCoin Tardis]", () => {
 
         const setupBlock = chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(wallet_1),
-          token.ftMint(amountStacked * 2, wallet_1)
+          token.testMint(amountStacked * 2, wallet_1)
         ]);
         const activationBlockHeight =
           setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
@@ -152,7 +152,7 @@ describe("[CityCoin Tardis]", () => {
 
         const setupBlock = chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(wallet_1),
         ]);
         const activationBlockHeight =
@@ -178,9 +178,9 @@ describe("[CityCoin Tardis]", () => {
 
         const setupBlock = chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(wallet_1),
-          token.ftMint(amountStacked * 2, wallet_1)
+          token.testMint(amountStacked * 2, wallet_1)
         ]);
         const activationBlockHeight =
           setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
@@ -224,7 +224,7 @@ describe("[CityCoin Tardis]", () => {
 
         const setupBlock = chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(wallet_1),
         ]);
         const activationBlockHeight =
@@ -258,9 +258,9 @@ describe("[CityCoin Tardis]", () => {
 
         const setupBlock = chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(wallet_1),
-          token.ftMint(amountStacked * 2, wallet_1)
+          token.testMint(amountStacked * 2, wallet_1)
         ]);
         const activationBlockHeight =
           setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
@@ -302,7 +302,7 @@ describe("[CityCoin Tardis]", () => {
         const blockHeight = 4350;
         const setupBlock = chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(wallet_1),
         ]);
         const activationBlockHeight =
@@ -328,9 +328,9 @@ describe("[CityCoin Tardis]", () => {
 
         const setupBlock = chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(wallet_1),
-          token.ftMint(amountStacked * 2, wallet_1)
+          token.testMint(amountStacked * 2, wallet_1)
         ]);
         const activationBlockHeight =
           setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;

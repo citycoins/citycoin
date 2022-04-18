@@ -233,15 +233,15 @@ export class CoreModel extends Model {
   // TESTING ONLY
   //////////////////////////////////////////////////
 
-  unsafeSetCityWallet(newCityWallet: Account): Tx {
+  testSetCityWallet(newCityWallet: Account): Tx {
     return this.callPublic(
-      "test-unsafe-set-city-wallet",
+      "test-set-city-wallet",
       [types.principal(newCityWallet.address)],
       this.deployer.address
     );
   }
 
-  unsafeSetActivationThreshold(newThreshold: number): Tx {
+  testSetActivationThreshold(newThreshold: number): Tx {
     return this.callPublic(
       "test-set-activation-threshold",
       [types.uint(newThreshold)],
@@ -257,11 +257,4 @@ export class CoreModel extends Model {
     );
   }
 
-  testMint(amount: number, recipient: Account, sender: Account): Tx {
-    return this.callPublic(
-      "test-mint",
-      [types.uint(amount), types.principal(recipient.address)],
-      sender.address
-    );
-  }
 }

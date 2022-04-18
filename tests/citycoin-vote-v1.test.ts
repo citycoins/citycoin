@@ -158,9 +158,9 @@ describe("[CityCoin Vote]", () => {
         
         const block = chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(wallet),
-          token.ftMint(amountCycle1 + amountCycle2, wallet),
+          token.testMint(amountCycle1 + amountCycle2, wallet),
         ]);
         const activationBlockHeight =
           block.height + CoreModel.ACTIVATION_DELAY - 1;
@@ -235,11 +235,11 @@ describe("[CityCoin Vote]", () => {
         
         const setupBlock = chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(wallet_1),
-          token.ftMint(amountCycle1 + amountCycle2, wallet_1),
-          token.ftMint(amountCycle1 + amountCycle2, wallet_2),
-          token.ftMint(amountCycle1 + amountCycle2, wallet_3)
+          token.testMint(amountCycle1 + amountCycle2, wallet_1),
+          token.testMint(amountCycle1 + amountCycle2, wallet_2),
+          token.testMint(amountCycle1 + amountCycle2, wallet_3)
         ]);
         const activationBlockHeight =
           setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
@@ -337,9 +337,9 @@ describe("[CityCoin Vote]", () => {
 
         const block = chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(wallet),
-          token.ftMint(amountCycle1 + amountCycle2, wallet),
+          token.testMint(amountCycle1 + amountCycle2, wallet),
         ]);
         const activationBlockHeight =
           block.height + CoreModel.ACTIVATION_DELAY - 1;
@@ -394,9 +394,9 @@ describe("[CityCoin Vote]", () => {
 
         const block = chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(wallet),
-          token.ftMint(amountCycle1 + amountCycle2, wallet),
+          token.testMint(amountCycle1 + amountCycle2, wallet),
         ]);
         const activationBlockHeight =
           block.height + CoreModel.ACTIVATION_DELAY - 1;
@@ -479,11 +479,11 @@ describe("[CityCoin Vote]", () => {
         
         const setupBlock = chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(wallet_1),
-          token.ftMint(amountCycle1 + amountCycle2, wallet_1),
-          token.ftMint(amountCycle1 + amountCycle2, wallet_2),
-          token.ftMint(amountCycle1 + amountCycle2, wallet_3)
+          token.testMint(amountCycle1 + amountCycle2, wallet_1),
+          token.testMint(amountCycle1 + amountCycle2, wallet_2),
+          token.testMint(amountCycle1 + amountCycle2, wallet_3)
         ]);
         const activationBlockHeight =
           setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
@@ -692,9 +692,9 @@ describe("[CityCoin Vote]", () => {
         const totalVote = miaVote + nycVote;
         const block = chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(wallet),
-          token.ftMint(amountCycle1 + amountCycle2, wallet),
+          token.testMint(amountCycle1 + amountCycle2, wallet),
         ]);
         const activationBlockHeight =
           block.height + CoreModel.ACTIVATION_DELAY - 1;
@@ -765,11 +765,11 @@ describe("[CityCoin Vote]", () => {
         const lockPeriod = 5;
         const block = chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(wallet_1),
-          token.ftMint(amountCycle1 + amountCycle2, wallet_1),
-          token.ftMint(amountCycle1 + amountCycle2, wallet_2),
-          token.ftMint(amountCycle1 + amountCycle2, wallet_3),
+          token.testMint(amountCycle1 + amountCycle2, wallet_1),
+          token.testMint(amountCycle1 + amountCycle2, wallet_2),
+          token.testMint(amountCycle1 + amountCycle2, wallet_3),
         ]);
         const activationBlockHeight =
           block.height + CoreModel.ACTIVATION_DELAY - 1;
@@ -820,9 +820,9 @@ describe("[CityCoin Vote]", () => {
         const expectedId = 1;
         const block = chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(wallet),
-          token.ftMint(amountTokens, wallet),
+          token.testMint(amountTokens, wallet),
         ]);
         const activationBlockHeight =
           block.height + CoreModel.ACTIVATION_DELAY - 1;
@@ -875,9 +875,9 @@ describe("[CityCoin Vote]", () => {
         const expectedId = 1;
         const block = chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(wallet),
-          token.ftMint(amountTokens, wallet),
+          token.testMint(amountTokens, wallet),
         ]);
         const activationBlockHeight =
           block.height + CoreModel.ACTIVATION_DELAY - 1;
