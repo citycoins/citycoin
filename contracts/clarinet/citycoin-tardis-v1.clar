@@ -5,11 +5,11 @@
 
 ;; ERRORS
 
-(define-constant ERR_INVALID_BLOCK u7000)
-(define-constant ERR_CYCLE_NOT_FOUND u7001)
-(define-constant ERR_USER_NOT_FOUND u7002)
-(define-constant ERR_SUPPLY_NOT_FOUND u7003)
-(define-constant ERR_BALANCE_NOT_FOUND u7004)
+(define-constant ERR_INVALID_BLOCK (err u7000))
+(define-constant ERR_CYCLE_NOT_FOUND (err u7001))
+(define-constant ERR_USER_NOT_FOUND (err u7002))
+(define-constant ERR_SUPPLY_NOT_FOUND (err u7003))
+(define-constant ERR_BALANCE_NOT_FOUND (err u7004))
 
 ;; get block hash by height
 
@@ -23,8 +23,8 @@
 (define-read-only (get-historical-balance (blockHeight uint) (address principal))
   (let 
     (
-      (blockHash (unwrap! (get-block-hash blockHeight) (err ERR_INVALID_BLOCK)))
-      (balance (unwrap! (at-block blockHash (contract-call? .citycoin-token get-balance address)) (err ERR_BALANCE_NOT_FOUND)))
+      (blockHash (unwrap! (get-block-hash blockHeight) ERR_INVALID_BLOCK))
+      (balance (unwrap! (at-block blockHash (contract-call? .citycoin-token get-balance address)) ERR_BALANCE_NOT_FOUND))
     )
     (ok balance)
   )
@@ -39,8 +39,8 @@
 (define-read-only (get-historical-supply (blockHeight uint))
   (let 
     (
-      (blockHash (unwrap! (get-block-hash blockHeight) (err ERR_INVALID_BLOCK)))
-      (supply (unwrap! (at-block blockHash (contract-call? .citycoin-token get-total-supply)) (err ERR_SUPPLY_NOT_FOUND)))
+      (blockHash (unwrap! (get-block-hash blockHeight) ERR_INVALID_BLOCK))
+      (supply (unwrap! (at-block blockHash (contract-call? .citycoin-token get-total-supply)) ERR_SUPPLY_NOT_FOUND))
     )
     (ok supply)
   )
@@ -55,9 +55,9 @@
 (define-read-only (get-historical-stacking-stats (blockHeight uint))
   (let 
     (
-      (blockHash (unwrap! (get-block-hash blockHeight) (err ERR_INVALID_BLOCK)))
-      (cycleId (unwrap! (contract-call? .citycoin-core-v1 get-reward-cycle blockHeight) (err ERR_CYCLE_NOT_FOUND)))
-      (stats (unwrap! (at-block blockHash (contract-call? .citycoin-core-v1 get-stacking-stats-at-cycle cycleId)) (err ERR_CYCLE_NOT_FOUND)))
+      (blockHash (unwrap! (get-block-hash blockHeight) ERR_INVALID_BLOCK))
+      (cycleId (unwrap! (contract-call? .citycoin-core-v1 get-reward-cycle blockHeight) ERR_CYCLE_NOT_FOUND))
+      (stats (unwrap! (at-block blockHash (contract-call? .citycoin-core-v1 get-stacking-stats-at-cycle cycleId)) ERR_CYCLE_NOT_FOUND))
     )
     (ok stats)
   )
@@ -72,10 +72,10 @@
 (define-read-only (get-historical-stacker-stats (blockHeight uint) (address principal))
   (let 
     (
-      (blockHash (unwrap! (get-block-hash blockHeight) (err ERR_INVALID_BLOCK)))
-      (userId (unwrap! (contract-call? .citycoin-core-v1 get-user-id address) (err ERR_USER_NOT_FOUND)))
-      (cycleId (unwrap! (contract-call? .citycoin-core-v1 get-reward-cycle blockHeight) (err ERR_CYCLE_NOT_FOUND)))
-      (stacker (unwrap! (at-block blockHash (contract-call? .citycoin-core-v1 get-stacker-at-cycle cycleId userId)) (err ERR_CYCLE_NOT_FOUND)))
+      (blockHash (unwrap! (get-block-hash blockHeight) ERR_INVALID_BLOCK))
+      (userId (unwrap! (contract-call? .citycoin-core-v1 get-user-id address) ERR_USER_NOT_FOUND))
+      (cycleId (unwrap! (contract-call? .citycoin-core-v1 get-reward-cycle blockHeight) ERR_CYCLE_NOT_FOUND))
+      (stacker (unwrap! (at-block blockHash (contract-call? .citycoin-core-v1 get-stacker-at-cycle cycleId userId)) ERR_CYCLE_NOT_FOUND))
     )
     (ok stacker)
   )
