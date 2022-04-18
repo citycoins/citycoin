@@ -18,6 +18,8 @@ CityCoins give communities the power to improve and program their cities.
 
 PRs are welcome! Please see the [open issues](https://github.com/citycoins/citycoin/issues) and comment if interested, or submit a PR for review.
 
+**Note:** All PRs should be opened against the `develop` branch!
+
 All code submitted should be thoroughly commented and tested where applicable.
 
 ## Testing
