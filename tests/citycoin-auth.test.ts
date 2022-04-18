@@ -1096,7 +1096,7 @@ describe("[CityCoin Auth]", () => {
 
         chain.mineBlock([
           core.testInitializeCore(contract),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(sender),
         ]);
 
@@ -1178,7 +1178,7 @@ describe("[CityCoin Auth]", () => {
 
         chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(sender),
         ]);
 
@@ -1200,7 +1200,7 @@ describe("[CityCoin Auth]", () => {
 
         chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(sender),
           auth.testSetCoreContractState(newContract, AuthModel.ContractState.STATE_INACTIVE, sender),
         ]);
@@ -1223,7 +1223,7 @@ describe("[CityCoin Auth]", () => {
 
         chain.mineBlock([
           core.testInitializeCore(core.address),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(sender),
         ]);
 
@@ -1245,7 +1245,7 @@ describe("[CityCoin Auth]", () => {
 
         chain.mineBlock([
           core.testInitializeCore(oldContract),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(sender),
         ]);
 
@@ -1299,7 +1299,7 @@ describe("[CityCoin Auth]", () => {
 
         chain.mineBlock([
           core.testInitializeCore(oldContract),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(sender),
           auth.createJob(
             "upgrade core",
@@ -1353,7 +1353,7 @@ describe("[CityCoin Auth]", () => {
 
         chain.mineBlock([
           core.testInitializeCore(oldContract),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(sender),
           auth.createJob(
             "upgrade core",
@@ -1405,7 +1405,7 @@ describe("[CityCoin Auth]", () => {
 
         chain.mineBlock([
           core.testInitializeCore(oldContract),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(sender),
           auth.createJob(
             "upgrade core",
@@ -1458,7 +1458,7 @@ describe("[CityCoin Auth]", () => {
 
         chain.mineBlock([
           core.testInitializeCore(oldContract),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(sender),
           auth.testSetCoreContractState(newContract, AuthModel.ContractState.STATE_INACTIVE, sender),
           auth.createJob(
@@ -1512,7 +1512,7 @@ describe("[CityCoin Auth]", () => {
 
         chain.mineBlock([
           core.testInitializeCore(oldContract),
-          core.unsafeSetActivationThreshold(1),
+          core.testSetActivationThreshold(1),
           core.registerUser(sender),
           auth.createJob(
             "upgrade core",

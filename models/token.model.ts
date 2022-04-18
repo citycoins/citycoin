@@ -125,18 +125,10 @@ export class TokenModel extends Model {
    * @param amount
    * @param recipient
    */
-  ftMint(amount: number, recipient: Account): Tx {
+  testMint(amount: number, recipient: Account): Tx {
     return this.callPublic(
       "test-mint",
       [types.uint(amount), types.principal(recipient.address)],
-      this.deployer.address
-    );
-  }
-
-  setTrustedCaller(newTrustedCaller: Account): Tx {
-    return this.callPublic(
-      "test-set-trusted-caller",
-      [types.principal(newTrustedCaller.address)],
       this.deployer.address
     );
   }

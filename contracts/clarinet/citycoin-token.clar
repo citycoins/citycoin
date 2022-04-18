@@ -177,13 +177,27 @@
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; FUNCTIONS ONLY USED DURING TESTS
+;; TESTING FUNCTIONS
+;; DELETE BEFORE DEPLOYING TO MAINNET
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define-public (test-mint (amount uint) (recipient principal))
-  (ft-mint? citycoins amount recipient)
+(define-constant DEPLOYED_AT block-height)
+
+(define-private (is-test-env)
+  (is-eq DEPLOYED_AT u0)
 )
 
+(define-public (test-mint (amount uint) (recipient principal))
+  (begin
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
+    (ft-mint? citycoins amount recipient)
+  )
+)
+
+;; delete?
 (define-public (test-set-token-activation)
-  (ok (var-set tokenActivated true))
+  (begin
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
+    (ok (var-set tokenActivated true))
+  )
 )

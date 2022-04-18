@@ -907,3 +907,39 @@
 (define-private (is-authorized-auth)
   (is-eq contract-caller .citycoin-auth)
 )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; TESTING FUNCTIONS
+;; DELETE BEFORE DEPLOYING TO MAINNET
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define-constant DEPLOYED_AT block-height)
+
+(define-private (is-test-env)
+  (is-eq DEPLOYED_AT u0)
+)
+
+(use-trait coreTrait .citycoin-core-trait.citycoin-core)
+
+(define-public (test-set-city-wallet (newCityWallet principal))
+  (begin
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
+    (ok (var-set cityWallet newCityWallet))
+  )
+)
+
+(define-public (test-set-activation-threshold (newThreshold uint))
+  (begin
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
+    (ok (var-set activationThreshold newThreshold))
+  )
+)
+
+(define-public (test-initialize-core (coreContract <coreTrait>))
+  (begin
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
+    (var-set activationThreshold u1)
+    (try! (contract-call? .citycoin-auth test-initialize-contracts coreContract))
+    (ok true)
+  )
+)

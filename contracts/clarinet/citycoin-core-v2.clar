@@ -909,36 +909,37 @@
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; FUNCTIONS ONLY USED DURING TESTS
+;; TESTING FUNCTIONS
+;; DELETE BEFORE DEPLOYING TO MAINNET
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define-public (test-unsafe-set-city-wallet (newCityWallet principal))
-  (ok (var-set cityWallet newCityWallet))
+(define-constant DEPLOYED_AT block-height)
+
+(define-private (is-test-env)
+  (is-eq DEPLOYED_AT u0)
 )
 
-(define-public (test-set-activation-threshold (newThreshold uint))
-  (ok (var-set activationThreshold newThreshold))
-)
+(use-trait coreTrait .citycoin-core-trait.citycoin-core)
 
-(define-public (test-generate-user-id (user principal))
-  (ok (get-or-create-user-id user))
-)
-
-(define-public (test-activate-contract)
+(define-public (test-set-city-wallet (newCityWallet principal))
   (begin
-    ;; (var-set cityWallet 'STFCVYY1RJDNJHST7RRTPACYHVJQDJ7R1DWTQHQA)
-    (var-set activationThreshold u2)
-    (ok true)
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
+    (ok (var-set cityWallet newCityWallet))
   )
 )
 
-(define-public (test-shutdown-contract (stacksHeight uint))
+(define-public (test-set-activation-threshold (newThreshold uint))
   (begin
-    ;; set variables to disable mining/stacking in CORE
-    (var-set activationReached false)
-    (var-set shutdownHeight stacksHeight)
-    ;; set variable to allow for all stacking claims
-    (var-set isShutdown true)
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
+    (ok (var-set activationThreshold newThreshold))
+  )
+)
+
+(define-public (test-initialize-core (coreContract <coreTrait>))
+  (begin
+    (asserts! (is-test-env) ERR_UNAUTHORIZED)
+    (var-set activationThreshold u1)
+    (try! (contract-call? .citycoin-auth test-initialize-contracts coreContract))
     (ok true)
   )
 )

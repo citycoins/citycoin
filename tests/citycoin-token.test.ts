@@ -25,7 +25,7 @@ describe("[CityCoin Token]", () => {
         const to = accounts.get("wallet_2")!;
         const amount = 100;
 
-        chain.mineBlock([token.ftMint(amount, from)]);
+        chain.mineBlock([token.testMint(amount, from)]);
 
         const block = chain.mineBlock([
           token.transfer(amount, from, to, from),
@@ -49,7 +49,7 @@ describe("[CityCoin Token]", () => {
           "MiamiCoin is the first CityCoin"
         );
 
-        chain.mineBlock([token.ftMint(amount, from)]);
+        chain.mineBlock([token.testMint(amount, from)]);
 
         const block = chain.mineBlock([
           token.transfer(amount, from, to, from, memo),
@@ -94,7 +94,7 @@ describe("[CityCoin Token]", () => {
         const from = accounts.get("wallet_1")!;
         const to = accounts.get("wallet_1")!;
 
-        chain.mineBlock([token.ftMint(100, from)]);
+        chain.mineBlock([token.testMint(100, from)]);
 
         const block = chain.mineBlock([
           token.transfer(100, from, to, from),
@@ -110,7 +110,7 @@ describe("[CityCoin Token]", () => {
         const sender = accounts.get("wallet_3")!;
         const amount = 100;
 
-        chain.mineBlock([token.ftMint(amount, from)]);
+        chain.mineBlock([token.testMint(amount, from)]);
 
         const block = chain.mineBlock([
           token.transfer(amount, from, to, sender),
@@ -157,7 +157,7 @@ describe("[CityCoin Token]", () => {
 
       it("succeeds and returns 100 after 100 tokens are minted to a wallet", () => {
         const wallet_1 = accounts.get("wallet_1")!;
-        chain.mineBlock([token.ftMint(100, wallet_1)]);
+        chain.mineBlock([token.testMint(100, wallet_1)]);
 
         const result = token.getBalance(wallet_1).result;
 
@@ -174,7 +174,7 @@ describe("[CityCoin Token]", () => {
 
       it("succeeds and returns 100 after 100 tokens are minted", () => {
         const wallet_1 = accounts.get("wallet_1")!;
-        chain.mineBlock([token.ftMint(100, wallet_1)]);
+        chain.mineBlock([token.testMint(100, wallet_1)]);
 
         const result = token.getTotalSupply().result;
 
@@ -225,7 +225,7 @@ describe("[CityCoin Token]", () => {
         const owner = accounts.get("wallet_1")!;
         const amount = 300;
         chain.mineBlock([
-          token.ftMint(amount, owner)
+          token.testMint(amount, owner)
         ]);
 
         // act
@@ -272,7 +272,7 @@ describe("[CityCoin Token]", () => {
         ]);
 
         let block = chain.mineBlock([
-          core.testMint(amount, recipient, wallet_2),
+          token.testMint(amount, recipient),
         ]);
 
         let receipt = block.receipts[0];
@@ -341,7 +341,7 @@ describe("[CityCoin Token]", () => {
 
         // act
 
-        chain.mineBlock([token.ftMint(amountTotal, from)]);
+        chain.mineBlock([token.testMint(amountTotal, from)]);
 
         const block = chain.mineBlock([
           token.sendMany(sendManyRecords, from),
@@ -408,7 +408,7 @@ describe("[CityCoin Token]", () => {
 
         // act
 
-        chain.mineBlock([token.ftMint(amountTotal, from)]);
+        chain.mineBlock([token.testMint(amountTotal, from)]);
 
         const block = chain.mineBlock([
           token.sendMany(sendManyRecords, from),
@@ -483,7 +483,7 @@ describe("[CityCoin Token]", () => {
 
         // act
 
-        chain.mineBlock([token.ftMint(amountTotal, from)]);
+        chain.mineBlock([token.testMint(amountTotal, from)]);
 
         const block = chain.mineBlock([
           token.sendMany(sendManyRecords, from),
