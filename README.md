@@ -24,36 +24,28 @@ All code submitted should be thoroughly commented and tested where applicable.
 
 ## Testing
 
-Contracts are tested via [clarinet](https://github.com/hirosystems/clarinet) using typescript.
+Contracts are tested via [clarinet](https://github.com/hirosystems/clarinet) using a custom typescript implementation.
 
 To test the contract using `clarinet`, first [install the tool](https://github.com/hirosystems/clarinet#installation) to make it available on your system.
 
-Several commands are available to help with testing via `npm`:
+After installation, the standard clarinet commands can be used against the root directory, e.g. `clarinet console`.
 
-- to run the prepare script:
-  `npm run clarinet:prepare`
+Several commands are also available to help with testing via `npm`:
+
 - to run all tests:
   `npm test`, `npm run test`, `npm run clarinet:test`
 - to run individual tests:
   `npm run test:auth`
   `npm run test:core`
+  `npm run test:tardis`
   `npm run test:token`
+  `npm run test:utils`
+  `npm run test:vote`
 - to run specific clarinet functions
   `npm run clarinet:check`
   `npm run clarinet:codecov`
+  `npm run clarinet:costs`
   `npm run console`, `npm run clarinet:console`
-
-A bash script is provided to prepare the tests as part of `clarinet:prepare`, and executes the following steps:
-
-1. copies all contract files from `./contracts` to `./contracts/clarinet`
-2. modifies address used in impl-trait by replacing it with a different address. e.g.
-   `(impl-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-10-ft-standard.ft-trait)`
-   is converted to:
-   `(impl-trait 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.sip-10-ft-standard.ft-trait)`
-3. appends code stored in `./contracts/test_addons` at the end of contract file with the same name
-   e.g. `./contracts/test_addons/citycoin-core-v1.clar` is added to `./contracts/citycoin-core-v1.clar`
-
-**Note:** `clarinet:test`, `clarinet:check`, and `clarinet:console` automatically execute `clarinet:prepare`.
 
 ## Definitions, Resources, and Links
 

@@ -4,13 +4,17 @@
   "description": "A smart contract implementation of the Proof of Transfer consensus mechanism, allowing for the mining and Stacking of a new fungible token on the Stacks blockchain with a portion of miner rewards going to a custodied account for a city to claim the protocol contribution.",
   "scripts": {
     "test": "clarinet test",
-    "test:token": "clarinet test ./tests/citycoin-token.test.ts",
-    "test:core": "clarinet test ./tests/citycoin-core-v1.test.ts",
     "test:auth": "clarinet test ./tests/citycoin-auth.test.ts",
+    "test:core": "clarinet test ./tests/citycoin-core-v1.test.ts",
+    "test:tardis": "clarinet test ./tests/citycoin-tardis.test.ts",
+    "test:token": "clarinet test ./tests/citycoin-token.test.ts",
+    "test:utils": "clarinet test ./tests/test-utils.test.ts",
+    "test:vote": "clarinet test ./tests/citycoin-vote-v1.test.ts",
     "clarinet:check": "clarinet check",
-    "clarinet:test": "clarinet test",
     "clarinet:codecov": "clarinet test --coverage",
-    "clarinet:console": "clarinet console",
-    "console": "clarinet:console"
+    "clarinet:costs": "clarinet test --costs",
+    "clarinet:test": "clarinet test",
+    "console": "clarinet console",
+    "clarinet:console": "clarinet console"
   }
 }
