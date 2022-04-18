@@ -1,5 +1,5 @@
 ;; MIAMICOIN CORE CONTRACT
-;; CityCoins Protocol Version 1.2.0
+;; CityCoins Protocol Version 1.1.0
 
 ;; GENERAL CONFIGURATION
 
