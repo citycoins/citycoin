@@ -272,7 +272,7 @@ describe("[CityCoin Token]", () => {
         ]);
 
         let block = chain.mineBlock([
-          core.testMint(amount, recipient, wallet_2),
+          token.ftMint(amount, recipient),
         ]);
 
         let receipt = block.receipts[0];

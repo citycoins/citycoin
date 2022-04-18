@@ -3,6 +3,7 @@
 ;; FUNCTIONS ONLY USED DURING TESTS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; used by add-on for citycoin-core-v1 test-initialize-core
 (define-public (test-initialize-contracts (coreContract <coreTrait>))
   (let
     (
@@ -23,6 +24,7 @@
   )
 )
 
+;; used by citycoin-auth.test.ts
 (define-public (test-set-active-core-contract)
   (ok (var-set activeCoreContract .citycoin-core-v1))
 )
@@ -32,6 +34,7 @@
 ;; (define-constant STATE_ACTIVE u1)
 ;; (define-constant STATE_INACTIVE u2)
 
+;; used by citycoin-auth.test.ts
 (define-public (test-set-core-contract-state (coreContract <coreTrait>) (state uint))
   (let
     (
