@@ -1,11 +1,8 @@
 # GitHub action to run Clarinet tests against the contracts
 # and fail if code is invalid or a test fails.
 
-# Uses a prepare script outlined in testing section of README
-
 name: Contract Tests
 
-# Controls when the action will run.
 on:
   push:
     branches:
@@ -13,17 +10,15 @@ on:
   pull_request:
     branches:
       - main
-  # Allows you to run this workflow manually from the Actions tab
+  # allow running manually
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: "Prepare contract files"
-        run: ./scripts/clarinet-prepare.sh
+      - name: "Checkout code"
+        uses: actions/checkout@v2
       - name: "Check contract syntax"
         uses: docker://hirosystems/clarinet:latest
         with:
