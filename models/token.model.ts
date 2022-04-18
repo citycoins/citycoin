@@ -133,7 +133,6 @@ export class TokenModel extends Model {
     );
   }
 
-  // delete?
   setTokenActivation(): Tx {
     return this.callPublic(
       "test-set-token-activation",

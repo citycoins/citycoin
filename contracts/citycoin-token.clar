@@ -194,7 +194,6 @@
   )
 )
 
-;; delete?
 (define-public (test-set-token-activation)
   (begin
     (asserts! (is-test-env) ERR_UNAUTHORIZED)
