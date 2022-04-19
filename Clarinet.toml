@@ -7,6 +7,18 @@ costs_version = 2
 
 # cities
 
+[contracts.miamicoin-auth]
+path = "contracts/cities/mia/local/miamicoin-auth.clar"
+depends_on = ["citycoin-core-trait", "citycoin-token-trait"]
+
+[contracts.miamicoin-core-v1]
+path = "contracts/cities/mia/local/miamicoin-core-v1.clar"
+depends_on = ["miamicoin-auth", "miamicoin-token", "citycoin-vrf", "citycoin-core-trait"]
+
+[contracts.miamicoin-token]
+path = "contracts/cities/mia/local/miamicoin-token.clar"
+depends_on = ["sip-010-trait", "miamicoin-auth", "citycoin-token-trait"]
+
 # core
 
 [contracts.citycoin-core-trait]

@@ -1,4 +1,4 @@
-;; CITYCOINS TOKEN CONTRACT
+;; MIAMICOIN TOKEN CONTRACT
 
 ;; CONTRACT OWNER
 
@@ -21,7 +21,7 @@
 ;; testnet: (impl-trait 'STR8P3RD1EHA8AA37ERSSSZSWKS9T2GYQFGXNA4C.sip-010-trait-ft-standard.sip-010-trait)
 ;; mainnet: (impl-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
-(define-fungible-token citycoins)
+(define-fungible-token miamicoin)
 
 ;; SIP-010 FUNCTIONS
 
@@ -32,16 +32,16 @@
       (print memo)
       none
     )
-    (ft-transfer? citycoins amount from to)
+    (ft-transfer? miamicoin amount from to)
   )
 )
 
 (define-read-only (get-name)
-  (ok "citycoins")
+  (ok "miamicoin")
 )
 
 (define-read-only (get-symbol)
-  (ok "CYCN")
+  (ok "MIA")
 )
 
 (define-read-only (get-decimals)
@@ -49,11 +49,11 @@
 )
 
 (define-read-only (get-balance (user principal))
-  (ok (ft-get-balance citycoins user))
+  (ok (ft-get-balance miamicoin user))
 )
 
 (define-read-only (get-total-supply)
-  (ok (ft-get-supply citycoins))
+  (ok (ft-get-supply miamicoin))
 )
 
 (define-read-only (get-token-uri)
@@ -84,7 +84,7 @@
 (define-public (activate-token (coreContract principal) (stacksHeight uint))
   (let
     (
-      (coreContractMap (try! (contract-call? .citycoin-auth get-core-contract-info coreContract)))
+      (coreContractMap (try! (contract-call? .miamicoin-auth get-core-contract-info coreContract)))
     )
     (asserts! (is-eq (get state coreContractMap) STATE_ACTIVE) ERR_UNAUTHORIZED)
     (asserts! (not (var-get tokenActivated)) ERR_TOKEN_ALREADY_ACTIVATED)
@@ -117,7 +117,7 @@
 
 ;; UTILITIES
 
-(define-data-var tokenUri (optional (string-utf8 256)) (some u"https://cdn.citycoins.co/metadata/citycoin.json"))
+(define-data-var tokenUri (optional (string-utf8 256)) (some u"https://cdn.citycoins.co/metadata/miamicoin.json"))
 
 ;; set token URI to new value, only accessible by Auth
 (define-public (set-token-uri (newUri (optional (string-utf8 256))))
@@ -131,22 +131,22 @@
 (define-public (mint (amount uint) (recipient principal))
   (let
     (
-      (coreContract (try! (contract-call? .citycoin-auth get-core-contract-info contract-caller)))
+      (coreContract (try! (contract-call? .miamicoin-auth get-core-contract-info contract-caller)))
     )
-    (ft-mint? citycoins amount recipient)
+    (ft-mint? miamicoin amount recipient)
   )
 )
 
 (define-public (burn (amount uint) (owner principal))
   (begin
     (asserts! (is-eq tx-sender owner) ERR_UNAUTHORIZED)
-    (ft-burn? citycoins amount owner)
+    (ft-burn? miamicoin amount owner)
   )
 )
 
 ;; checks if caller is Auth contract
 (define-private (is-authorized-auth)
-  (is-eq contract-caller .citycoin-auth)
+  (is-eq contract-caller .miamicoin-auth)
 )
 
 ;; SEND-MANY
@@ -191,6 +191,6 @@
 (define-public (test-mint (amount uint) (recipient principal))
   (begin
     (asserts! (is-test-env) ERR_UNAUTHORIZED)
-    (ft-mint? citycoins amount recipient)
+    (ft-mint? miamicoin amount recipient)
   )
 )
