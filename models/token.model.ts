@@ -133,14 +133,6 @@ export class TokenModel extends Model {
     );
   }
 
-  setTokenActivation(): Tx {
-    return this.callPublic(
-      "test-set-token-activation",
-      [],
-      this.deployer.address
-    );
-  }
-
   //////////////////////////////////////////////////
   // SEND-MANY
   //////////////////////////////////////////////////

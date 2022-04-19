@@ -193,10 +193,3 @@
     (ft-mint? citycoins amount recipient)
   )
 )
-
-(define-public (test-set-token-activation)
-  (begin
-    (asserts! (is-test-env) ERR_UNAUTHORIZED)
-    (ok (var-set tokenActivated true))
-  )
-)
