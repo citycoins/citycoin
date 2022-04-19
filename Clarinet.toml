@@ -50,11 +50,11 @@ depends_on = ["citycoin-core-v1"]
 # utilities
 
 [contracts.sip-010-trait]
-path = "contracts/utilities/sip-10-ft-standard.clar"
+path = "contracts/utilities/local/sip-10-ft-standard.clar"
 depends_on = []
 
 [contracts.test-utils]
-path = "contracts/utilities/test-utils.clar"
+path = "contracts/utilities/local/test-utils.clar"
 depends_on = ["citycoin-core-v1"]
 
 # vote
