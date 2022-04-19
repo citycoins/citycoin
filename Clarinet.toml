@@ -19,6 +19,18 @@ depends_on = ["miamicoin-auth", "miamicoin-token", "citycoin-vrf", "citycoin-cor
 path = "contracts/cities/mia/local/miamicoin-token.clar"
 depends_on = ["sip-010-trait", "miamicoin-auth", "citycoin-token-trait"]
 
+[contracts.newyorkcitycoin-auth]
+path = "contracts/cities/nyc/local/newyorkcitycoin-auth.clar"
+depends_on = ["citycoin-core-trait", "citycoin-token-trait"]
+
+[contracts.newyorkcitycoin-core-v1]
+path = "contracts/cities/nyc/local/newyorkcitycoin-core-v1.clar"
+depends_on = ["newyorkcitycoin-auth", "newyorkcitycoin-token", "citycoin-vrf", "citycoin-core-trait"]
+
+[contracts.newyorkcitycoin-token]
+path = "contracts/cities/nyc/local/newyorkcitycoin-token.clar"
+depends_on = ["sip-010-trait", "newyorkcitycoin-auth", "citycoin-token-trait"]
+
 # core
 
 [contracts.citycoin-core-trait]
