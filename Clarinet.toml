@@ -57,5 +57,4 @@ path = "contracts/Utilities/test-utils.clar"
 depends_on = ["citycoin-core-v1"]
 
 [repl.analysis]
-passes = ["check_checker"]
 costs_version = 2
