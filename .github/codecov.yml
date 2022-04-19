@@ -33,3 +33,5 @@ comment:
 ignore:
   - "*mainnet/*"
   - "*testnet/*"
+  - "contracts/tardis/local/citycoin-tardis-v1.clar"
+  - "contracts/core/local/citycoin-core-v2.clar"
