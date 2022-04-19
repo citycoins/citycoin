@@ -2,59 +2,69 @@
 name = "citycoin"
 requirements = []
 
-[contracts.citycoin-vrf]
-path = "contracts/VRF/local/citycoin-vrf.clar"
-depends_on = []
+[repl.analysis]
+costs_version = 2
+
+# cities
+
+# core
 
 [contracts.citycoin-core-trait]
-path = "contracts/Core/local/citycoin-core-trait.clar"
+path = "contracts/core/local/citycoin-core-trait.clar"
 depends_on = []
 
 [contracts.citycoin-token-trait]
-path = "contracts/Core/local/citycoin-token-trait.clar"
+path = "contracts/core/local/citycoin-token-trait.clar"
 depends_on = []
 
 [contracts.citycoin-auth]
-path = "contracts/Core/local/citycoin-auth.clar"
+path = "contracts/core/local/citycoin-auth.clar"
 depends_on = ["citycoin-core-trait", "citycoin-token-trait"]
 
 [contracts.citycoin-token]
-path = "contracts/Core/local/citycoin-token.clar"
+path = "contracts/core/local/citycoin-token.clar"
 depends_on = ["sip-010-trait", "citycoin-auth", "citycoin-token-trait"]
 
 [contracts.citycoin-core-v1]
-path = "contracts/Core/local/citycoin-core-v1.clar"
+path = "contracts/core/local/citycoin-core-v1.clar"
 depends_on = ["citycoin-auth", "citycoin-token", "citycoin-vrf", "citycoin-core-trait"]
 
-[contracts.citycoin-vote-v1]
-path = "contracts/Vote/local/citycoin-vote-v1.clar"
-depends_on = ["citycoin-core-v1"]
-
-[contracts.citycoin-tardis-v1]
-path = "contracts/Tardis/local/citycoin-tardis-v1.clar"
-depends_on = ["citycoin-core-v1"]
-
-[contracts.citycoin-tardis-v2]
-path = "contracts/Tardis/local/citycoin-tardis-v2.clar"
-depends_on = ["citycoin-core-v1"]
-
-# contracts listed below are used only in test suite
-
 [contracts.citycoin-core-v2]
-path = "contracts/Core/local/citycoin-core-v2.clar"
+path = "contracts/core/local/citycoin-core-v2.clar"
 depends_on = ["citycoin-auth", "citycoin-token", "citycoin-vrf", "citycoin-core-trait"]
 
 [contracts.citycoin-core-v3]
-path = "contracts/Core/local/citycoin-core-v2.clar"
+path = "contracts/core/local/citycoin-core-v2.clar"
 depends_on = ["citycoin-auth", "citycoin-token", "citycoin-vrf", "citycoin-core-trait"]
 
+# tardis
+
+[contracts.citycoin-tardis-v1]
+path = "contracts/tardis/local/citycoin-tardis-v1.clar"
+depends_on = ["citycoin-core-v1"]
+
+[contracts.citycoin-tardis-v2]
+path = "contracts/tardis/local/citycoin-tardis-v2.clar"
+depends_on = ["citycoin-core-v1"]
+
+# utilities
+
 [contracts.sip-010-trait]
-path = "contracts/Utilities/sip-10-ft-standard.clar"
+path = "contracts/utilities/sip-10-ft-standard.clar"
 depends_on = []
 
 [contracts.test-utils]
-path = "contracts/Utilities/test-utils.clar"
+path = "contracts/utilities/test-utils.clar"
 depends_on = ["citycoin-core-v1"]
 
-[repl.analysis]
-costs_version = 2
+# vote
+
+[contracts.citycoin-vote-v1]
+path = "contracts/vote/local/citycoin-vote-v1.clar"
+depends_on = ["citycoin-core-v1"]
+
+# vrf
+
+[contracts.citycoin-vrf]
+path = "contracts/vrf/local/citycoin-vrf.clar"
+depends_on = []
