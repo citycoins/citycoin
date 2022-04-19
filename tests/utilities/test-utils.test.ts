@@ -1,6 +1,6 @@
-import { describe, run, Chain, beforeEach, it } from "../deps.ts";
-import { TestUtilsModel } from "../models/test-utils.model.ts";
-import { Accounts, Context } from "../src/context.ts";
+import { describe, run, Chain, beforeEach, it } from "../../deps.ts";
+import { TestUtilsModel } from "../../models/test-utils.model.ts";
+import { Accounts, Context } from "../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
