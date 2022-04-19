@@ -7,14 +7,16 @@ on:
   push:
     branches:
       - main
+      - develop
   pull_request:
     branches:
       - main
+      - develop
   # allow running manually
   workflow_dispatch:
 
 jobs:
-  test:
+  test-contracts:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout code"
