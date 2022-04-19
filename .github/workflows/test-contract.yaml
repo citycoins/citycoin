@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  test-contracts:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout code"
