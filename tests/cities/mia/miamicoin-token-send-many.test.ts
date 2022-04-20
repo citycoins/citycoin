@@ -23,6 +23,51 @@ describe("[MiamiCoin Token]", () => {
   //////////////////////////////////////////////////
   describe("SEND-MANY", () => {
     describe("send-many()", () => {
+      it("fails with (err u1) if sender does not have enough CityCoins", () => {
+        // arrange
+        const from = accounts.get("wallet_1")!;
+        const recipients: Array<Account> = [
+          accounts.get("wallet_2")!,
+          accounts.get("wallet_3")!,
+          accounts.get("wallet_4")!,
+          accounts.get("wallet_5")!,
+          accounts.get("wallet_6")!,
+        ];
+        const amounts: Array<number> = [100, 200, 300, 400, 500];
+        const memos: Array<ArrayBuffer> = [
+          new TextEncoder().encode("MiamiCoin is the first CityCoin"),
+          new TextEncoder().encode("The Capitol of Capital"),
+          new TextEncoder().encode("Support your favorite cities"),
+          new TextEncoder().encode("Revolutionizing Civic Engagement"),
+          new TextEncoder().encode("Built on Stacks Secured by Bitcoin"),
+        ];
+
+        const sendManyRecords: SendManyRecord[] = [];
+
+        recipients.forEach((recipient, recipientIdx) => {
+          let record = new SendManyRecord(
+            recipient,
+            amounts[recipientIdx],
+            memos[recipientIdx]
+          );
+          sendManyRecords.push(record);
+        });
+
+        const amountTotal = sendManyRecords.reduce(
+          (sum, record) => sum + record.amount,
+          0
+        );
+
+        chain.mineBlock([token.testMint(amountTotal - 1, from)]);
+
+        // act
+        const receipt = chain.mineBlock([
+          token.sendMany(sendManyRecords, from),
+        ]).receipts[0];
+
+        // assert
+        receipt.result.expectErr().expectUint(1);
+      });
       it("succeeds with five ft_transfer_events and five print memo events with memo supplied", () => {
         // arrange
         const from = accounts.get("wallet_1")!;
