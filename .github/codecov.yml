@@ -15,12 +15,13 @@ coverage:
           - main
           - develop
     patch:
-      target: auto
-      threshold: 5%
-      base: auto
-      branches:
-        - main
-        - develop
+      default:
+        target: auto
+        threshold: 5%
+        base: auto
+        branches:
+          - main
+          - develop
 
 parsers:
   gcov:
