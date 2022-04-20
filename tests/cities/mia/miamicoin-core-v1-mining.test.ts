@@ -465,9 +465,6 @@ describe("[MiamiCoin Core]", () => {
         const miner = accounts.get("wallet_1")!;
         const amounts = [1];
         const cityWallet = accounts.get("mia_wallet")!;
-        console.log(miner.address);
-        console.log(cityWallet.address);
-        console.log(core.address);
         const setupBlock = chain.mineBlock([
           core.testInitializeCore(core.address),
           core.testSetActivationThreshold(1),

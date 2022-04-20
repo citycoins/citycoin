@@ -493,7 +493,7 @@
 ;; CITY WALLET MANAGEMENT
 
 ;; initial value for city wallet
-(define-data-var cityWallet principal 'STFCVYY1RJDNJHST7RRTPACYHVJQDJ7R1DWTQHQA)
+(define-data-var cityWallet principal 'ST3ZG8F9X4VKVTVQB2APF4NEYEE1HQHC2EDBF09JN)
 
 ;; returns city wallet principal
 (define-read-only (get-city-wallet)

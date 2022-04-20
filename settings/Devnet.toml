@@ -37,13 +37,23 @@ mnemonic = "apology together shy taxi glare struggle hip camp engage lion possib
 balance = 1_000_000_000
 
 [accounts.wallet_7]
-# ST3ZG8F9X4VKVTVQB2APF4NEYEE1HQHC2EDBF09JN
-mnemonic = "antenna bitter find rely gadget father exact excuse cross easy elbow alcohol injury loud silk bird crime cabbage winter fit wide screen update october"
+# ST14NRT7B8AM2CB79ZERZAA826Z63A3427ESZKH9
+mnemonic = "else shop pipe witness topple little pig lyrics fresh peanut hint online subject diesel hood manage menu danger defy produce suffer rough kiss antenna"
 balance = 1_000_000_000
 
 [accounts.wallet_8]
-# STEB8ZW46YZJ40E3P7A287RBJFWPHYNQ2AB5ECT8
-mnemonic = "east load echo merit ignore hip tag obvious truly adjust smart panther deer aisle north hotel process frown lock property catch bless notice topple"
+# ST1FA25033ZXQKSK575YMN42QZSVM5RHNTTEY0G9V
+mnemonic = "predict day office century record pilot screen theme proud grief protect inherit boss bunker sauce gas agent dentist bone hidden sibling state town exhaust"
+balance = 1_000_000_000
+
+[accounts.wallet_9]
+# ST102G8QG38GZGW2RVTXZVDHQHV95MPM02FMP07PD
+mnemonic = "sense grant caught opinion ancient run enjoy good lock derive legal fault cattle rebuild bread strategy bird safe again dance drum hamster awake sand"
+balance = 1_000_000_000
+
+[accounts.city_wallet]
+# ST3ZG8F9X4VKVTVQB2APF4NEYEE1HQHC2EDBF09JN
+mnemonic = "antenna bitter find rely gadget father exact excuse cross easy elbow alcohol injury loud silk bird crime cabbage winter fit wide screen update october"
 balance = 1_000_000_000
 
 [accounts.mia_wallet]
