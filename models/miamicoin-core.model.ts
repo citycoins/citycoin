@@ -259,4 +259,12 @@ export class MiamiCoinCoreModel extends Model {
     );
   }
 
+  testBurn(amount: number, recipient: Account, sender: Account): Tx {
+    return this.callPublic(
+      "test-burn",
+      [types.uint(amount), types.principal(recipient.address)],
+      sender.address
+    );
+  }
+
 }
