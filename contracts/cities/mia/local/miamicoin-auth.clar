@@ -606,7 +606,7 @@
 (define-public (test-set-active-core-contract)
   (begin
     (asserts! (is-test-env) (err ERR_UNAUTHORIZED))
-    (ok (var-set activeCoreContract .citycoin-core-v1))
+    (ok (var-set activeCoreContract .miamicoin-core-v1))
   )
 )
 
