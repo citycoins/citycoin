@@ -21,6 +21,9 @@ jobs:
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v2
+      - name: "Show directory structure (debug)"
+        run: |
+          ls -Rlh
       - name: "Check contract syntax"
         uses: docker://hirosystems/clarinet:latest
         with:
