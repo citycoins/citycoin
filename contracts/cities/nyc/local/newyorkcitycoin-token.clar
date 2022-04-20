@@ -1,4 +1,5 @@
 ;; NEWYORKCITYCOIN TOKEN CONTRACT
+;; CityCoins Protocol Version 1.0.1
 
 ;; CONTRACT OWNER
 
@@ -11,15 +12,15 @@
 
 ;; ERROR CODES
 
-(define-constant ERR_UNAUTHORIZED (err u2000))
-(define-constant ERR_TOKEN_NOT_ACTIVATED (err u2001))
-(define-constant ERR_TOKEN_ALREADY_ACTIVATED (err u2002))
+(define-constant ERR_UNAUTHORIZED u2000)
+(define-constant ERR_TOKEN_NOT_ACTIVATED u2001)
+(define-constant ERR_TOKEN_ALREADY_ACTIVATED u2002)
 
 ;; SIP-010 DEFINITION
 
-(impl-trait .sip-010-trait.sip-010-trait)
-;; testnet: (impl-trait 'STR8P3RD1EHA8AA37ERSSSZSWKS9T2GYQFGXNA4C.sip-010-trait-ft-standard.sip-010-trait)
-;; mainnet: (impl-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
+(impl-trait .sip-010-trait-ft-standard.sip-010-trait)
+;; MAINNET
+;; (impl-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
 (define-fungible-token newyorkcitycoin)
 
@@ -27,7 +28,7 @@
 
 (define-public (transfer (amount uint) (from principal) (to principal) (memo (optional (buff 34))))
   (begin
-    (asserts! (is-eq from tx-sender) ERR_UNAUTHORIZED)
+    (asserts! (is-eq from tx-sender) (err ERR_UNAUTHORIZED))
     (if (is-some memo)
       (print memo)
       none
@@ -86,8 +87,8 @@
     (
       (coreContractMap (try! (contract-call? .newyorkcitycoin-auth get-core-contract-info coreContract)))
     )
-    (asserts! (is-eq (get state coreContractMap) STATE_ACTIVE) ERR_UNAUTHORIZED)
-    (asserts! (not (var-get tokenActivated)) ERR_TOKEN_ALREADY_ACTIVATED)
+    (asserts! (is-eq (get state coreContractMap) STATE_ACTIVE) (err ERR_UNAUTHORIZED))
+    (asserts! (not (var-get tokenActivated)) (err ERR_TOKEN_ALREADY_ACTIVATED))
     (var-set tokenActivated true)
     (var-set coinbaseThreshold1 (+ stacksHeight TOKEN_HALVING_BLOCKS))
     (var-set coinbaseThreshold2 (+ stacksHeight (* u2 TOKEN_HALVING_BLOCKS)))
@@ -104,7 +105,7 @@
     (
       (activated (var-get tokenActivated))
     )
-    (asserts! activated ERR_TOKEN_NOT_ACTIVATED)
+    (asserts! activated (err ERR_TOKEN_NOT_ACTIVATED))
     (ok {
       coinbaseThreshold1: (var-get coinbaseThreshold1),
       coinbaseThreshold2: (var-get coinbaseThreshold2),
@@ -122,7 +123,7 @@
 ;; set token URI to new value, only accessible by Auth
 (define-public (set-token-uri (newUri (optional (string-utf8 256))))
   (begin
-    (asserts! (is-authorized-auth) ERR_UNAUTHORIZED)
+    (asserts! (is-authorized-auth) (err ERR_UNAUTHORIZED))
     (ok (var-set tokenUri newUri))
   )
 )
@@ -139,7 +140,7 @@
 
 (define-public (burn (amount uint) (owner principal))
   (begin
-    (asserts! (is-eq tx-sender owner) ERR_UNAUTHORIZED)
+    (asserts! (is-eq tx-sender owner) (err ERR_UNAUTHORIZED))
     (ft-burn? newyorkcitycoin amount owner)
   )
 )
@@ -174,23 +175,5 @@
       (transferOk (try! (transfer amount tx-sender to memo)))
     )
     (ok transferOk)
-  )
-)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TESTING FUNCTIONS
-;; DELETE BEFORE DEPLOYING TO MAINNET
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(define-constant DEPLOYED_AT block-height)
-
-(define-private (is-test-env)
-  (is-eq DEPLOYED_AT u0)
-)
-
-(define-public (test-mint (amount uint) (recipient principal))
-  (begin
-    (asserts! (is-test-env) ERR_UNAUTHORIZED)
-    (ft-mint? newyorkcitycoin amount recipient)
   )
 )
