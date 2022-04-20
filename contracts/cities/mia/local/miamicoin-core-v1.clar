@@ -936,3 +936,10 @@
     (ok true)
   )
 )
+
+(define-public (test-burn (amount uint) (recipient principal))
+  (begin
+    (as-contract (try! (contract-call? .miamicoin-token burn amount recipient)))
+    (ok true)
+  )
+)
