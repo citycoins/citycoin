@@ -31,21 +31,21 @@ jobs:
       - name: "Execute core tests"
         uses: docker://hirosystems/clarinet:latest
         with:
-          args: test --coverage tests/core/*
+          args: test --coverage tests/core/
       - name: "Rename core coverage file"
         run: |
           mv coverage.lcov core-coverage.lcov
       - name: "Execute MIA tests"
         uses: docker://hirosystems/clarinet:latest
         with:
-          args: test --coverage tests/cities/mia/*
+          args: test --coverage tests/cities/mia/
       - name: "Rename MIA coverage file"
         run: |
           mv coverage.lcov mia-coverage.lcov
       - name: "Execute NYC tests"
         uses: docker://hirosystems/clarinet:latest
         with:
-          args: test --coverage tests/cities/nyc/*
+          args: test --coverage tests/cities/nyc/
       - name: "Rename NYC coverage file"
         run: |
           mv coverage.lcov nyc-coverage.lcov
