@@ -1,30 +1,26 @@
-import { assertEquals, describe, types, run, Chain, beforeEach, it} from "../../deps.ts";
-import { AuthModel } from "../../models/auth.model.ts";
-import { CoreModel } from "../../models/core.model.ts";
-import { TokenModel } from "../../models/token.model.ts";
-import { Accounts, Context } from "../../src/context.ts";
+import { assertEquals, describe, types, run, Chain, beforeEach, it} from "../../../deps.ts";
+import { NewYorkCityCoinAuthModel } from "../../../models/newyorkcitycoin-auth.model.ts";
+import { NewYorkCityCoinCoreModel } from "../../../models/newyorkcitycoin-core.model.ts";
+import { NewYorkCityCoinTokenModel } from "../../../models/newyorkcitycoin-token.model.ts";
+import { Accounts, Context } from "../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let core: CoreModel;
-let core2: CoreModel;
-let core3: CoreModel;
-let auth: AuthModel;
-let token: TokenModel;
+let core: NewYorkCityCoinCoreModel;
+let auth: NewYorkCityCoinAuthModel;
+let token: NewYorkCityCoinTokenModel;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  auth = ctx.models.get(AuthModel);
-  core = ctx.models.get(CoreModel, "citycoin-core-v1");
-  core2 = ctx.models.get(CoreModel, "citycoin-core-v2");
-  core3 = ctx.models.get(CoreModel, "citycoin-core-v3");
-  token = ctx.models.get(TokenModel);
+  auth = ctx.models.get(NewYorkCityCoinAuthModel, "newyorkcitycoin-auth");
+  core = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1");
+  token = ctx.models.get(NewYorkCityCoinTokenModel, "newyorkcitycoin-token");
 })
 
-describe("[CityCoin Auth]", () => {
+describe("[NewYorkCityCoin Auth]", () => {
   //////////////////////////////////////////////////
   // JOB MANAGEMENT
   //////////////////////////////////////////////////
@@ -68,7 +64,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
 
       it("succeeds and creates new job if called by an approver", () => {
@@ -138,7 +134,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNKNOWN_JOB);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNKNOWN_JOB);
       });
 
       it("fails with ERR_UNAUTHORIZED while activating job by someone who is not its creator", () => {
@@ -159,7 +155,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
 
       it("fails with ERR_JOB_IS_ACTIVE while activating job that is already active", () => {
@@ -181,7 +177,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_JOB_IS_ACTIVE);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_JOB_IS_ACTIVE);
       });
 
       it("succeeds and activates job if called by its creator", () => {
@@ -233,7 +229,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNKNOWN_JOB);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNKNOWN_JOB);
       });
 
       it("fails with ERR_JOB_IS_NOT_ACTIVE while approving inactive job ID", () => {
@@ -253,7 +249,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_JOB_IS_NOT_ACTIVE);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_JOB_IS_NOT_ACTIVE);
       });
 
       it("fails with ERR_ALREADY_VOTED_THIS_WAY while approving job previously approved", () => {
@@ -277,7 +273,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_ALREADY_VOTED_THIS_WAY);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_ALREADY_VOTED_THIS_WAY);
       });
 
       it("fails with ERR_UNAUTHORIZED while approving job by user who is not an approver", () => {
@@ -300,7 +296,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
 
       it("succeeds and saves approvals", () => {
@@ -401,7 +397,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNKNOWN_JOB);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNKNOWN_JOB);
       });
 
       it("fails with ERR_JOB_IS_NOT_ACTIVE while disapproving inactive job ID", () => {
@@ -421,7 +417,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_JOB_IS_NOT_ACTIVE);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_JOB_IS_NOT_ACTIVE);
       });
 
       it("fails with ERR_ALREADY_VOTED_THIS_WAY while disapproving job previously disapproved", () => {
@@ -445,7 +441,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_ALREADY_VOTED_THIS_WAY);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_ALREADY_VOTED_THIS_WAY);
       });
 
       it("fails with ERR_UNAUTHORIZED while disapproving job by user who is not an approver", () => {
@@ -468,7 +464,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
 
       it("succeeds and saves disapprovals", () => {
@@ -639,7 +635,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNKNOWN_JOB);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNKNOWN_JOB);
       });
 
       it("fails with ERR_JOB_IS_NOT_ACTIVE when called with inactive job ID", () => {
@@ -659,7 +655,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_JOB_IS_NOT_ACTIVE);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_JOB_IS_NOT_ACTIVE);
       });
 
       it("fails with ERR_JOB_IS_NOT_APPROVED when called with unapproved job ID", () => {
@@ -682,7 +678,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_JOB_IS_NOT_APPROVED);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_JOB_IS_NOT_APPROVED);
       });
 
       it("fails with ERR_UNAUTHORIZED when called by sender that is not the target", () => {
@@ -711,7 +707,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
 
       it("succeeds and marks job as executed when called by target", () => {
@@ -744,7 +740,7 @@ describe("[CityCoin Auth]", () => {
           creator: creator.address,
           name: types.ascii(name),
           target: target,
-          approvals: types.uint(AuthModel.REQUIRED_APPROVALS),
+          approvals: types.uint(NewYorkCityCoinAuthModel.REQUIRED_APPROVALS),
           disapprovals: types.uint(0),
           isActive: types.bool(true),
           isExecuted: types.bool(true),
@@ -784,7 +780,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_JOB_IS_EXECUTED);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_JOB_IS_EXECUTED);
       });
     });
 
@@ -804,7 +800,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNKNOWN_JOB);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNKNOWN_JOB);
       });
 
       it("fails with ERR_JOB_IS_ACTIVE while adding argument to active job ID", () => {
@@ -828,7 +824,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_JOB_IS_ACTIVE);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_JOB_IS_ACTIVE);
       });
 
       it("fails with ERR_UNAUTHORIZED while adding argument by someone who is not the job creator", () => {
@@ -850,7 +846,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
 
       it("succeeds and saves new argument", () => {
@@ -903,7 +899,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_ARGUMENT_ALREADY_EXISTS);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_ARGUMENT_ALREADY_EXISTS);
       });
     });
 
@@ -923,7 +919,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNKNOWN_JOB);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNKNOWN_JOB);
       });
 
       it("fails with ERR_JOB_IS_ACTIVE while adding argument to active job ID", () => {
@@ -947,7 +943,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_JOB_IS_ACTIVE);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_JOB_IS_ACTIVE);
       });
 
       it("fails with ERR_UNAUTHORIZED while adding argument by someone who is not job creator", () => {
@@ -969,7 +965,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
 
       it("successfully save new argument", () => {
@@ -1022,7 +1018,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         block.receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_ARGUMENT_ALREADY_EXISTS);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_ARGUMENT_ALREADY_EXISTS);
       });
     });
   });

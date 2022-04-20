@@ -1,24 +1,23 @@
-import { assertEquals, describe, types, run, Chain, beforeEach, it } from "../../deps.ts";
-import { CoreModel } from "../../models/core.model.ts";
-import { TokenModel } from "../../models/token.model.ts";
-import { Accounts, Context } from "../../src/context.ts";
-
+import { assertEquals, describe, types, run, Chain, beforeEach, it } from "../../../deps.ts";
+import { NewYorkCityCoinCoreModel } from "../../../models/newyorkcitycoin-core.model.ts";
+import { NewYorkCityCoinTokenModel } from "../../../models/newyorkcitycoin-token.model.ts";
+import { Accounts, Context } from "../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let core: CoreModel;
-let token: TokenModel;
+let core: NewYorkCityCoinCoreModel;
+let token: NewYorkCityCoinTokenModel;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  core = ctx.models.get(CoreModel);
-  token = ctx.models.get(TokenModel);
+  core = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1");
+  token = ctx.models.get(NewYorkCityCoinTokenModel, "newyorkcitycoin-token");
 });
 
-describe("[CityCoin Core]", () => {
+describe("[NewYorkCityCoin Core]", () => {
   //////////////////////////////////////////////////
   // MINING CONFIGURATION
   //////////////////////////////////////////////////
@@ -36,7 +35,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner2),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -44,7 +43,7 @@ describe("[CityCoin Core]", () => {
           core.mineTokens(amount, miner),
           core.mineTokens(amount * 1000, miner2),
         ]);
-        chain.mineEmptyBlock(CoreModel.TOKEN_REWARD_MATURITY);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
 
         // act
         const result = core.getBlockWinnerId(block.height).result;
@@ -64,7 +63,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner2),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -72,7 +71,7 @@ describe("[CityCoin Core]", () => {
           core.mineTokens(amount, miner),
           core.mineTokens(amount * 1000, miner2),
         ]);
-        chain.mineEmptyBlock(CoreModel.TOKEN_REWARD_MATURITY);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
         chain.mineBlock([
           core.claimMiningReward(block.height - 1, miner2),
         ]);
@@ -103,7 +102,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
       });
 
       it("fails with ERR_INSUFFICIENT_COMMITMENT while trying to mine with 0 commitment", () => {
@@ -124,7 +123,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_INSUFFICIENT_COMMITMENT);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_INSUFFICIENT_COMMITMENT);
       });
 
       it("fails with ERR_INSUFFICIENT_BALANCE while trying to mine with commitment larger than current balance", () => {
@@ -145,7 +144,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_INSUFFICIENT_BALANCE);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_INSUFFICIENT_BALANCE);
       });
 
       it("fails with ERR_STACKING_NOT_VAILABLE while trying to mine before the activation period ends", () => {
@@ -166,12 +165,12 @@ describe("[CityCoin Core]", () => {
         //assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_STACKING_NOT_AVAILABLE);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_STACKING_NOT_AVAILABLE);
       });
 
       it("succeeds and emits one stx_transfer event to city wallet during first cycle", () => {
         // arrange
-        const cityWallet = accounts.get("city_wallet")!;
+        const cityWallet = accounts.get("nyc_wallet")!;
         const miner = accounts.get("wallet_2")!;
         const amountUstx = 200;
         const block = chain.mineBlock([
@@ -181,7 +180,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner),
         ]);
         chain.mineEmptyBlockUntil(
-          block.height + CoreModel.ACTIVATION_DELAY - 1
+          block.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1
         );
 
         // act
@@ -201,7 +200,7 @@ describe("[CityCoin Core]", () => {
 
       it("succeeds and emits one stx_transfer event to city wallet and one to stacker while mining in cycle with stackers", () => {
         // arrange
-        const cityWallet = accounts.get("city_wallet")!;
+        const cityWallet = accounts.get("nyc_wallet")!;
         const miner = accounts.get("wallet_2")!;
         const amountUstx = 200;
         const amountTokens = 500;
@@ -214,9 +213,9 @@ describe("[CityCoin Core]", () => {
         ]);
 
         const activationBlockHeight =
-          block.height + CoreModel.ACTIVATION_DELAY - 1;
+          block.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
         const cycle1FirstBlockHeight =
-          activationBlockHeight + CoreModel.REWARD_CYCLE_LENGTH;
+          activationBlockHeight + NewYorkCityCoinCoreModel.REWARD_CYCLE_LENGTH;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
         chain.mineBlock([core.stackTokens(amountTokens, 1, miner)]);
@@ -232,13 +231,13 @@ describe("[CityCoin Core]", () => {
         assertEquals(receipt.events.length, 2);
 
         receipt.events.expectSTXTransferEvent(
-          amountUstx * CoreModel.SPLIT_CITY_PCT,
+          amountUstx * NewYorkCityCoinCoreModel.SPLIT_CITY_PCT,
           miner.address,
           cityWallet.address
         );
 
         receipt.events.expectSTXTransferEvent(
-          amountUstx * (1 - CoreModel.SPLIT_CITY_PCT),
+          amountUstx * (1 - NewYorkCityCoinCoreModel.SPLIT_CITY_PCT),
           miner.address,
           core.address
         );
@@ -256,7 +255,7 @@ describe("[CityCoin Core]", () => {
         ]);
 
         const activationBlockHeight =
-          block.height + CoreModel.ACTIVATION_DELAY - 1;
+          block.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -293,7 +292,7 @@ describe("[CityCoin Core]", () => {
         ]);
 
         const activationBlockHeight =
-          block.height + CoreModel.ACTIVATION_DELAY - 1;
+          block.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -305,7 +304,7 @@ describe("[CityCoin Core]", () => {
         receipts[0].result.expectOk().expectBool(true);
         receipts[1].result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_USER_ALREADY_MINED);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_USER_ALREADY_MINED);
       });
     });
 
@@ -322,7 +321,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
       });
 
       it("fails with ERR_STACKING_NOT_AVAILABLE while trying to mine before activation period ends", () => {
@@ -342,7 +341,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_STACKING_NOT_AVAILABLE);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_STACKING_NOT_AVAILABLE);
       });
 
       it("fails with ERR_INSUFFICIENT_COMMITMENT while providing empty list of amounts", () => {
@@ -355,7 +354,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1
         );
 
         // act
@@ -365,7 +364,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_INSUFFICIENT_COMMITMENT);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_INSUFFICIENT_COMMITMENT);
       });
 
       it("fails with ERR_INSUFFICIENT_COMMITMENT while providing list of amounts filled with 0", () => {
@@ -378,7 +377,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1
         );
 
         // act
@@ -388,7 +387,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_INSUFFICIENT_COMMITMENT);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_INSUFFICIENT_COMMITMENT);
       });
 
       it("fails with ERR_INSUFFICIENT_COMMITMENT while providing list of amounts with one or more 0s", () => {
@@ -401,7 +400,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1
         );
 
         // act
@@ -411,7 +410,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_INSUFFICIENT_COMMITMENT);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_INSUFFICIENT_COMMITMENT);
       });
 
       it("fails with ERR_INSUFFICIENT_BALANCE when sum of all commitments > miner balance", () => {
@@ -424,7 +423,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1
         );
 
         // act
@@ -434,7 +433,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_INSUFFICIENT_BALANCE);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_INSUFFICIENT_BALANCE);
       });
 
       it("fails with ERR_USER_ALREADY_MINED when call overlaps already mined blocks", () => {
@@ -447,7 +446,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1
         );
         chain.mineBlock([core.mineMany(amounts, miner)]);
 
@@ -458,21 +457,21 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_USER_ALREADY_MINED);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_USER_ALREADY_MINED);
       });
 
       it("succeeds and emits one stx_transfer event when amounts list has only one value and there are no stackers", () => {
         // arrange
         const miner = accounts.get("wallet_1")!;
         const amounts = [1];
-        const cityWallet = accounts.get("city_wallet")!;
+        const cityWallet = accounts.get("nyc_wallet")!;
         const setupBlock = chain.mineBlock([
           core.testInitializeCore(core.address),
           core.testSetActivationThreshold(1),
           core.registerUser(miner),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1
         );
 
         // act
@@ -495,14 +494,14 @@ describe("[CityCoin Core]", () => {
         // arrange
         const miner = accounts.get("wallet_1")!;
         const amounts = [1, 2, 200, 89, 3423];
-        const cityWallet = accounts.get("city_wallet")!;
+        const cityWallet = accounts.get("nyc_wallet")!;
         const setupBlock = chain.mineBlock([
           core.testInitializeCore(core.address),
           core.testSetActivationThreshold(1),
           core.registerUser(miner),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1
         );
 
         // act
@@ -525,7 +524,7 @@ describe("[CityCoin Core]", () => {
         // arrange
         const miner = accounts.get("wallet_1")!;
         const amounts = [10000];
-        const cityWallet = accounts.get("city_wallet")!;
+        const cityWallet = accounts.get("nyc_wallet")!;
         const amountTokens = 500;
         const block = chain.mineBlock([
           core.testInitializeCore(core.address),
@@ -536,9 +535,9 @@ describe("[CityCoin Core]", () => {
         ]);
 
         const activationBlockHeight =
-          block.height + CoreModel.ACTIVATION_DELAY - 1;
+          block.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
         const cycle1FirstBlockHeight =
-          activationBlockHeight + CoreModel.REWARD_CYCLE_LENGTH;
+          activationBlockHeight + NewYorkCityCoinCoreModel.REWARD_CYCLE_LENGTH;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
         chain.mineBlock([core.stackTokens(amountTokens, 1, miner)]);
@@ -556,13 +555,13 @@ describe("[CityCoin Core]", () => {
         const totalAmount = amounts.reduce((sum, amount) => sum + amount, 0);
 
         receipt.events.expectSTXTransferEvent(
-          totalAmount * CoreModel.SPLIT_CITY_PCT,
+          totalAmount * NewYorkCityCoinCoreModel.SPLIT_CITY_PCT,
           miner.address,
           cityWallet.address
         );
 
         receipt.events.expectSTXTransferEvent(
-          totalAmount * (1 - CoreModel.SPLIT_CITY_PCT),
+          totalAmount * (1 - NewYorkCityCoinCoreModel.SPLIT_CITY_PCT),
           miner.address,
           core.address
         );
@@ -572,7 +571,7 @@ describe("[CityCoin Core]", () => {
         // arrange
         const miner = accounts.get("wallet_1")!;
         const amounts = [100, 200, 300];
-        const cityWallet = accounts.get("city_wallet")!;
+        const cityWallet = accounts.get("nyc_wallet")!;
         const amountTokens = 500;
         const block = chain.mineBlock([
           core.testInitializeCore(core.address),
@@ -583,9 +582,9 @@ describe("[CityCoin Core]", () => {
         ]);
 
         const activationBlockHeight =
-          block.height + CoreModel.ACTIVATION_DELAY - 1;
+          block.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
         const cycle1FirstBlockHeight =
-          activationBlockHeight + CoreModel.REWARD_CYCLE_LENGTH;
+          activationBlockHeight + NewYorkCityCoinCoreModel.REWARD_CYCLE_LENGTH;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
         chain.mineBlock([core.stackTokens(amountTokens, 1, miner)]);
@@ -603,13 +602,13 @@ describe("[CityCoin Core]", () => {
         const totalAmount = amounts.reduce((sum, amount) => sum + amount, 0);
 
         receipt.events.expectSTXTransferEvent(
-          totalAmount * CoreModel.SPLIT_CITY_PCT,
+          totalAmount * NewYorkCityCoinCoreModel.SPLIT_CITY_PCT,
           miner.address,
           cityWallet.address
         );
 
         receipt.events.expectSTXTransferEvent(
-          totalAmount * (1 - CoreModel.SPLIT_CITY_PCT),
+          totalAmount * (1 - NewYorkCityCoinCoreModel.SPLIT_CITY_PCT),
           miner.address,
           core.address
         );
@@ -625,7 +624,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1
         );
 
         // act
@@ -649,7 +648,7 @@ describe("[CityCoin Core]", () => {
           core.testSetActivationThreshold(1),
           core.registerUser(miner),
         ]);
-        chain.mineEmptyBlockUntil(setupBlock.height + CoreModel.ACTIVATION_DELAY - 1);
+        chain.mineEmptyBlockUntil(setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1);
 
         // act
         const block = chain.mineBlock([core.mineMany(amounts, miner)]);
@@ -670,7 +669,7 @@ describe("[CityCoin Core]", () => {
           core.testSetActivationThreshold(1),
           core.registerUser(miner),
         ]);
-        chain.mineEmptyBlockUntil(setupBlock.height + CoreModel.ACTIVATION_DELAY + 145);
+        chain.mineEmptyBlockUntil(setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY + 145);
 
         // act
         const block = chain.mineBlock([core.mineMany(amounts, miner)]);

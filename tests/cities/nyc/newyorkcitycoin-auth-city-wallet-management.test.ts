@@ -1,30 +1,26 @@
-import { describe, run, Chain, beforeEach, it} from "../../deps.ts";
-import { AuthModel } from "../../models/auth.model.ts";
-import { CoreModel } from "../../models/core.model.ts";
-import { TokenModel } from "../../models/token.model.ts";
-import { Accounts, Context } from "../../src/context.ts";
+import { describe, run, Chain, beforeEach, it} from "../../../deps.ts";
+import { NewYorkCityCoinAuthModel } from "../../../models/newyorkcitycoin-auth.model.ts";
+import { NewYorkCityCoinCoreModel } from "../../../models/newyorkcitycoin-core.model.ts";
+import { NewYorkCityCoinTokenModel } from "../../../models/newyorkcitycoin-token.model.ts";
+import { Accounts, Context } from "../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let core: CoreModel;
-let core2: CoreModel;
-let core3: CoreModel;
-let auth: AuthModel;
-let token: TokenModel;
+let core: NewYorkCityCoinCoreModel;
+let auth: NewYorkCityCoinAuthModel;
+let token: NewYorkCityCoinTokenModel;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  auth = ctx.models.get(AuthModel);
-  core = ctx.models.get(CoreModel, "citycoin-core-v1");
-  core2 = ctx.models.get(CoreModel, "citycoin-core-v2");
-  core3 = ctx.models.get(CoreModel, "citycoin-core-v3");
-  token = ctx.models.get(TokenModel);
+  auth = ctx.models.get(NewYorkCityCoinAuthModel, "newyorkcitycoin-auth");
+  core = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1");
+  token = ctx.models.get(NewYorkCityCoinTokenModel, "newyorkcitycoin-token");
 })
 
-describe("[CityCoin Auth]", () => {
+describe("[NewYorkCityCoin Auth]", () => {
   //////////////////////////////////////////////////
   // CITY WALLET MANAGEMENT
   //////////////////////////////////////////////////
@@ -32,7 +28,7 @@ describe("[CityCoin Auth]", () => {
     describe("get-city-wallet()", () => {
       it("succeeds and returns city wallet", () => {
         // arrange
-        const cityWallet = accounts.get("city_wallet")!;
+        const cityWallet = accounts.get("nyc_wallet")!;
         // act
         const result = auth.getCityWallet().result;
         // assert
@@ -42,7 +38,7 @@ describe("[CityCoin Auth]", () => {
     describe("set-city-wallet()", () => {
       it("fails with ERR_CORE_CONTRACT_NOT_FOUND if principal not found in core contracts map", () => {
         // arrange
-        const cityWallet = accounts.get("city_wallet")!;
+        const cityWallet = accounts.get("nyc_wallet")!;
         const newCityWallet = accounts.get("wallet_2")!;
         // act
         const receipt = chain.mineBlock([
@@ -55,7 +51,7 @@ describe("[CityCoin Auth]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_CORE_CONTRACT_NOT_FOUND);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_CORE_CONTRACT_NOT_FOUND);
       });
 
       it("fails with ERR_UNAUTHORIZED if not called by city wallet", () => {
@@ -76,12 +72,12 @@ describe("[CityCoin Auth]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
 
       it("fails with ERR_UNAUTHORIZED if not called by the active core contract", () => {
         // arrange
-        const cityWallet = accounts.get("city_wallet")!;
+        const cityWallet = accounts.get("nyc_wallet")!;
         const newCityWallet = accounts.get("wallet_2")!;
         chain.mineBlock([
           core.testInitializeCore(core.address),
@@ -97,12 +93,12 @@ describe("[CityCoin Auth]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
 
       it("succeeds and updates city wallet variable when called by current city wallet", () => {
         // arrange
-        const cityWallet = accounts.get("city_wallet")!;
+        const cityWallet = accounts.get("nyc_wallet")!;
         const newCityWallet = accounts.get("wallet_2")!;
         chain.mineBlock([
           core.testInitializeCore(core.address),
@@ -137,7 +133,7 @@ describe("[CityCoin Auth]", () => {
         const approver1 = accounts.get("wallet_2")!;
         const approver2 = accounts.get("wallet_3")!;
         const approver3 = accounts.get("wallet_4")!;
-        const cityWallet = accounts.get("city_wallet")!;
+        const cityWallet = accounts.get("nyc_wallet")!;
         const newCityWallet = accounts.get("wallet_2")!;
         chain.mineBlock([
           core.testInitializeCore(core.address),

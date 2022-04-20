@@ -1,24 +1,23 @@
-import { assertEquals, describe, types, run, Chain, beforeEach, it } from "../../deps.ts";
-import { CoreModel } from "../../models/core.model.ts";
-import { TokenModel } from "../../models/token.model.ts";
-import { Accounts, Context } from "../../src/context.ts";
-
+import { assertEquals, describe, types, run, Chain, beforeEach, it } from "../../../deps.ts";
+import { NewYorkCityCoinCoreModel } from "../../../models/newyorkcitycoin-core.model.ts";
+import { NewYorkCityCoinTokenModel } from "../../../models/newyorkcitycoin-token.model.ts";
+import { Accounts, Context } from "../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let core: CoreModel;
-let token: TokenModel;
+let core: NewYorkCityCoinCoreModel;
+let token: NewYorkCityCoinTokenModel;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  core = ctx.models.get(CoreModel);
-  token = ctx.models.get(TokenModel);
+  core = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1");
+  token = ctx.models.get(NewYorkCityCoinTokenModel, "newyorkcitycoin-token");
 });
 
-describe("[CityCoin Core]", () => {
+describe("[NewYorkCityCoin Core]", () => {
   //////////////////////////////////////////////////
   // TOKEN CONFIGURATION
   //////////////////////////////////////////////////
@@ -28,7 +27,7 @@ describe("[CityCoin Core]", () => {
         // act
         const result = core.getCoinbaseThresholds().result;
         // assert
-        result.expectErr().expectUint(CoreModel.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
+        result.expectErr().expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
       });
       it("succeeds and returns coinbase thresholds", () => {
         // arrange
@@ -39,17 +38,17 @@ describe("[CityCoin Core]", () => {
           core.registerUser(user)
         ]);
         const activationBlockHeight =
-          block.height + CoreModel.ACTIVATION_DELAY - 1;
+          block.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
         chain.mineEmptyBlockUntil(activationBlockHeight);
         // act
         const result = core.getCoinbaseThresholds().result;
         // assert
         const expectedResult = {
-          coinbaseThreshold1: types.uint(activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS),     // 210151
-          coinbaseThreshold2: types.uint(activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS * 2), // 420151
-          coinbaseThreshold3: types.uint(activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS * 3), // 630151
-          coinbaseThreshold4: types.uint(activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS * 4), // 840151
-          coinbaseThreshold5: types.uint(activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS * 5)  // 1050151
+          coinbaseThreshold1: types.uint(activationBlockHeight + NewYorkCityCoinCoreModel.TOKEN_HALVING_BLOCKS),     // 210151
+          coinbaseThreshold2: types.uint(activationBlockHeight + NewYorkCityCoinCoreModel.TOKEN_HALVING_BLOCKS * 2), // 420151
+          coinbaseThreshold3: types.uint(activationBlockHeight + NewYorkCityCoinCoreModel.TOKEN_HALVING_BLOCKS * 3), // 630151
+          coinbaseThreshold4: types.uint(activationBlockHeight + NewYorkCityCoinCoreModel.TOKEN_HALVING_BLOCKS * 4), // 840151
+          coinbaseThreshold5: types.uint(activationBlockHeight + NewYorkCityCoinCoreModel.TOKEN_HALVING_BLOCKS * 5)  // 1050151
         };
         assertEquals(result.expectOk().expectTuple(), expectedResult);
       });

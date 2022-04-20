@@ -1,24 +1,23 @@
-import { describe, run, Chain, beforeEach, it } from "../../deps.ts";
-import { CoreModel } from "../../models/core.model.ts";
-import { TokenModel } from "../../models/token.model.ts";
-import { Accounts, Context } from "../../src/context.ts";
-
+import { describe, run, Chain, beforeEach, it } from "../../../deps.ts";
+import { NewYorkCityCoinCoreModel } from "../../../models/newyorkcitycoin-core.model.ts";
+import { NewYorkCityCoinTokenModel } from "../../../models/newyorkcitycoin-token.model.ts";
+import { Accounts, Context } from "../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let core: CoreModel;
-let token: TokenModel;
+let core: NewYorkCityCoinCoreModel;
+let token: NewYorkCityCoinTokenModel;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  core = ctx.models.get(CoreModel);
-  token = ctx.models.get(TokenModel);
+  core = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1");
+  token = ctx.models.get(NewYorkCityCoinTokenModel, "newyorkcitycoin-token");
 });
 
-describe("[CityCoin Core]", () => {
+describe("[NewYorkCityCoin Core]", () => {
   //////////////////////////////////////////////////
   // CITY WALLET MANAGEMENT
   //////////////////////////////////////////////////
@@ -33,7 +32,7 @@ describe("[CityCoin Core]", () => {
       });
       it("succeeds and returns current city wallet variable as city wallet address after initialization", () => {
         // arrange
-        const cityWallet = accounts.get("city_wallet")!;
+        const cityWallet = accounts.get("nyc_wallet")!;
         chain.mineBlock([
           core.testInitializeCore(core.address),
         ]);
@@ -57,7 +56,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_UNAUTHORIZED);
       });
     });
   });

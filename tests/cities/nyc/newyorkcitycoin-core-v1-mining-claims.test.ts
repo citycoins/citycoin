@@ -1,24 +1,20 @@
-import { assertEquals, describe, run, Chain, beforeEach, it } from "../../deps.ts";
-import { CoreModel } from "../../models/core.model.ts";
-import { TokenModel } from "../../models/token.model.ts";
-import { Accounts, Context } from "../../src/context.ts";
-
+import { assertEquals, describe, run, Chain, beforeEach, it } from "../../../deps.ts";
+import { NewYorkCityCoinCoreModel } from "../../../models/newyorkcitycoin-core.model.ts";
+import { Accounts, Context } from "../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let core: CoreModel;
-let token: TokenModel;
+let core: NewYorkCityCoinCoreModel;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  core = ctx.models.get(CoreModel);
-  token = ctx.models.get(TokenModel);
+  core = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1");
 });
 
-describe("[CityCoin Core]", () => {
+describe("[NewYorkCityCoin Core]", () => {
   //////////////////////////////////////////////////
   // MINING CLAIM ACTIONS
   //////////////////////////////////////////////////
@@ -36,7 +32,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_USER_ID_NOT_FOUND);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_USER_ID_NOT_FOUND);
       });
 
       it("fails with ERR_NO_MINERS_AT_BLOCK when called with block height at which nobody decided to mine", () => {
@@ -56,7 +52,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_NO_MINERS_AT_BLOCK);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_NO_MINERS_AT_BLOCK);
       });
 
       it("fails with ERR_USER_DID_NOT_MINE_IN_BLOCK when called by user who didn't mine specific block", () => {
@@ -70,7 +66,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -86,7 +82,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.receipts[0].result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_USER_DID_NOT_MINE_IN_BLOCK);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_USER_DID_NOT_MINE_IN_BLOCK);
       });
 
       it("fails with ERR_CLAIMED_BEFORE_MATURITY when called before maturity window passes", () => {
@@ -99,7 +95,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -113,7 +109,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_CLAIMED_BEFORE_MATURITY);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_CLAIMED_BEFORE_MATURITY);
       });
 
       it("fails with ERR_REWARD_ALREADY_CLAIMED when trying to claim rewards a 2nd time", () => {
@@ -126,12 +122,12 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         const block = chain.mineBlock([core.mineTokens(amount, miner)]);
-        chain.mineEmptyBlock(CoreModel.TOKEN_REWARD_MATURITY);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
 
         // act
         const receipt = chain.mineBlock([
@@ -142,7 +138,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_REWARD_ALREADY_CLAIMED);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_REWARD_ALREADY_CLAIMED);
       });
 
       it("fails with ERR_MINER_DID_NOT_WIN when trying to claim reward owed to someone else", () => {
@@ -156,7 +152,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -164,7 +160,7 @@ describe("[CityCoin Core]", () => {
           core.mineTokens(amount, miner),
           core.mineTokens(amount * 10000, otherMiner),
         ]);
-        chain.mineEmptyBlock(CoreModel.TOKEN_REWARD_MATURITY);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
 
         // act
         const receipt = chain.mineBlock([
@@ -174,7 +170,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_MINER_DID_NOT_WIN);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_MINER_DID_NOT_WIN);
       });
 
       it("succeeds and mints 250000 tokens in 1st issuance cycle, during bonus period", () => {
@@ -187,12 +183,12 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         const block = chain.mineBlock([core.mineTokens(amount, miner)]);
-        chain.mineEmptyBlock(CoreModel.TOKEN_REWARD_MATURITY);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
 
         // act
         const receipt = chain.mineBlock([
@@ -207,7 +203,7 @@ describe("[CityCoin Core]", () => {
         receipt.events.expectFungibleTokenMintEvent(
           250000,
           miner.address,
-          "citycoins"
+          "newyorkcitycoin"
         );
       });
 
@@ -221,14 +217,14 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(
-          activationBlockHeight + CoreModel.BONUS_PERIOD_LENGTH + 1
+          activationBlockHeight + NewYorkCityCoinCoreModel.BONUS_PERIOD_LENGTH + 1
         );
 
         const block = chain.mineBlock([core.mineTokens(amount, miner)]);
-        chain.mineEmptyBlock(CoreModel.TOKEN_REWARD_MATURITY);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
 
         // act
         const receipt = chain.mineBlock([
@@ -243,7 +239,7 @@ describe("[CityCoin Core]", () => {
         receipt.events.expectFungibleTokenMintEvent(
           100000,
           miner.address,
-          "citycoins"
+          "newyorkcitycoin"
         );
       });
 
@@ -257,14 +253,14 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(
-          activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS + 1
+          activationBlockHeight + NewYorkCityCoinCoreModel.TOKEN_HALVING_BLOCKS + 1
         );
 
         const block = chain.mineBlock([core.mineTokens(amount, miner)]);
-        chain.mineEmptyBlock(CoreModel.TOKEN_REWARD_MATURITY);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
 
         // act
         const receipt = chain.mineBlock([
@@ -279,7 +275,7 @@ describe("[CityCoin Core]", () => {
         receipt.events.expectFungibleTokenMintEvent(
           50000,
           miner.address,
-          "citycoins"
+          "newyorkcitycoin"
         );
       });
 
@@ -293,14 +289,14 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(
-          activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS * 2 + 1
+          activationBlockHeight + NewYorkCityCoinCoreModel.TOKEN_HALVING_BLOCKS * 2 + 1
         );
 
         const block = chain.mineBlock([core.mineTokens(amount, miner)]);
-        chain.mineEmptyBlock(CoreModel.TOKEN_REWARD_MATURITY);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
 
         // act
         const receipt = chain.mineBlock([
@@ -315,7 +311,7 @@ describe("[CityCoin Core]", () => {
         receipt.events.expectFungibleTokenMintEvent(
           25000,
           miner.address,
-          "citycoins"
+          "newyorkcitycoin"
         );
       });
 
@@ -329,14 +325,14 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(
-          activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS * 3 + 1
+          activationBlockHeight + NewYorkCityCoinCoreModel.TOKEN_HALVING_BLOCKS * 3 + 1
         );
 
         const block = chain.mineBlock([core.mineTokens(amount, miner)]);
-        chain.mineEmptyBlock(CoreModel.TOKEN_REWARD_MATURITY);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
 
         // act
         const receipt = chain.mineBlock([
@@ -351,7 +347,7 @@ describe("[CityCoin Core]", () => {
         receipt.events.expectFungibleTokenMintEvent(
           12500,
           miner.address,
-          "citycoins"
+          "newyorkcitycoin"
         );
       });
 
@@ -365,14 +361,14 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(
-          activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS * 4 + 1
+          activationBlockHeight + NewYorkCityCoinCoreModel.TOKEN_HALVING_BLOCKS * 4 + 1
         );
 
         const block = chain.mineBlock([core.mineTokens(amount, miner)]);
-        chain.mineEmptyBlock(CoreModel.TOKEN_REWARD_MATURITY);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
 
         // act
         const receipt = chain.mineBlock([
@@ -387,7 +383,7 @@ describe("[CityCoin Core]", () => {
         receipt.events.expectFungibleTokenMintEvent(
           6250,
           miner.address,
-          "citycoins"
+          "newyorkcitycoin"
         );
       });
 
@@ -401,14 +397,14 @@ describe("[CityCoin Core]", () => {
           core.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(
-          activationBlockHeight + CoreModel.TOKEN_HALVING_BLOCKS * 5 + 1
+          activationBlockHeight + NewYorkCityCoinCoreModel.TOKEN_HALVING_BLOCKS * 5 + 1
         );
 
         const block = chain.mineBlock([core.mineTokens(amount, miner)]);
-        chain.mineEmptyBlock(CoreModel.TOKEN_REWARD_MATURITY);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
 
         // act
         const receipt = chain.mineBlock([
@@ -423,7 +419,7 @@ describe("[CityCoin Core]", () => {
         receipt.events.expectFungibleTokenMintEvent(
           3125,
           miner.address,
-          "citycoins"
+          "newyorkcitycoin"
         );
       });
     });
@@ -474,7 +470,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -501,7 +497,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -529,7 +525,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -540,7 +536,7 @@ describe("[CityCoin Core]", () => {
           ]).height - 1;
 
         chain.mineEmptyBlockUntil(
-          minerBlockHeight + CoreModel.TOKEN_REWARD_MATURITY + 1
+          minerBlockHeight + NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY + 1
         );
 
         // act
@@ -567,7 +563,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -578,7 +574,7 @@ describe("[CityCoin Core]", () => {
           ]).height - 1;
 
         chain.mineEmptyBlockUntil(
-          minerBlockHeight + CoreModel.TOKEN_REWARD_MATURITY + 1
+          minerBlockHeight + NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY + 1
         );
 
         // act
@@ -638,7 +634,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -665,7 +661,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -693,7 +689,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -704,7 +700,7 @@ describe("[CityCoin Core]", () => {
           ]).height - 1;
 
         chain.mineEmptyBlockUntil(
-          minerBlockHeight + CoreModel.TOKEN_REWARD_MATURITY + 1
+          minerBlockHeight + NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY + 1
         );
 
         // act
@@ -731,7 +727,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -742,7 +738,7 @@ describe("[CityCoin Core]", () => {
           ]).height - 1;
 
         chain.mineEmptyBlockUntil(
-          minerBlockHeight + CoreModel.TOKEN_REWARD_MATURITY + 1
+          minerBlockHeight + NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY + 1
         );
         chain.mineBlock([
           core.claimMiningReward(minerBlockHeight, user),
@@ -769,7 +765,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -780,7 +776,7 @@ describe("[CityCoin Core]", () => {
           ]).height - 1;
 
         chain.mineEmptyBlockUntil(
-          minerBlockHeight + CoreModel.TOKEN_REWARD_MATURITY + 1
+          minerBlockHeight + NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY + 1
         );
 
         // act

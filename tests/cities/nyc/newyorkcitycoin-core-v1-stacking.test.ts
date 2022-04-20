@@ -1,24 +1,23 @@
-import { assertEquals, describe, TxReceipt, types, run, Chain, beforeEach, it } from "../../deps.ts";
-import { CoreModel } from "../../models/core.model.ts";
-import { TokenModel } from "../../models/token.model.ts";
-import { Accounts, Context } from "../../src/context.ts";
-
+import { assertEquals, describe, TxReceipt, types, run, Chain, beforeEach, it } from "../../../deps.ts";
+import { NewYorkCityCoinCoreModel } from "../../../models/newyorkcitycoin-core.model.ts";
+import { NewYorkCityCoinTokenModel } from "../../../models/newyorkcitycoin-token.model.ts";
+import { Accounts, Context } from "../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let core: CoreModel;
-let token: TokenModel;
+let core: NewYorkCityCoinCoreModel;
+let token: NewYorkCityCoinTokenModel;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  core = ctx.models.get(CoreModel);
-  token = ctx.models.get(TokenModel);
+  core = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1");
+  token = ctx.models.get(NewYorkCityCoinTokenModel, "newyorkcitycoin-token");
 });
 
-describe("[CityCoin Core]", () => {
+describe("[NewYorkCityCoin Core]", () => {
   //////////////////////////////////////////////////
   // STACKING CONFIGURATION
   //////////////////////////////////////////////////
@@ -33,7 +32,7 @@ describe("[CityCoin Core]", () => {
           core.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + CoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
         chain.mineEmptyBlockUntil(activationBlockHeight);
         // act
         const result1 = core.getFirstStacksBlockInRewardCycle(0).result;
@@ -41,8 +40,8 @@ describe("[CityCoin Core]", () => {
         const result3 = core.getFirstStacksBlockInRewardCycle(2).result;
         // assert
         result1.expectUint(activationBlockHeight);
-        result2.expectUint(activationBlockHeight + CoreModel.REWARD_CYCLE_LENGTH);
-        result3.expectUint(activationBlockHeight + CoreModel.REWARD_CYCLE_LENGTH * 2);
+        result2.expectUint(activationBlockHeight + NewYorkCityCoinCoreModel.REWARD_CYCLE_LENGTH);
+        result3.expectUint(activationBlockHeight + NewYorkCityCoinCoreModel.REWARD_CYCLE_LENGTH * 2);
       });
     });
     describe("get-entitled-stacking-reward()", () => {
@@ -59,9 +58,9 @@ describe("[CityCoin Core]", () => {
           token.testMint(amountTokens, stacker),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + CoreModel.ACTIVATION_DELAY + 1
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY + 1
         );
-        chain.mineEmptyBlock(CoreModel.REWARD_CYCLE_LENGTH * 2);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.REWARD_CYCLE_LENGTH * 2);
         // act
         const result = core.getStackingReward(stackerId, targetCycle).result;
         // assert
@@ -82,12 +81,12 @@ describe("[CityCoin Core]", () => {
           token.testMint(amountTokens, stacker),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + CoreModel.ACTIVATION_DELAY + 1
+          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY + 1
         );
         chain.mineBlock([core.stackTokens(amountTokens, 1, stacker)]);
-        chain.mineEmptyBlock(CoreModel.REWARD_CYCLE_LENGTH);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.REWARD_CYCLE_LENGTH);
         chain.mineBlock([core.mineTokens(amountUstx, miner)]);
-        chain.mineEmptyBlock(CoreModel.REWARD_CYCLE_LENGTH);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.REWARD_CYCLE_LENGTH);
         // act
         const result = core.getStackingReward(stackerId, targetCycle).result;
         // assert
@@ -116,7 +115,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_STACKING_NOT_AVAILABLE);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_STACKING_NOT_AVAILABLE);
       });
 
       it("fails with ERR_CANNOT_STACK while trying to stack with lock period = 0", () => {
@@ -131,7 +130,7 @@ describe("[CityCoin Core]", () => {
           token.testMint(amountTokens, stacker),
         ]);
         const activationBlockHeight =
-          block.height + CoreModel.ACTIVATION_DELAY - 1;
+          block.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
@@ -142,7 +141,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_CANNOT_STACK);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_CANNOT_STACK);
       });
 
       it("fails with ERR_CANNOT_STACK while trying to stack with lock period > 32", () => {
@@ -157,7 +156,7 @@ describe("[CityCoin Core]", () => {
           token.testMint(amountTokens, stacker),
         ]);
         const activationBlockHeight =
-          block.height + CoreModel.ACTIVATION_DELAY - 1;
+          block.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
@@ -168,7 +167,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_CANNOT_STACK);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_CANNOT_STACK);
       });
 
       it("fails with ERR_CANNOT_STACK while trying to stack with 0 tokens", () => {
@@ -183,7 +182,7 @@ describe("[CityCoin Core]", () => {
           token.testMint(amountTokens, stacker),
         ]);
         const activationBlockHeight =
-          block.height + CoreModel.ACTIVATION_DELAY - 1;
+          block.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
@@ -194,7 +193,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_CANNOT_STACK);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_CANNOT_STACK);
       });
 
       it("fails with ERR_FT_INSUFFICIENT_BALANCE while trying to stack with amount tokens > user balance", () => {
@@ -209,7 +208,7 @@ describe("[CityCoin Core]", () => {
           token.testMint(amountTokens, stacker),
         ]);
         const activationBlockHeight =
-          block.height + CoreModel.ACTIVATION_DELAY - 1;
+          block.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
@@ -220,7 +219,7 @@ describe("[CityCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(CoreModel.ErrCode.ERR_FT_INSUFFICIENT_BALANCE);
+          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_FT_INSUFFICIENT_BALANCE);
       });
 
       it("succeeds and emits one ft_transfer event to core contract", () => {
@@ -235,7 +234,7 @@ describe("[CityCoin Core]", () => {
           token.testMint(amountTokens, stacker),
         ]);
         const activationBlockHeight =
-          block.height + CoreModel.ACTIVATION_DELAY - 1;
+          block.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
@@ -251,7 +250,7 @@ describe("[CityCoin Core]", () => {
           amountTokens,
           stacker.address,
           core.address,
-          "citycoins"
+          "newyorkcitycoin"
         );
       });
 
@@ -267,7 +266,7 @@ describe("[CityCoin Core]", () => {
           token.testMint(amountTokens * 3, stacker),
         ]);
         const activationBlockHeight =
-          block.height + CoreModel.ACTIVATION_DELAY - 1;
+          block.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
@@ -291,7 +290,7 @@ describe("[CityCoin Core]", () => {
             amountTokens,
             stacker.address,
             core.address,
-            "citycoins"
+            "newyorkcitycoin"
           );
         });
       });
@@ -308,7 +307,7 @@ describe("[CityCoin Core]", () => {
           token.testMint(amountTokens, stacker),
         ]);
         const activationBlockHeight =
-          block.height + CoreModel.ACTIVATION_DELAY - 1;
+          block.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
@@ -342,7 +341,7 @@ describe("[CityCoin Core]", () => {
           token.testMint(amountTokens, stacker),
         ]);
         const activationBlockHeight =
-          block.height + CoreModel.ACTIVATION_DELAY - 1;
+          block.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
@@ -404,7 +403,7 @@ describe("[CityCoin Core]", () => {
           token.testMint(totalAmountTokens, stacker),
         ]);
         const activationBlockHeight =
-          block.height + CoreModel.ACTIVATION_DELAY - 1;
+          block.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
@@ -412,7 +411,7 @@ describe("[CityCoin Core]", () => {
           // move chain tip to the beginning of specific cycle
           chain.mineEmptyBlockUntil(
             activationBlockHeight +
-              record.stackInCycle * CoreModel.REWARD_CYCLE_LENGTH
+              record.stackInCycle * NewYorkCityCoinCoreModel.REWARD_CYCLE_LENGTH
           );
 
           chain.mineBlock([
@@ -474,8 +473,8 @@ describe("[CityCoin Core]", () => {
           core.registerUser(stacker),
           token.testMint(amountTokens, stacker),
         ]);
-        const activationBlockHeight = block.height + CoreModel.ACTIVATION_DELAY - 1;
-        chain.mineEmptyBlockUntil(activationBlockHeight + CoreModel.REWARD_CYCLE_LENGTH * stackDuringCycle);
+        const activationBlockHeight = block.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+        chain.mineEmptyBlockUntil(activationBlockHeight + NewYorkCityCoinCoreModel.REWARD_CYCLE_LENGTH * stackDuringCycle);
 
         // act
         const receipt = chain.mineBlock([core.stackTokens(amountTokens, lockPeriod, stacker)]).receipts[0];
@@ -500,8 +499,8 @@ describe("[CityCoin Core]", () => {
           core.registerUser(stacker),
           token.testMint(amountTokens, stacker),
         ]);
-        const activationBlockHeight = block.height + CoreModel.ACTIVATION_DELAY - 1;
-        chain.mineEmptyBlockUntil(activationBlockHeight + CoreModel.REWARD_CYCLE_LENGTH * stackDuringCycle);
+        const activationBlockHeight = block.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+        chain.mineEmptyBlockUntil(activationBlockHeight + NewYorkCityCoinCoreModel.REWARD_CYCLE_LENGTH * stackDuringCycle);
 
         // act
         const receipt = chain.mineBlock([core.stackTokens(amountTokens, lockPeriod, stacker)]).receipts[0];

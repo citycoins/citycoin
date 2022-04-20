@@ -1,23 +1,20 @@
-import { describe, assertEquals, types, run, Chain, it, beforeEach} from "../../deps.ts";
-import { CoreModel } from "../../models/core.model.ts";
-import { TokenModel } from "../../models/token.model.ts";
-import { Accounts, Context } from "../../src/context.ts";
+import { describe, assertEquals, types, run, Chain, it, beforeEach} from "../../../deps.ts";
+import { NewYorkCityCoinTokenModel } from "../../../models/newyorkcitycoin-token.model.ts";
+import { Accounts, Context } from "../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let token: TokenModel;
-let core: CoreModel;
+let token: NewYorkCityCoinTokenModel;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  token = ctx.models.get(TokenModel);
-  core = ctx.models.get(CoreModel);
+  token = ctx.models.get(NewYorkCityCoinTokenModel, "newyorkcitycoin-token");
 })
 
-describe("[CityCoin Token]", () => {
+describe("[NewYorkCityCoin Token]", () => {
   //////////////////////////////////////////////////
   // SIP-010 FUNCTIONS
   //////////////////////////////////////////////////
@@ -40,7 +37,7 @@ describe("[CityCoin Token]", () => {
           amount,
           from.address,
           to.address,
-          "citycoins"
+          "newyorkcitycoin"
         );
       });
 
@@ -77,7 +74,7 @@ describe("[CityCoin Token]", () => {
           amount,
           from.address,
           to.address,
-          "citycoins"
+          "newyorkcitycoin"
         );
       });
 
@@ -122,23 +119,23 @@ describe("[CityCoin Token]", () => {
         assertEquals(block.receipts.length, 1);
         block.receipts[0].result
           .expectErr()
-          .expectUint(TokenModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinTokenModel.ErrCode.ERR_UNAUTHORIZED);
       });
     });
 
     describe("get-name()", () => {
-      it("succeeds and returns 'citycoins'", () => {
+      it("succeeds and returns 'newyorkcitycoin'", () => {
         const result = token.getName().result;
 
-        result.expectOk().expectAscii("citycoins");
+        result.expectOk().expectAscii("newyorkcitycoin");
       });
     });
 
     describe("get-symbol()", () => {
-      it("succeeds and returns 'CYCN'", () => {
+      it("succeeds and returns 'NYC'", () => {
         const result = token.getSymbol().result;
 
-        result.expectOk().expectAscii("CYCN");
+        result.expectOk().expectAscii("NYC");
       });
     });
 
@@ -187,7 +184,7 @@ describe("[CityCoin Token]", () => {
     describe("get-token-uri()", () => {
       it("succeds and returns correct uri", () => {
         const result = token.getTokenUri().result;
-        const tokenUri = "https://cdn.citycoins.co/metadata/citycoin.json";
+        const tokenUri = "https://cdn.citycoins.co/metadata/newyorkcitycoin.json";
 
         console.log(`\n  URI: ${tokenUri}`);
         result.expectOk().expectSome().expectUtf8(tokenUri);
@@ -208,7 +205,7 @@ describe("[CityCoin Token]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(TokenModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinTokenModel.ErrCode.ERR_UNAUTHORIZED);
       });
 
       it("fails with u1 when sender is trying to burn more tokens than they own", () => {
@@ -244,7 +241,7 @@ describe("[CityCoin Token]", () => {
         receipt.events.expectFungibleTokenBurnEvent(
           amount,
           owner.address,
-          "citycoins"
+          "newyorkcitycoin"
         );
       });
     });

@@ -1,23 +1,23 @@
-import { describe, run, Chain, it, beforeEach} from "../../deps.ts";
-import { CoreModel } from "../../models/core.model.ts";
-import { TokenModel } from "../../models/token.model.ts";
-import { Accounts, Context } from "../../src/context.ts";
+import { describe, run, Chain, it, beforeEach} from "../../../deps.ts";
+import { NewYorkCityCoinCoreModel } from "../../../models/newyorkcitycoin-core.model.ts";
+import { NewYorkCityCoinTokenModel } from "../../../models/newyorkcitycoin-token.model.ts";
+import { Accounts, Context } from "../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let token: TokenModel;
-let core: CoreModel;
+let token: NewYorkCityCoinTokenModel;
+let core: NewYorkCityCoinCoreModel;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  token = ctx.models.get(TokenModel);
-  core = ctx.models.get(CoreModel);
+  core = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1");
+  token = ctx.models.get(NewYorkCityCoinTokenModel, "newyorkcitycoin-token");
 })
 
-describe("[CityCoin Token]", () => {
+describe("[NewYorkCityCoin Token]", () => {
   //////////////////////////////////////////////////
   // TOKEN UTILITIES
   //////////////////////////////////////////////////
@@ -33,11 +33,10 @@ describe("[CityCoin Token]", () => {
 
         receipt.result
           .expectErr()
-          .expectUint(TokenModel.ErrCode.ERR_CORE_CONTRACT_NOT_FOUND);
+          .expectUint(NewYorkCityCoinTokenModel.ErrCode.ERR_CORE_CONTRACT_NOT_FOUND);
       });
 
       it("succeeds when called by trusted caller and mints requested amount of tokens", () => {
-        const wallet_2 = accounts.get("wallet_2")!;
         const amount = 200;
         const recipient = accounts.get("wallet_3")!;
 
@@ -55,7 +54,7 @@ describe("[CityCoin Token]", () => {
         receipt.events.expectFungibleTokenMintEvent(
           amount,
           recipient.address,
-          "citycoins"
+          "newyorkcitycoin"
         );
       });
     });
@@ -68,7 +67,7 @@ describe("[CityCoin Token]", () => {
         const receipt = block.receipts[0];
         receipt.result
           .expectErr()
-          .expectUint(TokenModel.ErrCode.ERR_CORE_CONTRACT_NOT_FOUND);
+          .expectUint(NewYorkCityCoinTokenModel.ErrCode.ERR_CORE_CONTRACT_NOT_FOUND);
       });
     });
   });

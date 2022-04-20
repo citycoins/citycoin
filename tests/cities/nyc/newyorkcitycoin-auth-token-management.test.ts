@@ -1,30 +1,26 @@
-import { describe, run, Chain, beforeEach, it} from "../../deps.ts";
-import { AuthModel } from "../../models/auth.model.ts";
-import { CoreModel } from "../../models/core.model.ts";
-import { TokenModel } from "../../models/token.model.ts";
-import { Accounts, Context } from "../../src/context.ts";
+import { describe, run, Chain, beforeEach, it} from "../../../deps.ts";
+import { NewYorkCityCoinAuthModel } from "../../../models/newyorkcitycoin-auth.model.ts";
+import { NewYorkCityCoinCoreModel } from "../../../models/newyorkcitycoin-core.model.ts";
+import { NewYorkCityCoinTokenModel } from "../../../models/newyorkcitycoin-token.model.ts";
+import { Accounts, Context } from "../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let core: CoreModel;
-let core2: CoreModel;
-let core3: CoreModel;
-let auth: AuthModel;
-let token: TokenModel;
+let core: NewYorkCityCoinCoreModel;
+let auth: NewYorkCityCoinAuthModel;
+let token: NewYorkCityCoinTokenModel;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  auth = ctx.models.get(AuthModel);
-  core = ctx.models.get(CoreModel, "citycoin-core-v1");
-  core2 = ctx.models.get(CoreModel, "citycoin-core-v2");
-  core3 = ctx.models.get(CoreModel, "citycoin-core-v3");
-  token = ctx.models.get(TokenModel);
+  auth = ctx.models.get(NewYorkCityCoinAuthModel, "newyorkcitycoin-auth");
+  core = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1");
+  token = ctx.models.get(NewYorkCityCoinTokenModel, "newyorkcitycoin-token");
 })
 
-describe("[CityCoin Auth]", () => {
+describe("[NewYorkCityCoin Auth]", () => {
   //////////////////////////////////////////////////
   // TOKEN MANAGEMENT
   //////////////////////////////////////////////////
@@ -46,7 +42,7 @@ describe("[CityCoin Auth]", () => {
 
         receipt.result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
       it("fails with ERR_UNAUTHORIZED when called by someone who is not auth contract", () => {
         // arrange
@@ -60,11 +56,11 @@ describe("[CityCoin Auth]", () => {
 
         receipt.result
           .expectErr()
-          .expectUint(TokenModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinTokenModel.ErrCode.ERR_UNAUTHORIZED);
       });
       it("succeeds and updates token uri to none if no new value is provided", () => {
         // arrange
-        const sender = accounts.get("city_wallet")!;
+        const sender = accounts.get("nyc_wallet")!;
         // act
         const block = chain.mineBlock([
           auth.setTokenUri(sender, token.address),
@@ -79,7 +75,7 @@ describe("[CityCoin Auth]", () => {
       });
       it("succeeds and updates token uri to new value if provided", () => {
         // arrange
-        const sender = accounts.get("city_wallet")!;
+        const sender = accounts.get("nyc_wallet")!;
         const newUri = "http://something-something.com";
         // act
         const block = chain.mineBlock([
@@ -204,10 +200,10 @@ describe("[CityCoin Auth]", () => {
         // assert
         receipts[0].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNAUTHORIZED);
         receipts[1].result
           .expectErr()
-          .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
     });
   });
