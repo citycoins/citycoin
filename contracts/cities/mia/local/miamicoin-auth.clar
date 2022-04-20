@@ -609,22 +609,3 @@
     (ok (var-set activeCoreContract .miamicoin-core-v1))
   )
 )
-
-(define-public (test-set-core-contract-state (coreContract <coreTrait>) (state uint))
-  (let
-    (
-      (coreContractAddress (contract-of coreContract))
-    )
-    (asserts! (is-test-env) (err ERR_UNAUTHORIZED))
-    (asserts! (or (>= state STATE_DEPLOYED) (<= state STATE_INACTIVE)) (err ERR_UNAUTHORIZED))
-    (map-set CoreContracts
-      coreContractAddress
-      {
-        state: state,
-        startHeight: u0,
-        endHeight: u0
-      }
-    )
-    (ok true)
-  )
-)

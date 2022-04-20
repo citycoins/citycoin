@@ -893,16 +893,6 @@
   )
 )
 
-;; check if contract caller is city wallet
-(define-private (is-authorized-city)
-  (is-eq contract-caller (var-get cityWallet))
-)
-
-;; check if contract caller is contract owner
-(define-private (is-authorized-owner)
-  (is-eq contract-caller CONTRACT_OWNER)
-)
-
 ;; checks if caller is Auth contract
 (define-private (is-authorized-auth)
   (is-eq contract-caller .citycoin-auth)

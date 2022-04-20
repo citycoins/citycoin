@@ -257,12 +257,4 @@ export class NewYorkCityCoinAuthModel extends Model {
       sender.address
     );
   }
-
-  testSetCoreContractState(targetContract: string, state: number, sender: Account): Tx {
-    return this.callPublic(
-      "test-set-core-contract-state",
-      [types.principal(targetContract), types.uint(state)],
-      sender.address
-    );
-  }
 }
