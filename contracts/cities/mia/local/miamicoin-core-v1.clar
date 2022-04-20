@@ -939,6 +939,7 @@
 
 (define-public (test-burn (amount uint) (recipient principal))
   (begin
+    (asserts! (is-test-env) (err ERR_UNAUTHORIZED))
     (as-contract (try! (contract-call? .miamicoin-token burn amount recipient)))
     (ok true)
   )
