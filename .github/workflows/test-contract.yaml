@@ -53,13 +53,13 @@ jobs:
       - name: "Rename tardis coverage file"
         run: |
           mv coverage.lcov tardis-coverage.lcov
-      - name: "Execute utility tests"
+      - name: "Execute utilities tests"
         uses: docker://hirosystems/clarinet:latest
         with:
-          args: test --coverage tests/utility/
-      - name: "Rename utility coverage file"
+          args: test --coverage tests/utilities/
+      - name: "Rename utilities coverage file"
         run: |
-          mv coverage.lcov utility-coverage.lcov
+          mv coverage.lcov utilities-coverage.lcov
       - name: "Execute vote tests"
         uses: docker://hirosystems/clarinet:latest
         with:
