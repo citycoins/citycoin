@@ -17,7 +17,7 @@
 
 ;; SIP-010 DEFINITION
 
-(impl-trait .sip-010-trait.sip-010-trait)
+(impl-trait .sip-010-trait-ft-standard.sip-010-trait)
 ;; testnet: (impl-trait 'STR8P3RD1EHA8AA37ERSSSZSWKS9T2GYQFGXNA4C.sip-010-trait-ft-standard.sip-010-trait)
 ;; mainnet: (impl-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
