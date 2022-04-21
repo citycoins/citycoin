@@ -7,6 +7,46 @@ costs_version = 2
 
 # cities
 
+[contracts.miamicoin-auth]
+path = "contracts/cities/mia/local/miamicoin-auth.clar"
+depends_on = ["citycoin-core-trait", "citycoin-token-trait"]
+
+[contracts.miamicoin-core-v1]
+path = "contracts/cities/mia/local/miamicoin-core-v1.clar"
+depends_on = ["miamicoin-auth", "miamicoin-token", "citycoin-vrf", "citycoin-core-trait"]
+
+[contracts.miamicoin-core-v2]
+path = "contracts/cities/mia/local/miamicoin-core-v1.clar"
+depends_on = ["miamicoin-auth", "miamicoin-token", "citycoin-vrf", "citycoin-core-trait"]
+
+[contracts.miamicoin-core-v3]
+path = "contracts/cities/mia/local/miamicoin-core-v1.clar"
+depends_on = ["miamicoin-auth", "miamicoin-token", "citycoin-vrf", "citycoin-core-trait"]
+
+[contracts.miamicoin-token]
+path = "contracts/cities/mia/local/miamicoin-token.clar"
+depends_on = ["sip-010-trait-ft-standard", "miamicoin-auth", "citycoin-token-trait"]
+
+[contracts.newyorkcitycoin-auth]
+path = "contracts/cities/nyc/local/newyorkcitycoin-auth.clar"
+depends_on = ["citycoin-core-trait", "citycoin-token-trait"]
+
+[contracts.newyorkcitycoin-core-v1]
+path = "contracts/cities/nyc/local/newyorkcitycoin-core-v1.clar"
+depends_on = ["newyorkcitycoin-auth", "newyorkcitycoin-token", "citycoin-vrf", "citycoin-core-trait"]
+
+[contracts.newyorkcitycoin-core-v2]
+path = "contracts/cities/nyc/local/newyorkcitycoin-core-v1.clar"
+depends_on = ["newyorkcitycoin-auth", "newyorkcitycoin-token", "citycoin-vrf", "citycoin-core-trait"]
+
+[contracts.newyorkcitycoin-core-v3]
+path = "contracts/cities/nyc/local/newyorkcitycoin-core-v1.clar"
+depends_on = ["newyorkcitycoin-auth", "newyorkcitycoin-token", "citycoin-vrf", "citycoin-core-trait"]
+
+[contracts.newyorkcitycoin-token]
+path = "contracts/cities/nyc/local/newyorkcitycoin-token.clar"
+depends_on = ["sip-010-trait-ft-standard", "newyorkcitycoin-auth", "citycoin-token-trait"]
+
 # core
 
 [contracts.citycoin-core-trait]
@@ -23,7 +63,7 @@ depends_on = ["citycoin-core-trait", "citycoin-token-trait"]
 
 [contracts.citycoin-token]
 path = "contracts/core/local/citycoin-token.clar"
-depends_on = ["sip-010-trait", "citycoin-auth", "citycoin-token-trait"]
+depends_on = ["sip-010-trait-ft-standard", "citycoin-auth", "citycoin-token-trait"]
 
 [contracts.citycoin-core-v1]
 path = "contracts/core/local/citycoin-core-v1.clar"
@@ -49,8 +89,8 @@ depends_on = ["citycoin-core-v1"]
 
 # utilities
 
-[contracts.sip-010-trait]
-path = "contracts/utilities/local/sip-10-ft-standard.clar"
+[contracts.sip-010-trait-ft-standard]
+path = "contracts/utilities/local/sip-010-trait-ft-standard.clar"
 depends_on = []
 
 [contracts.test-utils]

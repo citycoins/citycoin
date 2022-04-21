@@ -1,23 +1,23 @@
-import { describe, assertEquals, types, Account, run, Chain, it, beforeEach} from "../../deps.ts";
-import { CoreModel } from "../../models/core.model.ts";
-import { SendManyRecord, TokenModel } from "../../models/token.model.ts";
-import { Accounts, Context } from "../../src/context.ts";
+import { describe, assertEquals, types, Account, run, Chain, it, beforeEach} from "../../../deps.ts";
+import { NewYorkCityCoinCoreModel } from "../../../models/newyorkcitycoin-core.model.ts";
+import { SendManyRecord, NewYorkCityCoinTokenModel } from "../../../models/newyorkcitycoin-token.model.ts";
+import { Accounts, Context } from "../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let token: TokenModel;
-let core: CoreModel;
+let core: NewYorkCityCoinCoreModel;
+let token: NewYorkCityCoinTokenModel;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  token = ctx.models.get(TokenModel);
-  core = ctx.models.get(CoreModel);
+  core = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1");
+  token = ctx.models.get(NewYorkCityCoinTokenModel, "newyorkcitycoin-token");
 })
 
-describe("[CityCoin Token]", () => {
+describe("[NewYorkCityCoin Token]", () => {
   //////////////////////////////////////////////////
   // SEND-MANY
   //////////////////////////////////////////////////
@@ -134,7 +134,7 @@ describe("[CityCoin Token]", () => {
               sendManyRecords[sendManyIdx].amount,
               from.address,
               sendManyRecords[sendManyIdx].to.address,
-              "citycoins"
+              "newyorkcitycoin"
             );
           }
 
@@ -201,7 +201,7 @@ describe("[CityCoin Token]", () => {
               sendManyRecords[sendManyIdx].amount,
               from.address,
               sendManyRecords[sendManyIdx].to.address,
-              "citycoins"
+              "newyorkcitycoin"
             );
           }
 
@@ -276,7 +276,7 @@ describe("[CityCoin Token]", () => {
               sendManyRecords[sendManyIdx].amount,
               from.address,
               sendManyRecords[sendManyIdx].to.address,
-              "citycoins"
+              "newyorkcitycoin"
             );
           }
 
