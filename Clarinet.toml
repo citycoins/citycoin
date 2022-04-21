@@ -5,7 +5,32 @@ requirements = []
 [repl.analysis]
 costs_version = 2
 
-# cities
+# mainnet contract references
+
+[[project.requirements]]
+contract_id = "SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.miamicoin-auth"
+[[project.requirements]]
+contract_id = "SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.miamicoin-core-v1"
+[[project.requirements]]
+contract_id = "SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.miamicoin-token"
+
+[[project.requirements]]
+contract_id = "SP2H8PY27SEZ03MWRKS5XABZYQN17ETGQS3527SA5.newyorkcitycoin-auth"
+[[project.requirements]]
+contract_id = "SP2H8PY27SEZ03MWRKS5XABZYQN17ETGQS3527SA5.newyorkcitycoin-core-v1"
+[[project.requirements]]
+contract_id = "SP2H8PY27SEZ03MWRKS5XABZYQN17ETGQS3527SA5.newyorkcitycoin-token"
+
+# contracts listed below are already deployed
+# and added only to ensure clarinet check passes
+
+[contracts.citycoin-tardis-v1-mainnet]
+path = "contracts/Tardis/citycoin-tardis-v1-mainnet.clar"
+depends_on = []
+
+# all contracts below are used with the testing suite
+
+# mia
 
 [contracts.miamicoin-auth]
 path = "contracts/cities/mia/local/miamicoin-auth.clar"
@@ -26,6 +51,8 @@ depends_on = ["miamicoin-auth", "miamicoin-token", "citycoin-vrf", "citycoin-cor
 [contracts.miamicoin-token]
 path = "contracts/cities/mia/local/miamicoin-token.clar"
 depends_on = ["sip-010-trait-ft-standard", "miamicoin-auth", "citycoin-token-trait"]
+
+# nyc
 
 [contracts.newyorkcitycoin-auth]
 path = "contracts/cities/nyc/local/newyorkcitycoin-auth.clar"
