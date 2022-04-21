@@ -1,6 +1,5 @@
 [project]
 name = "citycoin"
-requirements = []
 
 [repl.analysis]
 costs_version = 2
@@ -25,7 +24,7 @@ contract_id = "SP2H8PY27SEZ03MWRKS5XABZYQN17ETGQS3527SA5.newyorkcitycoin-token"
 # and added only to ensure clarinet check passes
 
 [contracts.citycoin-tardis-v1-mainnet]
-path = "contracts/Tardis/citycoin-tardis-v1-mainnet.clar"
+path = "contracts/tardis/mainnet/citycoin-tardis-v1-mainnet.clar"
 depends_on = []
 
 # all contracts below are used with the testing suite
