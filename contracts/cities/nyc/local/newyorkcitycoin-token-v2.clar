@@ -119,7 +119,6 @@
 
 ;; CONVERSION
 
-;; TODO: consider tx-sender vs contract-caller
 (define-public (convert-to-v2)
   (let
     (
@@ -128,8 +127,7 @@
     ;; verify positive balance
     (asserts! (> balanceV1 u0) ERR_V1_BALANCE_NOT_FOUND)
     ;; burn old
-    ;; TODO: MIA will need to call from core contract
-    ;; (try! (contract-call? .newyorkcitycoin-token burn balanceV1 tx-sender))
+    (try! (contract-call? .newyorkcitycoin-token burn balanceV1 tx-sender))
     (print {
       balanceV1: balanceV1,
       balanceV2: (* balanceV1 MICRO_CITYCOINS),

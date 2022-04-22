@@ -119,7 +119,6 @@
 
 ;; CONVERSION
 
-;; TODO: consider tx-sender vs contract-caller
 (define-public (convert-to-v2)
   (let
     (
