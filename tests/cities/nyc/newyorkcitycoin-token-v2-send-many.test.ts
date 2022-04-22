@@ -16,7 +16,7 @@ beforeEach(() => {
   chain = ctx.chain;
   accounts = ctx.accounts;
   core = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1");
-  token = ctx.models.get(NewYorkCityCoinTokenModelV2, "newyorkcitycoin-token");
+  token = ctx.models.get(NewYorkCityCoinTokenModel, "newyorkcitycoin-token");
   tokenV2 = ctx.models.get(NewYorkCityCoinTokenModelV2, "newyorkcitycoin-token-v2");
 })
 

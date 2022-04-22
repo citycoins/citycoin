@@ -9,7 +9,7 @@ enum ErrCode {
   ERR_CORE_CONTRACT_NOT_FOUND = 6009,
 }
 
-export class MiamiCoinCoinTokenModelV2 extends Model {
+export class MiamiCoinTokenModelV2 extends Model {
   name = "miamicoin-token-v2";
   static readonly ErrCode = ErrCode;
 

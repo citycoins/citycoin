@@ -129,9 +129,10 @@
     ;; burn old
     (try! (contract-call? .newyorkcitycoin-token burn balanceV1 tx-sender))
     (print {
-      balanceV1: balanceV1,
-      balanceV2: (* balanceV1 MICRO_CITYCOINS),
-      tx-sender: tx-sender
+      burnedV1: balanceV1,
+      mintedV2: (* balanceV1 MICRO_CITYCOINS),
+      tx-sender: tx-sender,
+      contract-caller: contract-caller
     })
     ;; create new
     (ft-mint? newyorkcitycoin (* balanceV1 MICRO_CITYCOINS) tx-sender)

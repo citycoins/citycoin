@@ -16,7 +16,7 @@ beforeEach(() => {
   chain = ctx.chain;
   accounts = ctx.accounts;
   core = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1");
-  token = ctx.models.get(NewYorkCityCoinTokenModelV2, "newyorkcitycoin-token");
+  token = ctx.models.get(NewYorkCityCoinTokenModel, "newyorkcitycoin-token");
   tokenV2 = ctx.models.get(NewYorkCityCoinTokenModelV2, "newyorkcitycoin-token-v2");
 })
 
@@ -125,7 +125,7 @@ describe("[NewYorkCityCoin Token v2]", () => {
         assertEquals(block.receipts.length, 1);
         block.receipts[0].result
           .expectErr()
-          .expectUint(NewYorkCityCoinTokenModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinTokenModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
     });
 
@@ -211,7 +211,7 @@ describe("[NewYorkCityCoin Token v2]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(NewYorkCityCoinTokenModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinTokenModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
 
       it("fails with u1 when sender is trying to burn more tokens than they own", () => {

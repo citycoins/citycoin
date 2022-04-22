@@ -1,7 +1,7 @@
 import { describe, assertEquals, types, run, Chain, it, beforeEach} from "../../../deps.ts";
 import { MiamiCoinCoreModel } from "../../../models/miamicoin-core.model.ts";
 import { MiamiCoinTokenModel } from "../../../models/miamicoin-token.model.ts";
-import { MiamiCoinCoinTokenModelV2 } from "../../../models/miamicoin-token-v2.model.ts";
+import { MiamiCoinTokenModelV2 } from "../../../models/miamicoin-token-v2.model.ts";
 import { Accounts, Context } from "../../../src/context.ts";
 
 let ctx: Context;
@@ -9,7 +9,7 @@ let chain: Chain;
 let accounts: Accounts;
 let core: MiamiCoinCoreModel;
 let token: MiamiCoinTokenModel;
-let tokenV2: MiamiCoinCoinTokenModelV2;
+let tokenV2: MiamiCoinTokenModelV2;
 
 beforeEach(() => {
   ctx = new Context();
@@ -17,7 +17,7 @@ beforeEach(() => {
   accounts = ctx.accounts;
   core = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v1")
   token = ctx.models.get(MiamiCoinTokenModel, "miamicoin-token");
-  tokenV2 = ctx.models.get(MiamiCoinCoinTokenModelV2, "miamicoin-token-v2");
+  tokenV2 = ctx.models.get(MiamiCoinTokenModelV2, "miamicoin-token-v2");
 })
 
 describe("[MiamiCoin Token v2]", () => {
@@ -125,7 +125,7 @@ describe("[MiamiCoin Token v2]", () => {
         assertEquals(block.receipts.length, 1);
         block.receipts[0].result
           .expectErr()
-          .expectUint(MiamiCoinTokenModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(MiamiCoinTokenModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
     });
 
@@ -208,7 +208,7 @@ describe("[MiamiCoin Token v2]", () => {
           tokenV2.burn(amount, wallet, wallet)
         ]).receipts[0];
         // assert
-        receipt.result.expectErr().expectUint(MiamiCoinTokenModel.ErrCode.ERR_CORE_CONTRACT_NOT_FOUND);
+        receipt.result.expectErr().expectUint(MiamiCoinTokenModelV2.ErrCode.ERR_CORE_CONTRACT_NOT_FOUND);
       });
 
       it("succeeds when called by trusted caller and burns tokens", () => {

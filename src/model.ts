@@ -3,6 +3,7 @@ import { Account, Chain, Tx } from "../deps.ts";
 export abstract class Model {
   abstract readonly name: string;
   private contractName: string | undefined;
+  static readonly MICRO_CITYCOINS = 1000000;
 
   constructor(readonly chain: Chain, readonly deployer: Account, contractName?: string | undefined) {
     this.contractName = contractName;
