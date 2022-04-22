@@ -33,19 +33,21 @@ After installation, the standard clarinet commands can be used against the root 
 Several commands are also available to help with testing via `npm`:
 
 - to run all tests:
-  `npm test`, `npm run test`, `npm run clarinet:test`
-- to run individual tests:
-  `npm run test:auth`
-  `npm run test:core`
-  `npm run test:tardis`
-  `npm run test:token`
-  `npm run test:utils`
-  `npm run test:vote`
+  - `npm test`
+  - `npm run test`
+  - `npm run clarinet:test`
+- to run individual tests for cities:
+  - `npm run test:mia`
+  - `npm run test:nyc`
+- to run individual tests by type:
+  - `npm run test:tardis`
+  - `npm run test:utils`
+  - `npm run test:vote`
 - to run specific clarinet functions
-  `npm run clarinet:check`
-  `npm run clarinet:codecov`
-  `npm run clarinet:costs`
-  `npm run console`, `npm run clarinet:console`
+  - `npm run clarinet:check`
+  - `npm run clarinet:codecov`
+  - `npm run clarinet:costs`
+  - `npm run console`, `npm run clarinet:console`
 
 ## Definitions, Resources, and Links
 
