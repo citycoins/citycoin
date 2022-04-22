@@ -130,7 +130,7 @@ describe("[MiamiCoin Auth]", () => {
           .expectUint(MiamiCoinAuthModel.ErrCode.ERR_CORE_CONTRACT_NOT_FOUND);
       });
 
-      it("throws ERR_UNAUTHORIZED if old and new contract are the same", () => {
+      it("fails with ERR_UNAUTHORIZED if old and new contract are the same", () => {
         // arrange
         const sender = accounts.get("mia_wallet")!;
         const oldContract = core.address;
@@ -223,7 +223,7 @@ describe("[MiamiCoin Auth]", () => {
     });
 
     describe("execute-upgrade-core-contract-job()", () => {
-      it("throws ERR_UNAUTHORIZED if contract-caller is not an approver", () => {
+      it("fails with ERR_UNAUTHORIZED if contract-caller is not an approver", () => {
         // arrange
         const jobId = 1;
         const sender = accounts.get("wallet_1")!;
@@ -277,7 +277,7 @@ describe("[MiamiCoin Auth]", () => {
           .expectUint(MiamiCoinAuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
 
-      it("throws ERR_UNAUTHORIZED if submitted trait principal does not match job principal", () => {
+      it("fails with ERR_UNAUTHORIZED if submitted trait principal does not match job principal", () => {
         // arrange
         const jobId = 1;
         const sender = accounts.get("wallet_1")!;
@@ -331,7 +331,7 @@ describe("[MiamiCoin Auth]", () => {
           .expectUint(MiamiCoinAuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
 
-      it("throws ERR_UNAUTHORIZED if old and new contract are the same", () => {
+      it("fails with ERR_UNAUTHORIZED if old and new contract are the same", () => {
         // arrange
         const jobId = 1;
         const sender = accounts.get("wallet_1")!;
