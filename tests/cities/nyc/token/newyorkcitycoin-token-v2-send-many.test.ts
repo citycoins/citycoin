@@ -1,22 +1,16 @@
-import { describe, assertEquals, types, Account, run, Chain, it, beforeEach} from "../../../deps.ts";
-import { NewYorkCityCoinCoreModel } from "../../../models/newyorkcitycoin-core.model.ts";
-import { NewYorkCityCoinTokenModel } from "../../../models/newyorkcitycoin-token.model.ts";
-import { SendManyRecord, NewYorkCityCoinTokenModelV2 } from "../../../models/newyorkcitycoin-token-v2.model.ts";
-import { Accounts, Context } from "../../../src/context.ts";
+import { describe, assertEquals, types, Account, run, Chain, it, beforeEach} from "../../../../deps.ts";
+import { SendManyRecord, NewYorkCityCoinTokenModelV2 } from "../../../../models/newyorkcitycoin-token-v2.model.ts";
+import { Accounts, Context } from "../../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let core: NewYorkCityCoinCoreModel;
-let token: NewYorkCityCoinTokenModel;
 let tokenV2: NewYorkCityCoinTokenModelV2;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  core = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1");
-  token = ctx.models.get(NewYorkCityCoinTokenModel, "newyorkcitycoin-token");
   tokenV2 = ctx.models.get(NewYorkCityCoinTokenModelV2, "newyorkcitycoin-token-v2");
 })
 

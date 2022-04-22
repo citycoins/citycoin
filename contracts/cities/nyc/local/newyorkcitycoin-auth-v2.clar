@@ -403,7 +403,7 @@
 ;; function to activate core contract through registration
 ;; - check that target is in core contract map
 ;; - check that caller is core contract
-;; - check that target is in STATE_DELPOYED
+;; - check that target is in STATE_DEPLOYED
 ;; - set active in core contract map
 ;; - set as activeCoreContract
 (define-public (activate-core-contract (targetContract principal) (stacksHeight uint))

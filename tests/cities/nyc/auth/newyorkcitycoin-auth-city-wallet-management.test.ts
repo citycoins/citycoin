@@ -1,15 +1,13 @@
-import { describe, run, Chain, beforeEach, it} from "../../../deps.ts";
-import { NewYorkCityCoinAuthModel } from "../../../models/newyorkcitycoin-auth.model.ts";
-import { NewYorkCityCoinCoreModel } from "../../../models/newyorkcitycoin-core.model.ts";
-import { NewYorkCityCoinTokenModel } from "../../../models/newyorkcitycoin-token.model.ts";
-import { Accounts, Context } from "../../../src/context.ts";
+import { describe, run, Chain, beforeEach, it} from "../../../../deps.ts";
+import { NewYorkCityCoinAuthModel } from "../../../../models/newyorkcitycoin-auth.model.ts";
+import { NewYorkCityCoinCoreModel } from "../../../../models/newyorkcitycoin-core.model.ts";
+import { Accounts, Context } from "../../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
 let core: NewYorkCityCoinCoreModel;
 let auth: NewYorkCityCoinAuthModel;
-let token: NewYorkCityCoinTokenModel;
 
 beforeEach(() => {
   ctx = new Context();
@@ -17,7 +15,6 @@ beforeEach(() => {
   accounts = ctx.accounts;
   auth = ctx.models.get(NewYorkCityCoinAuthModel, "newyorkcitycoin-auth");
   core = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1");
-  token = ctx.models.get(NewYorkCityCoinTokenModel, "newyorkcitycoin-token");
 })
 
 describe("[NewYorkCityCoin Auth]", () => {

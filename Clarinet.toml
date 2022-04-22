@@ -97,7 +97,7 @@ path = "contracts/cities/nyc/local/newyorkcitycoin-auth.clar"
 depends_on = ["citycoin-core-trait", "citycoin-token-trait"]
 
 [contracts.newyorkcitycoin-auth-v2]
-path = "contracts/cities/nyc/local/newyorkcitycoin-auth.clar"
+path = "contracts/cities/nyc/local/newyorkcitycoin-auth-v2.clar"
 depends_on = ["citycoin-core-trait", "citycoin-token-trait", "newyorkcitycoin-auth"]
 
 [contracts.newyorkcitycoin-core-v1]

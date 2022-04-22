@@ -1,22 +1,16 @@
-import { describe, assertEquals, types, Account, run, Chain, it, beforeEach} from "../../../deps.ts";
-import { MiamiCoinCoreModel } from "../../../models/miamicoin-core.model.ts";
-import { SendManyRecord, MiamiCoinTokenModel } from "../../../models/miamicoin-token.model.ts";
-import { MiamiCoinTokenModelV2 } from "../../../models/miamicoin-token-v2.model.ts";
-import { Accounts, Context } from "../../../src/context.ts";
+import { describe, assertEquals, types, Account, run, Chain, it, beforeEach} from "../../../../deps.ts";
+import { SendManyRecord, MiamiCoinTokenModelV2 } from "../../../../models/miamicoin-token-v2.model.ts";
+import { Accounts, Context } from "../../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let core: MiamiCoinCoreModel;
-let token: MiamiCoinTokenModel;
 let tokenV2: MiamiCoinTokenModelV2;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  core = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v1");
-  token = ctx.models.get(MiamiCoinTokenModel, "miamicoin-token");
   tokenV2 = ctx.models.get(MiamiCoinTokenModelV2, "miamicoin-token-v2");
 })
 

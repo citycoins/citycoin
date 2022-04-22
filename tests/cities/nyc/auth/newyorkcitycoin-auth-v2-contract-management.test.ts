@@ -1,7 +1,7 @@
-import { assertEquals, describe, types, run, Chain, beforeEach, it} from "../../../deps.ts";
-import { NewYorkCityCoinAuthModelV2 } from "../../../models/newyorkcitycoin-auth-v2.model.ts";
-import { NewYorkCityCoinCoreModel } from "../../../models/newyorkcitycoin-core.model.ts";
-import { Accounts, Context } from "../../../src/context.ts";
+import { assertEquals, describe, types, run, Chain, beforeEach, it} from "../../../../deps.ts";
+import { NewYorkCityCoinAuthModelV2 } from "../../../../models/newyorkcitycoin-auth-v2.model.ts";
+import { NewYorkCityCoinCoreModel } from "../../../../models/newyorkcitycoin-core.model.ts";
+import { Accounts, Context } from "../../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
@@ -36,7 +36,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
           .expectErr()
           .expectUint(NewYorkCityCoinAuthModelV2.ErrCode.ERR_NO_ACTIVE_CORE_CONTRACT);
       });
-      it("succeeds and returns active core contract after authV2 contract is initialized", () => {
+      it("succeeds and returns active core contract after auth contract is initialized", () => {
         // arrange
         const sender = accounts.get("wallet_1")!;
         const target = core.address;
@@ -67,7 +67,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
           .expectUint(NewYorkCityCoinAuthModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
 
-      it.skip("fails with ERR_UNAUTHORIZED if authV2 contract is already initialized", () => {
+      it.skip("fails with ERR_UNAUTHORIZED if auth contract is already initialized", () => {
         // arrange
         const sender = accounts.get("deployer")!;
         const target = core.address;
@@ -150,7 +150,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(NewYorkCityCoinAuthModelV2.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinAuthModelV2.ErrCode.ERR_CONTRACT_ALREADY_EXISTS);
       });
       it.skip("fails with ERR_CONTRACT_ALREADY_EXISTS if called with a target contract already in core contracts map", () => {
         // arrange
@@ -408,7 +408,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
 
       it("fails with ERR_INCORRECT_CONTRACT_STATE if new contract is not in STATE_DEPLOYED", () => {
         // arrange
-        const sender = accounts.get("mia_wallet")!;
+        const sender = accounts.get("nyc_wallet")!;
         const contract = core.address;
 
         chain.mineBlock([

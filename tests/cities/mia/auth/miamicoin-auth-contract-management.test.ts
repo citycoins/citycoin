@@ -1,7 +1,7 @@
-import { assertEquals, describe, types, run, Chain, beforeEach, it} from "../../../deps.ts";
-import { MiamiCoinAuthModel } from "../../../models/miamicoin-auth.model.ts";
-import { MiamiCoinCoreModel } from "../../../models/miamicoin-core.model.ts";
-import { Accounts, Context } from "../../../src/context.ts";
+import { assertEquals, describe, types, run, Chain, beforeEach, it} from "../../../../deps.ts";
+import { MiamiCoinAuthModel } from "../../../../models/miamicoin-auth.model.ts";
+import { MiamiCoinCoreModel } from "../../../../models/miamicoin-core.model.ts";
+import { Accounts, Context } from "../../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
