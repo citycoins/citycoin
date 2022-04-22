@@ -85,7 +85,7 @@ describe("[CityCoin Auth]", () => {
           .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
 
-      it("throws ERR_INCORRECT_CONTRACT_STATE if new contract is not in STATE_DEPLOYED", () => {
+      it("fails with ERR_INCORRECT_CONTRACT_STATE if new contract is not in STATE_DEPLOYED", () => {
         // arrange
         const sender = accounts.get("city_wallet")!;
         const contract = core.address;
@@ -166,7 +166,7 @@ describe("[CityCoin Auth]", () => {
           .expectUint(AuthModel.ErrCode.ERR_CORE_CONTRACT_NOT_FOUND);
       });
 
-      it("throws ERR_CONTRACT_ALREADY_EXISTS if old and new contract are the same", () => {
+      it("fails with ERR_CONTRACT_ALREADY_EXISTS if old and new contract are the same", () => {
         // arrange
         const sender = accounts.get("city_wallet")!;
         const oldContract = core.address;
@@ -188,7 +188,7 @@ describe("[CityCoin Auth]", () => {
           .expectErr()
           .expectUint(AuthModel.ErrCode.ERR_CONTRACT_ALREADY_EXISTS);
       });
-      it("throws ERR_CONTRACT_ALREADY_EXISTS if called with a target contract already in core contracts map", () => {
+      it("fails with ERR_CONTRACT_ALREADY_EXISTS if called with a target contract already in core contracts map", () => {
         // arrange
         const sender = accounts.get("city_wallet")!;
         const oldContract = core.address;
@@ -282,7 +282,7 @@ describe("[CityCoin Auth]", () => {
     });
 
     describe("execute-upgrade-core-contract-job()", () => {
-      it("throws ERR_UNAUTHORIZED if contract-caller is not an approver", () => {
+      it("fails with ERR_UNAUTHORIZED if contract-caller is not an approver", () => {
         // arrange
         const jobId = 1;
         const sender = accounts.get("wallet_1")!;
@@ -336,7 +336,7 @@ describe("[CityCoin Auth]", () => {
           .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
 
-      it("throws ERR_UNAUTHORIZED if submitted trait principal does not match job principal", () => {
+      it("fails with ERR_UNAUTHORIZED if submitted trait principal does not match job principal", () => {
         // arrange
         const jobId = 1;
         const sender = accounts.get("wallet_1")!;
@@ -390,7 +390,7 @@ describe("[CityCoin Auth]", () => {
           .expectUint(AuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
 
-      it("throws ERR_CONTRACT_ALREADY_EXISTS if old and new contract are the same", () => {
+      it("fails with ERR_CONTRACT_ALREADY_EXISTS if old and new contract are the same", () => {
         // arrange
         const jobId = 1;
         const sender = accounts.get("wallet_1")!;
@@ -442,7 +442,7 @@ describe("[CityCoin Auth]", () => {
           .expectUint(AuthModel.ErrCode.ERR_CONTRACT_ALREADY_EXISTS);
       });
 
-      it("throws ERR_CONTRACT_ALREADY_EXISTS if called with a target contract already in core contracts map", () => {
+      it("fails with ERR_CONTRACT_ALREADY_EXISTS if called with a target contract already in core contracts map", () => {
         // arrange
         const jobId = 1;
         const sender = accounts.get("wallet_1")!;
