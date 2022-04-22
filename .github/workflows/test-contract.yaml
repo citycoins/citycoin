@@ -67,6 +67,13 @@ jobs:
       - name: "Rename vote coverage file"
         run: |
           mv coverage.lcov vote-coverage.lcov
+      - name: "Execute vrf tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/vrf/
+      - name: "Rename vrf coverage file"
+        run: |
+          mv coverage.lcov vrf-coverage.lcov
       - name: "Combine code coverage files"
         run: |
           ls -Rlh *.lcov
