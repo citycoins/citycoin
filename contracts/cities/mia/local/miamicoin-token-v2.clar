@@ -86,7 +86,7 @@
 (define-public (activate-token (coreContract principal) (stacksHeight uint))
   (let
     (
-      (coreContractMap (try! (contract-call? .miamicoin-auth get-core-contract-info coreContract)))
+      (coreContractMap (try! (contract-call? .miamicoin-auth-v2 get-core-contract-info coreContract)))
     )
     (asserts! (is-eq (get state coreContractMap) STATE_ACTIVE) ERR_UNAUTHORIZED)
     (asserts! (not (var-get tokenActivated)) ERR_TOKEN_ALREADY_ACTIVATED)
@@ -156,7 +156,7 @@
 (define-public (mint (amount uint) (recipient principal))
   (let
     (
-      (coreContract (try! (contract-call? .miamicoin-auth get-core-contract-info contract-caller)))
+      (coreContract (try! (contract-call? .miamicoin-auth-v2 get-core-contract-info contract-caller)))
     )
     (ft-mint? miamicoin amount recipient)
   )
@@ -172,7 +172,7 @@
 
 ;; checks if caller is Auth contract
 (define-private (is-authorized-auth)
-  (is-eq contract-caller .miamicoin-auth)
+  (is-eq contract-caller .miamicoin-auth-v2)
 )
 
 ;; SEND-MANY
