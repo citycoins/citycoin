@@ -191,40 +191,60 @@ describe("[MiamiCoin Token v2]", () => {
       });
     });
 
-    /*
     describe("burn()", () => {
-      it("fails with ERR_CORE_CONTRACT_NOT_FOUND when called by someone who is not a trusted caller", () => {
+      it("fails with ERR_UNAUTHORIZED when owner is different than transaction sender", () => {
         // arrange
-        const wallet = accounts.get("wallet_1")!;
+        const owner = accounts.get("wallet_1")!;
+        const sender = accounts.get("wallet_2")!;
         const amount = 500;
+
         // act
-        const receipt = chain.mineBlock([
-          tokenV2.burn(amount, wallet, wallet)
-        ]).receipts[0];
+        const receipt = chain.mineBlock([tokenV2.burn(amount, owner, sender)])
+          .receipts[0];
+
         // assert
-        receipt.result.expectErr().expectUint(MiamiCoinTokenModelV2.ErrCode.ERR_CORE_CONTRACT_NOT_FOUND);
+        receipt.result
+          .expectErr()
+          .expectUint(MiamiCoinTokenModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
 
-      it("succeeds when called by trusted caller and burns tokens", () => {
+      it("fails with u1 when sender is trying to burn more tokens than they own", () => {
+        const owner = accounts.get("wallet_5")!;
+        const amount = 8888912313;
+
+        // act
+        const receipt = chain.mineBlock([
+          tokenV2.burn(amount, owner, owner),
+        ]).receipts[0];
+
+        receipt.result.expectErr().expectUint(1); // 1 is standard ft-burn error code
+      })
+
+      it("succeeds when called by token owner and burns correct amount of tokens", () => {
         // arrange
-        const wallet = accounts.get("wallet_1")!;
-        const amount = 500;
+        const owner = accounts.get("wallet_1")!;
+        const amount = 300;
         chain.mineBlock([
-          tokenV2.testMint(amount, wallet),
-          core.testInitializeCore(core.address)
+          tokenV2.testMint(amount, owner)
         ]);
+
         // act
         const receipt = chain.mineBlock([
-          core.testBurn(amount, wallet, wallet)
+          tokenV2.burn(amount, owner, owner),
         ]).receipts[0];
-        // assert
-        receipt.result.expectOk();
-        assertEquals(receipt.events.length, 1);
-        receipt.events.expectFungibleTokenBurnEvent(amount, wallet.address, "miamicoin");
-      });
 
+        // assert
+        receipt.result.expectOk().expectBool(true);
+
+        assertEquals(receipt.events.length, 1);
+
+        receipt.events.expectFungibleTokenBurnEvent(
+          amount,
+          owner.address,
+          "miamicoin"
+        );
+      });
     });
-    */
   });
 });
 

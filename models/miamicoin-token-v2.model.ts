@@ -108,13 +108,13 @@ export class MiamiCoinTokenModelV2 extends Model {
     );
   }
 
-  // burn(amount: number, owner: Account, sender: Account): Tx {
-  //   return this.callPublic(
-  //     "burn",
-  //     [types.uint(amount), types.principal(owner.address)],
-  //     sender.address
-  //   );
-  // }
+  burn(amount: number, owner: Account, sender: Account): Tx {
+    return this.callPublic(
+      "burn",
+      [types.uint(amount), types.principal(owner.address)],
+      sender.address
+    );
+  }
 
   convertToV2(sender: Account): Tx {
     return this.callPublic("convert-to-v2", [], sender.address);
