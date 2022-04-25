@@ -105,11 +105,11 @@ path = "contracts/cities/nyc/local/newyorkcitycoin-core-v1.clar"
 depends_on = ["newyorkcitycoin-auth", "newyorkcitycoin-token", "citycoin-vrf", "citycoin-core-trait"]
 
 [contracts.newyorkcitycoin-core-v2]
-path = "contracts/cities/nyc/local/newyorkcitycoin-core-v1.clar"
+path = "contracts/cities/nyc/local/newyorkcitycoin-core-v2.clar"
 depends_on = ["newyorkcitycoin-auth", "newyorkcitycoin-token", "citycoin-vrf", "citycoin-core-trait"]
 
 [contracts.newyorkcitycoin-core-v3]
-path = "contracts/cities/nyc/local/newyorkcitycoin-core-v1.clar"
+path = "contracts/cities/nyc/local/newyorkcitycoin-core-v2.clar"
 depends_on = ["newyorkcitycoin-auth", "newyorkcitycoin-token", "citycoin-vrf", "citycoin-core-trait"]
 
 [contracts.newyorkcitycoin-token]
