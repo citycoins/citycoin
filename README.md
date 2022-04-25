@@ -35,14 +35,20 @@ Several commands are also available to help with testing via `npm`:
 - to run all tests:
   - `npm test`
   - `npm run test`
-  - `npm run clarinet:test`
 - to run individual tests for cities:
   - `npm run test:mia`
   - `npm run test:nyc`
 - to run individual tests by type:
-  - `npm run test:tardis`
-  - `npm run test:utils`
-  - `npm run test:vote`
+  - `npm run test:cities`
+  - `npm run test:base`
+  - `npm run test:misc`
+- to run more specific tests:
+  - `npm run test:mia:auth`
+  - `npm run test:nyc:core`
+  - `npm run test:base:token`
+  - `npm run test:misc:tardis`
+  - `npm run test:misc:utils`
+  - `npm run test:misc:vote`
 - to run specific clarinet functions
   - `npm run clarinet:check`
   - `npm run clarinet:codecov`
