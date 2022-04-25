@@ -12,6 +12,7 @@ enum ErrCode {
 export class NewYorkCityCoinTokenModelV2 extends Model {
   name = "newyorkcitycoin-token-v2";
   static readonly ErrCode = ErrCode;
+  static readonly MICRO_CITYCOINS = 1000000;
 
   //////////////////////////////////////////////////
   // SIP-010 FUNCTIONS
