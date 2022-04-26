@@ -17,8 +17,8 @@ beforeEach(() => {
   accounts = ctx.accounts;
   auth = ctx.models.get(NewYorkCityCoinAuthModel, "newyorkcitycoin-auth");
   core = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1");
-  core2 = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v2");
-  core3 = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v3");
+  core2 = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1-1");
+  core3 = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1-2");
 })
 
 describe("[NewYorkCityCoin Auth]", () => {

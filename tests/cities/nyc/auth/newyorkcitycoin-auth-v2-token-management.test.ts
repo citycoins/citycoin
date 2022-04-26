@@ -1,20 +1,20 @@
 import { describe, run, Chain, beforeEach, it} from "../../../../deps.ts";
 import { NewYorkCityCoinAuthModelV2 } from "../../../../models/newyorkcitycoin-auth-v2.model.ts";
-import { NewYorkCityCoinTokenModel } from "../../../../models/newyorkcitycoin-token.model.ts";
+import { NewYorkCityCoinTokenModelV2 } from "../../../../models/newyorkcitycoin-token-v2.model.ts";
 import { Accounts, Context } from "../../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
 let authV2: NewYorkCityCoinAuthModelV2;
-let token: NewYorkCityCoinTokenModel;
+let token: NewYorkCityCoinTokenModelV2;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
   authV2 = ctx.models.get(NewYorkCityCoinAuthModelV2, "newyorkcitycoin-auth-v2");
-  token = ctx.models.get(NewYorkCityCoinTokenModel, "newyorkcitycoin-token");
+  token = ctx.models.get(NewYorkCityCoinTokenModelV2, "newyorkcitycoin-token-v2");
 })
 
 describe("[NewYorkCityCoin Auth v2]", () => {
@@ -53,9 +53,9 @@ describe("[NewYorkCityCoin Auth v2]", () => {
 
         receipt.result
           .expectErr()
-          .expectUint(NewYorkCityCoinTokenModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinTokenModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
-      it.skip("succeeds and updates token uri to none if no new value is provided", () => {
+      it("succeeds and updates token uri to none if no new value is provided", () => {
         // arrange
         const sender = accounts.get("nyc_wallet")!;
         // act
@@ -70,7 +70,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
         const result = token.getTokenUri().result;
         result.expectOk().expectNone();
       });
-      it.skip("succeeds and updates token uri to new value if provided", () => {
+      it("succeeds and updates token uri to new value if provided", () => {
         // arrange
         const sender = accounts.get("nyc_wallet")!;
         const newUri = "http://something-something.com";
