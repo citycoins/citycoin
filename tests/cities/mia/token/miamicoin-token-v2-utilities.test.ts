@@ -1,19 +1,19 @@
 import { describe, run, Chain, it, beforeEach} from "../../../../deps.ts";
-import { MiamiCoinCoreModel } from "../../../../models/miamicoin-core.model.ts";
+import { MiamiCoinCoreModelV2 } from "../../../../models/miamicoin-core-v2.model.ts";
 import { MiamiCoinTokenModelV2 } from "../../../../models/miamicoin-token-v2.model.ts";
 import { Accounts, Context } from "../../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let core: MiamiCoinCoreModel;
+let coreV2: MiamiCoinCoreModelV2;
 let tokenV2: MiamiCoinTokenModelV2;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  core = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v1");
+  coreV2 = ctx.models.get(MiamiCoinCoreModelV2, "miamicoin-core-v2");
   tokenV2 = ctx.models.get(MiamiCoinTokenModelV2, "miamicoin-token-v2");
 })
 
@@ -41,7 +41,7 @@ describe("[MiamiCoin Token v2]", () => {
         const recipient = accounts.get("wallet_3")!;
 
         chain.mineBlock([
-          core.testInitializeCore(core.address),
+          coreV2.testInitializeCore(coreV2.address),
         ]);
 
         let block = chain.mineBlock([
