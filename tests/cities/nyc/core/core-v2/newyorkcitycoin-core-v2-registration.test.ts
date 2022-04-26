@@ -1,20 +1,20 @@
-import { assertEquals, describe, types, run, Chain, beforeEach, it } from "../../../../deps.ts";
-import { MiamiCoinCoreModelV2 } from "../../../../models/miamicoin-core-v2.model.ts";
-import { Accounts, Context } from "../../../../src/context.ts";
+import { assertEquals, describe, types, run, Chain, beforeEach, it } from "../../../../../deps.ts";
+import { NewYorkCityCoinCoreModelV2 } from "../../../../../models/newyorkcitycoin-core-v2.model.ts";
+import { Accounts, Context } from "../../../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let coreV2: MiamiCoinCoreModelV2;
+let coreV2: NewYorkCityCoinCoreModelV2;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  coreV2 = ctx.models.get(MiamiCoinCoreModelV2, "miamicoin-core-v2");
+  coreV2 = ctx.models.get(NewYorkCityCoinCoreModelV2);
 });
 
-describe("[MiamiCoin Core v2]", () => {
+describe("[NewYorkCityCoin Core v2]", () => {
   //////////////////////////////////////////////////
   // REGISTRATION
   //////////////////////////////////////////////////
@@ -27,7 +27,7 @@ describe("[MiamiCoin Core v2]", () => {
         // assert
         result
           .expectErr()
-          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
+          .expectUint(NewYorkCityCoinCoreModelV2.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
       });
       it("succeeds and returns activation height", () => {
         // arrange
@@ -38,7 +38,7 @@ describe("[MiamiCoin Core v2]", () => {
           coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          block.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         // act
         const result = coreV2.getActivationBlock().result;
@@ -52,7 +52,7 @@ describe("[MiamiCoin Core v2]", () => {
         // act
         const result = coreV2.getActivationDelay().result;
         // assert
-        result.expectUint(MiamiCoinCoreModelV2.ACTIVATION_DELAY);
+        result.expectUint(NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY);
       });
     });
     describe("get-activation-threshold()", () => {
@@ -60,7 +60,7 @@ describe("[MiamiCoin Core v2]", () => {
         // act
         const result = coreV2.getActivationThreshold().result;
         // assert
-        result.expectUint(MiamiCoinCoreModelV2.ACTIVATION_THRESHOLD);
+        result.expectUint(NewYorkCityCoinCoreModelV2.ACTIVATION_THRESHOLD);
       });
     });
     describe("get-registered-users-nonce()", () => {
@@ -93,7 +93,7 @@ describe("[MiamiCoin Core v2]", () => {
           .receipts[0];
 
         // assert
-        receipt.result.expectErr().expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_UNAUTHORIZED);
+        receipt.result.expectErr().expectUint(NewYorkCityCoinCoreModelV2.ErrCode.ERR_UNAUTHORIZED);
       })
       it("succeeds and registers new user and emits print event with memo when supplied", () => {
         // arrange
@@ -154,7 +154,7 @@ describe("[MiamiCoin Core v2]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_USER_ALREADY_REGISTERED);
+          .expectUint(NewYorkCityCoinCoreModelV2.ErrCode.ERR_USER_ALREADY_REGISTERED);
       });
 
       it("fails with ERR_ACTIVATION_THRESHOLD_REACHED when user wants to register after reaching activation threshold", () => {
@@ -174,7 +174,7 @@ describe("[MiamiCoin Core v2]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_ACTIVATION_THRESHOLD_REACHED);
+          .expectUint(NewYorkCityCoinCoreModelV2.ErrCode.ERR_ACTIVATION_THRESHOLD_REACHED);
       });
     });
   });

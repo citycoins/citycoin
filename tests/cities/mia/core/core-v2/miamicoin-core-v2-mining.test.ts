@@ -1,23 +1,23 @@
-import { assertEquals, describe, types, run, Chain, beforeEach, it } from "../../../../deps.ts";
-import { MiamiCoinCoreModel } from "../../../../models/miamicoin-core.model.ts";
-import { MiamiCoinTokenModel } from "../../../../models/miamicoin-token.model.ts";
-import { Accounts, Context } from "../../../../src/context.ts";
+import { assertEquals, describe, types, run, Chain, beforeEach, it } from "../../../../../deps.ts";
+import { MiamiCoinCoreModelV2 } from "../../../../../models/miamicoin-core-v2.model.ts";
+import { MiamiCoinTokenModelV2 } from "../../../../../models/miamicoin-token-v2.model.ts";
+import { Accounts, Context } from "../../../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let core: MiamiCoinCoreModel;
-let token: MiamiCoinTokenModel;
+let coreV2: MiamiCoinCoreModelV2;
+let tokenV2: MiamiCoinTokenModelV2;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  core = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v1");
-  token = ctx.models.get(MiamiCoinTokenModel, "miamicoin-token");
+  coreV2 = ctx.models.get(MiamiCoinCoreModelV2, "miamicoin-core-v2");
+  tokenV2 = ctx.models.get(MiamiCoinTokenModelV2, "miamicoin-token-v2");
 });
 
-describe("[MiamiCoin Core]", () => {
+describe("[MiamiCoin Core v2]", () => {
   //////////////////////////////////////////////////
   // MINING CONFIGURATION
   //////////////////////////////////////////////////
@@ -29,24 +29,24 @@ describe("[MiamiCoin Core]", () => {
         const miner2 = accounts.get("wallet_3")!;
         const amount = 2;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
-          core.registerUser(miner2),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
+          coreV2.registerUser(miner2),
         ]);
         const activationBlockHeight =
-          setupBlock.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         const block = chain.mineBlock([
-          core.mineTokens(amount, miner),
-          core.mineTokens(amount * 1000, miner2),
+          coreV2.mineTokens(amount, miner),
+          coreV2.mineTokens(amount * 1000, miner2),
         ]);
-        chain.mineEmptyBlock(MiamiCoinCoreModel.TOKEN_REWARD_MATURITY);
+        chain.mineEmptyBlock(MiamiCoinCoreModelV2.TOKEN_REWARD_MATURITY);
 
         // act
-        const result = core.getBlockWinnerId(block.height).result;
+        const result = coreV2.getBlockWinnerId(block.height).result;
 
         // assert
         result.expectNone();
@@ -57,26 +57,26 @@ describe("[MiamiCoin Core]", () => {
         const miner2 = accounts.get("wallet_3")!;
         const amount = 2;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
-          core.registerUser(miner2),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
+          coreV2.registerUser(miner2),
         ]);
         const activationBlockHeight =
-          setupBlock.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         const block = chain.mineBlock([
-          core.mineTokens(amount, miner),
-          core.mineTokens(amount * 1000, miner2),
+          coreV2.mineTokens(amount, miner),
+          coreV2.mineTokens(amount * 1000, miner2),
         ]);
-        chain.mineEmptyBlock(MiamiCoinCoreModel.TOKEN_REWARD_MATURITY);
+        chain.mineEmptyBlock(MiamiCoinCoreModelV2.TOKEN_REWARD_MATURITY);
         chain.mineBlock([
-          core.claimMiningReward(block.height - 1, miner2),
+          coreV2.claimMiningReward(block.height - 1, miner2),
         ]);
         // act
-        const result = core.getBlockWinnerId(block.height - 1).result;
+        const result = coreV2.getBlockWinnerId(block.height - 1).result;
 
         // assert
         result.expectSome().expectUint(2);
@@ -96,13 +96,13 @@ describe("[MiamiCoin Core]", () => {
 
         // act
         const receipt = chain.mineBlock([
-          core.mineTokens(amountUstx, miner),
+          coreV2.mineTokens(amountUstx, miner),
         ]).receipts[0];
 
         // assert
         receipt.result
           .expectErr()
-          .expectUint(MiamiCoinCoreModel.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
+          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
       });
 
       it("fails with ERR_INSUFFICIENT_COMMITMENT while trying to mine with 0 commitment", () => {
@@ -110,20 +110,20 @@ describe("[MiamiCoin Core]", () => {
         const miner = accounts.get("wallet_2")!;
         const amountUstx = 0;
         chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
 
         // act
         const receipt = chain.mineBlock([
-          core.mineTokens(amountUstx, miner),
+          coreV2.mineTokens(amountUstx, miner),
         ]).receipts[0];
 
         // assert
         receipt.result
           .expectErr()
-          .expectUint(MiamiCoinCoreModel.ErrCode.ERR_INSUFFICIENT_COMMITMENT);
+          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_INSUFFICIENT_COMMITMENT);
       });
 
       it("fails with ERR_INSUFFICIENT_BALANCE while trying to mine with commitment larger than current balance", () => {
@@ -131,20 +131,20 @@ describe("[MiamiCoin Core]", () => {
         const miner = accounts.get("wallet_2")!;
         const amountUstx = miner.balance + 1;
         chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
 
         // act
         const receipt = chain.mineBlock([
-          core.mineTokens(amountUstx, miner),
+          coreV2.mineTokens(amountUstx, miner),
         ]).receipts[0];
 
         // assert
         receipt.result
           .expectErr()
-          .expectUint(MiamiCoinCoreModel.ErrCode.ERR_INSUFFICIENT_BALANCE);
+          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_INSUFFICIENT_BALANCE);
       });
 
       it("fails with ERR_STACKING_NOT_VAILABLE while trying to mine before the activation period ends", () => {
@@ -152,20 +152,20 @@ describe("[MiamiCoin Core]", () => {
         const miner = accounts.get("wallet_2")!;
         const amountUstx = 200;
         chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
 
         // act
         const receipt = chain.mineBlock([
-          core.mineTokens(amountUstx, miner),
+          coreV2.mineTokens(amountUstx, miner),
         ]).receipts[0];
 
         //assert
         receipt.result
           .expectErr()
-          .expectUint(MiamiCoinCoreModel.ErrCode.ERR_STACKING_NOT_AVAILABLE);
+          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_STACKING_NOT_AVAILABLE);
       });
 
       it("succeeds and emits one stx_transfer event to city wallet during first cycle", () => {
@@ -174,18 +174,18 @@ describe("[MiamiCoin Core]", () => {
         const miner = accounts.get("wallet_2")!;
         const amountUstx = 200;
         const block = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetCityWallet(cityWallet),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetCityWallet(cityWallet),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         chain.mineEmptyBlockUntil(
-          block.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1
         );
 
         // act
         const receipt = chain.mineBlock([
-          core.mineTokens(amountUstx, miner),
+          coreV2.mineTokens(amountUstx, miner),
         ]).receipts[0];
 
         //assert
@@ -205,25 +205,25 @@ describe("[MiamiCoin Core]", () => {
         const amountUstx = 200;
         const amountTokens = 500;
         const block = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetCityWallet(cityWallet),
-          token.testMint(amountTokens, miner),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetCityWallet(cityWallet),
+          tokenV2.testMint(amountTokens, miner),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
 
         const activationBlockHeight =
-          block.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
         const cycle1FirstBlockHeight =
-          activationBlockHeight + MiamiCoinCoreModel.REWARD_CYCLE_LENGTH;
+          activationBlockHeight + MiamiCoinCoreModelV2.REWARD_CYCLE_LENGTH;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
-        chain.mineBlock([core.stackTokens(amountTokens, 1, miner)]);
+        chain.mineBlock([coreV2.stackTokens(amountTokens, 1, miner)]);
         chain.mineEmptyBlockUntil(cycle1FirstBlockHeight);
 
         // act
         const receipt = chain.mineBlock([
-          core.mineTokens(amountUstx, miner),
+          coreV2.mineTokens(amountUstx, miner),
         ]).receipts[0];
 
         //assert
@@ -231,15 +231,15 @@ describe("[MiamiCoin Core]", () => {
         assertEquals(receipt.events.length, 2);
 
         receipt.events.expectSTXTransferEvent(
-          amountUstx * MiamiCoinCoreModel.SPLIT_CITY_PCT,
+          amountUstx * MiamiCoinCoreModelV2.SPLIT_CITY_PCT,
           miner.address,
           cityWallet.address
         );
 
         receipt.events.expectSTXTransferEvent(
-          amountUstx * (1 - MiamiCoinCoreModel.SPLIT_CITY_PCT),
+          amountUstx * (1 - MiamiCoinCoreModelV2.SPLIT_CITY_PCT),
           miner.address,
-          core.address
+          coreV2.address
         );
       });
 
@@ -249,19 +249,19 @@ describe("[MiamiCoin Core]", () => {
         const amountUstx = 200;
         const memo = new TextEncoder().encode("hello world");
         const block = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
 
         const activationBlockHeight =
-          block.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
         const receipt = chain.mineBlock([
-          core.mineTokens(amountUstx, miner, memo),
+          coreV2.mineTokens(amountUstx, miner, memo),
         ]).receipts[0];
 
         //assert
@@ -271,7 +271,7 @@ describe("[MiamiCoin Core]", () => {
         const expectedEvent = {
           type: "contract_event",
           contract_event: {
-            contract_identifier: core.address,
+            contract_identifier: coreV2.address,
             topic: "print",
             value: types.some(types.buff(memo)),
           },
@@ -286,25 +286,25 @@ describe("[MiamiCoin Core]", () => {
         const amountUstx = 200;
         const memo = new TextEncoder().encode("hello world");
         const block = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
 
         const activationBlockHeight =
-          block.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
-        const mineTokensTx = core.mineTokens(amountUstx, miner, memo);
+        const mineTokensTx = coreV2.mineTokens(amountUstx, miner, memo);
         const receipts = chain.mineBlock([mineTokensTx, mineTokensTx]).receipts;
 
         //assert
         receipts[0].result.expectOk().expectBool(true);
         receipts[1].result
           .expectErr()
-          .expectUint(MiamiCoinCoreModel.ErrCode.ERR_USER_ALREADY_MINED);
+          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_USER_ALREADY_MINED);
       });
     });
 
@@ -315,13 +315,13 @@ describe("[MiamiCoin Core]", () => {
         const amounts = [1, 2, 3, 4];
 
         // act
-        const receipt = chain.mineBlock([core.mineMany(amounts, miner)])
+        const receipt = chain.mineBlock([coreV2.mineMany(amounts, miner)])
           .receipts[0];
 
         // assert
         receipt.result
           .expectErr()
-          .expectUint(MiamiCoinCoreModel.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
+          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
       });
 
       it("fails with ERR_STACKING_NOT_AVAILABLE while trying to mine before activation period ends", () => {
@@ -329,19 +329,19 @@ describe("[MiamiCoin Core]", () => {
         const miner = accounts.get("wallet_1")!;
         const amounts = [1, 2, 3, 4];
         chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
 
         // act
-        const receipt = chain.mineBlock([core.mineMany(amounts, miner)])
+        const receipt = chain.mineBlock([coreV2.mineMany(amounts, miner)])
           .receipts[0];
 
         // assert
         receipt.result
           .expectErr()
-          .expectUint(MiamiCoinCoreModel.ErrCode.ERR_STACKING_NOT_AVAILABLE);
+          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_STACKING_NOT_AVAILABLE);
       });
 
       it("fails with ERR_INSUFFICIENT_COMMITMENT while providing empty list of amounts", () => {
@@ -349,22 +349,22 @@ describe("[MiamiCoin Core]", () => {
         const miner = accounts.get("wallet_1")!;
         const amounts: number[] = [];
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1
+          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1
         );
 
         // act
-        const receipt = chain.mineBlock([core.mineMany(amounts, miner)])
+        const receipt = chain.mineBlock([coreV2.mineMany(amounts, miner)])
           .receipts[0];
 
         // assert
         receipt.result
           .expectErr()
-          .expectUint(MiamiCoinCoreModel.ErrCode.ERR_INSUFFICIENT_COMMITMENT);
+          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_INSUFFICIENT_COMMITMENT);
       });
 
       it("fails with ERR_INSUFFICIENT_COMMITMENT while providing list of amounts filled with 0", () => {
@@ -372,22 +372,22 @@ describe("[MiamiCoin Core]", () => {
         const miner = accounts.get("wallet_1")!;
         const amounts = [0, 0, 0, 0];
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1
+          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1
         );
 
         // act
-        const receipt = chain.mineBlock([core.mineMany(amounts, miner)])
+        const receipt = chain.mineBlock([coreV2.mineMany(amounts, miner)])
           .receipts[0];
 
         // assert
         receipt.result
           .expectErr()
-          .expectUint(MiamiCoinCoreModel.ErrCode.ERR_INSUFFICIENT_COMMITMENT);
+          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_INSUFFICIENT_COMMITMENT);
       });
 
       it("fails with ERR_INSUFFICIENT_COMMITMENT while providing list of amounts with one or more 0s", () => {
@@ -395,22 +395,22 @@ describe("[MiamiCoin Core]", () => {
         const miner = accounts.get("wallet_1")!;
         const amounts = [1, 2, 3, 4, 0, 5, 6, 7];
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1
+          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1
         );
 
         // act
-        const receipt = chain.mineBlock([core.mineMany(amounts, miner)])
+        const receipt = chain.mineBlock([coreV2.mineMany(amounts, miner)])
           .receipts[0];
 
         // assert
         receipt.result
           .expectErr()
-          .expectUint(MiamiCoinCoreModel.ErrCode.ERR_INSUFFICIENT_COMMITMENT);
+          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_INSUFFICIENT_COMMITMENT);
       });
 
       it("fails with ERR_INSUFFICIENT_BALANCE when sum of all commitments > miner balance", () => {
@@ -418,22 +418,22 @@ describe("[MiamiCoin Core]", () => {
         const miner = accounts.get("wallet_1")!;
         const amounts = [1, miner.balance];
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1
+          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1
         );
 
         // act
-        const receipt = chain.mineBlock([core.mineMany(amounts, miner)])
+        const receipt = chain.mineBlock([coreV2.mineMany(amounts, miner)])
           .receipts[0];
 
         // assert
         receipt.result
           .expectErr()
-          .expectUint(MiamiCoinCoreModel.ErrCode.ERR_INSUFFICIENT_BALANCE);
+          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_INSUFFICIENT_BALANCE);
       });
 
       it("fails with ERR_USER_ALREADY_MINED when call overlaps already mined blocks", () => {
@@ -441,23 +441,23 @@ describe("[MiamiCoin Core]", () => {
         const miner = accounts.get("wallet_1")!;
         const amounts = [1, 2];
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1
+          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1
         );
-        chain.mineBlock([core.mineMany(amounts, miner)]);
+        chain.mineBlock([coreV2.mineMany(amounts, miner)]);
 
         // act
-        const receipt = chain.mineBlock([core.mineMany(amounts, miner)])
+        const receipt = chain.mineBlock([coreV2.mineMany(amounts, miner)])
           .receipts[0];
 
         // assert
         receipt.result
           .expectErr()
-          .expectUint(MiamiCoinCoreModel.ErrCode.ERR_USER_ALREADY_MINED);
+          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_USER_ALREADY_MINED);
       });
 
       it("succeeds and emits one stx_transfer event when amounts list has only one value and there are no stackers", () => {
@@ -466,25 +466,23 @@ describe("[MiamiCoin Core]", () => {
         const amounts = [1];
         const cityWallet = accounts.get("mia_wallet")!;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1
+          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1
         );
 
         // act
-        const block = chain.mineBlock([
-          core.mineMany(amounts, miner)
-        ]);
-        
-        const receipt = block.receipts[0];
+        const receipt = chain.mineBlock([
+          coreV2.mineMany(amounts, miner)
+        ]).receipts[0];
 
         // assert
         receipt.result.expectOk().expectBool(true);
 
-        assertEquals(receipt.events.length, 1);
+        assertEquals(receipt.events.length, 2);
 
         receipt.events.expectSTXTransferEvent(
           amounts.reduce((sum, amount) => sum + amount, 0),
@@ -499,22 +497,23 @@ describe("[MiamiCoin Core]", () => {
         const amounts = [1, 2, 200, 89, 3423];
         const cityWallet = accounts.get("mia_wallet")!;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1
+          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1
         );
 
         // act
-        const receipt = chain.mineBlock([core.mineMany(amounts, miner)])
-          .receipts[0];
+        const receipt = chain.mineBlock([
+          coreV2.mineMany(amounts, miner)
+        ]).receipts[0];
 
         // assert
         receipt.result.expectOk().expectBool(true);
 
-        assertEquals(receipt.events.length, 1);
+        assertEquals(receipt.events.length, 2);
 
         receipt.events.expectSTXTransferEvent(
           amounts.reduce((sum, amount) => sum + amount, 0),
@@ -530,43 +529,43 @@ describe("[MiamiCoin Core]", () => {
         const cityWallet = accounts.get("mia_wallet")!;
         const amountTokens = 500;
         const block = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetCityWallet(cityWallet),
-          token.testMint(amountTokens, miner),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetCityWallet(cityWallet),
+          tokenV2.testMint(amountTokens, miner),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
 
         const activationBlockHeight =
-          block.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
         const cycle1FirstBlockHeight =
-          activationBlockHeight + MiamiCoinCoreModel.REWARD_CYCLE_LENGTH;
+          activationBlockHeight + MiamiCoinCoreModelV2.REWARD_CYCLE_LENGTH;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
-        chain.mineBlock([core.stackTokens(amountTokens, 1, miner)]);
+        chain.mineBlock([coreV2.stackTokens(amountTokens, 1, miner)]);
         chain.mineEmptyBlockUntil(cycle1FirstBlockHeight);
 
         // act
-        const receipt = chain.mineBlock([core.mineMany(amounts, miner)])
+        const receipt = chain.mineBlock([coreV2.mineMany(amounts, miner)])
           .receipts[0];
 
         // assert
         receipt.result.expectOk().expectBool(true);
 
-        assertEquals(receipt.events.length, 2);
+        assertEquals(receipt.events.length, 3);
 
         const totalAmount = amounts.reduce((sum, amount) => sum + amount, 0);
 
         receipt.events.expectSTXTransferEvent(
-          totalAmount * MiamiCoinCoreModel.SPLIT_CITY_PCT,
+          totalAmount * MiamiCoinCoreModelV2.SPLIT_CITY_PCT,
           miner.address,
           cityWallet.address
         );
 
         receipt.events.expectSTXTransferEvent(
-          totalAmount * (1 - MiamiCoinCoreModel.SPLIT_CITY_PCT),
+          totalAmount * (1 - MiamiCoinCoreModelV2.SPLIT_CITY_PCT),
           miner.address,
-          core.address
+          coreV2.address
         );
       });
 
@@ -577,43 +576,43 @@ describe("[MiamiCoin Core]", () => {
         const cityWallet = accounts.get("mia_wallet")!;
         const amountTokens = 500;
         const block = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetCityWallet(cityWallet),
-          token.testMint(amountTokens, miner),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetCityWallet(cityWallet),
+          tokenV2.testMint(amountTokens, miner),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
 
         const activationBlockHeight =
-          block.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
         const cycle1FirstBlockHeight =
-          activationBlockHeight + MiamiCoinCoreModel.REWARD_CYCLE_LENGTH;
+          activationBlockHeight + MiamiCoinCoreModelV2.REWARD_CYCLE_LENGTH;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
-        chain.mineBlock([core.stackTokens(amountTokens, 1, miner)]);
+        chain.mineBlock([coreV2.stackTokens(amountTokens, 1, miner)]);
         chain.mineEmptyBlockUntil(cycle1FirstBlockHeight);
 
         // act
-        const receipt = chain.mineBlock([core.mineMany(amounts, miner)])
+        const receipt = chain.mineBlock([coreV2.mineMany(amounts, miner)])
           .receipts[0];
 
         // assert
         receipt.result.expectOk().expectBool(true);
 
-        assertEquals(receipt.events.length, 2);
+        assertEquals(receipt.events.length, 3);
 
         const totalAmount = amounts.reduce((sum, amount) => sum + amount, 0);
 
         receipt.events.expectSTXTransferEvent(
-          totalAmount * MiamiCoinCoreModel.SPLIT_CITY_PCT,
+          totalAmount * MiamiCoinCoreModelV2.SPLIT_CITY_PCT,
           miner.address,
           cityWallet.address
         );
 
         receipt.events.expectSTXTransferEvent(
-          totalAmount * (1 - MiamiCoinCoreModel.SPLIT_CITY_PCT),
+          totalAmount * (1 - MiamiCoinCoreModelV2.SPLIT_CITY_PCT),
           miner.address,
-          core.address
+          coreV2.address
         );
       });
 
@@ -622,25 +621,67 @@ describe("[MiamiCoin Core]", () => {
         const miner = accounts.get("wallet_1")!;
         const amounts = [1, 2, 200, 89, 3423];
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1
+          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1
         );
 
         // act
-        const block = chain.mineBlock([core.mineMany(amounts, miner)]);
+        const block = chain.mineBlock([coreV2.mineMany(amounts, miner)]);
 
         // assert
         const userId = 1;
 
         amounts.forEach((amount, idx) => {
-          core
+          coreV2
             .hasMinedAtBlock(block.height + idx - 1, userId)
             .result.expectBool(true);
         });
+      });
+
+      it("succeeds and prints tuple with firstBlock and lastBlock when mining only one block", () => {
+        const miner = accounts.get("wallet_6")!;
+        const amounts = [123];
+        const setupBlock = chain.mineBlock([
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
+        ]);
+        chain.mineEmptyBlockUntil(setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1);
+
+        // act
+        const block = chain.mineBlock([coreV2.mineMany(amounts, miner)]);
+
+        // assert
+        const firstBlock = block.height - 1;
+        const lastBlock = firstBlock + amounts.length - 1;
+        const expectedPrintMsg = `{firstBlock: ${types.uint(firstBlock)}, lastBlock: ${types.uint(lastBlock)}}`;
+
+        block.receipts[0].events.expectPrintEvent(coreV2.address, expectedPrintMsg);
+      });
+
+      it("succeeds and prints tuple with firstBlock and lastBlock when mining multiple blocks", () => {
+        const miner = accounts.get("wallet_6")!;
+        const amounts = [1, 2, 5, 60];
+        const setupBlock = chain.mineBlock([
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
+        ]);
+        chain.mineEmptyBlockUntil(setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY + 145);
+
+        // act
+        const block = chain.mineBlock([coreV2.mineMany(amounts, miner)]);
+
+        // assert
+        const firstBlock = block.height - 1;
+        const lastBlock = firstBlock + amounts.length - 1;
+        const expectedPrintMsg = `{firstBlock: ${types.uint(firstBlock)}, lastBlock: ${types.uint(lastBlock)}}`;
+
+        block.receipts[0].events.expectPrintEvent(coreV2.address, expectedPrintMsg);
       });
     });
   });
