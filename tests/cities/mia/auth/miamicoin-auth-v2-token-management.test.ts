@@ -1,20 +1,20 @@
 import { describe, run, Chain, beforeEach, it} from "../../../../deps.ts";
 import { MiamiCoinAuthModelV2 } from "../../../../models/miamicoin-auth-v2.model.ts";
-import { MiamiCoinTokenModel } from "../../../../models/miamicoin-token.model.ts";
+import { MiamiCoinTokenModelV2 } from "../../../../models/miamicoin-token-v2.model.ts";
 import { Accounts, Context } from "../../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
 let authV2: MiamiCoinAuthModelV2;
-let token: MiamiCoinTokenModel;
+let tokenV2: MiamiCoinTokenModelV2;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
   authV2 = ctx.models.get(MiamiCoinAuthModelV2, "miamicoin-auth-v2");
-  token = ctx.models.get(MiamiCoinTokenModel, "miamicoin-token");
+  tokenV2 = ctx.models.get(MiamiCoinTokenModelV2, "miamicoin-token-v2");
 })
 
 describe("[MiamiCoin Auth v2]", () => {
@@ -30,7 +30,7 @@ describe("[MiamiCoin Auth v2]", () => {
         const block = chain.mineBlock([
           authV2.setTokenUri(
             sender,
-            token.address,
+            tokenV2.address,
             "http://something-something.com"
           ),
         ]);
@@ -46,31 +46,31 @@ describe("[MiamiCoin Auth v2]", () => {
         const sender = accounts.get("wallet_2")!;
         // act
         const block = chain.mineBlock([
-          token.setTokenUri(sender, "http://something-something.com"),
+          tokenV2.setTokenUri(sender, "http://something-something.com"),
         ]);
         // assert
         const receipt = block.receipts[0];
 
         receipt.result
           .expectErr()
-          .expectUint(MiamiCoinTokenModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(MiamiCoinTokenModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
-      it.skip("succeeds and updates token uri to none if no new value is provided", () => {
+      it("succeeds and updates token uri to none if no new value is provided", () => {
         // arrange
         const sender = accounts.get("mia_wallet")!;
         // act
         const block = chain.mineBlock([
-          authV2.setTokenUri(sender, token.address),
+          authV2.setTokenUri(sender, tokenV2.address),
         ]);
         // assert
         const receipt = block.receipts[0];
 
         receipt.result.expectOk().expectBool(true);
 
-        const result = token.getTokenUri().result;
+        const result = tokenV2.getTokenUri().result;
         result.expectOk().expectNone();
       });
-      it.skip("succeeds and updates token uri to new value if provided", () => {
+      it("succeeds and updates token uri to new value if provided", () => {
         // arrange
         const sender = accounts.get("mia_wallet")!;
         const newUri = "http://something-something.com";
@@ -78,7 +78,7 @@ describe("[MiamiCoin Auth v2]", () => {
         const block = chain.mineBlock([
           authV2.setTokenUri(
             sender,
-            token.address,
+            tokenV2.address,
             newUri
           ),
         ]);
@@ -87,7 +87,7 @@ describe("[MiamiCoin Auth v2]", () => {
 
         receipt.result.expectOk().expectBool(true);
 
-        const result = token.getTokenUri().result;
+        const result = tokenV2.getTokenUri().result;
         result.expectOk().expectSome().expectUtf8(newUri);
       });
     });

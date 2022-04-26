@@ -17,8 +17,8 @@ beforeEach(() => {
   accounts = ctx.accounts;
   auth = ctx.models.get(MiamiCoinAuthModel, "miamicoin-auth");
   core = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v1");
-  core2 = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v2");
-  core3 = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v3");
+  core2 = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v1-1");
+  core3 = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v1-2");
 })
 
 describe("[MiamiCoin Auth]", () => {

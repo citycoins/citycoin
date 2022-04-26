@@ -1,24 +1,24 @@
 import { assertEquals, describe, types, run, Chain, beforeEach, it} from "../../../../deps.ts";
 import { MiamiCoinAuthModelV2 } from "../../../../models/miamicoin-auth-v2.model.ts";
-import { MiamiCoinCoreModel } from "../../../../models/miamicoin-core.model.ts";
+import { MiamiCoinCoreModelV2 } from "../../../../models/miamicoin-core-v2.model.ts";
 import { Accounts, Context } from "../../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
 let authV2: MiamiCoinAuthModelV2;
-let core: MiamiCoinCoreModel;
-let core2: MiamiCoinCoreModel;
-let core3: MiamiCoinCoreModel;
+let coreV2: MiamiCoinCoreModelV2;
+let coreV2_2: MiamiCoinCoreModelV2;
+let coreV2_3: MiamiCoinCoreModelV2;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
   authV2 = ctx.models.get(MiamiCoinAuthModelV2, "miamicoin-auth-v2");
-  core = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v1");
-  core2 = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v2");
-  core3 = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v3");
+  coreV2 = ctx.models.get(MiamiCoinCoreModelV2, "miamicoin-core-v2");
+  coreV2_2 = ctx.models.get(MiamiCoinCoreModelV2, "miamicoin-core-v2-1");
+  coreV2_3 = ctx.models.get(MiamiCoinCoreModelV2, "miamicoin-core-v2-2");
 })
 
 describe("[MiamiCoin Auth v2]", () => {
@@ -39,7 +39,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("succeeds and returns active core contract after auth contract is initialized", () => {
         // arrange
         const sender = accounts.get("wallet_1")!;
-        const target = core.address;
+        const target = coreV2.address;
         chain.mineBlock([authV2.testSetActiveCoreContract(sender)]);
 
         // act
@@ -54,7 +54,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("fails with ERR_UNAUTHORIZED if not called by CONTRACT_OWNER", () => {
         // arrange
         const sender = accounts.get("wallet_2")!;
-        const target = core.address;
+        const target = coreV2.address;
 
         // act
         const receipt = chain.mineBlock([
@@ -67,10 +67,10 @@ describe("[MiamiCoin Auth v2]", () => {
           .expectUint(MiamiCoinAuthModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
 
-      it.skip("fails with ERR_UNAUTHORIZED if auth contract is already initialized", () => {
+      it("fails with ERR_UNAUTHORIZED if auth contract is already initialized", () => {
         // arrange
         const sender = accounts.get("deployer")!;
-        const target = core.address;
+        const target = coreV2.address;
 
         // act
         chain.mineBlock([authV2.initializeContracts(target, sender)]);
@@ -85,10 +85,10 @@ describe("[MiamiCoin Auth v2]", () => {
           .expectUint(MiamiCoinAuthModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
 
-      it.skip("succeeds and updates core contract map", () => {
+      it("succeeds and updates core contract map", () => {
         // arrange
         const sender = accounts.get("deployer")!;
-        const target = core.address;
+        const target = coreV2.address;
 
         // act
         const receipt = chain.mineBlock([
@@ -116,8 +116,8 @@ describe("[MiamiCoin Auth v2]", () => {
       it("fails with ERR_CORE_CONTRACT_NOT_FOUND if principal not found in core contracts map", () => {
         // arrange
         const sender = accounts.get("wallet_1")!;
-        const oldContract = core.address;
-        const newContract = core.address;
+        const oldContract = coreV2.address;
+        const newContract = coreV2.address;
 
         // act
         const receipt = chain.mineBlock([
@@ -130,16 +130,16 @@ describe("[MiamiCoin Auth v2]", () => {
           .expectUint(MiamiCoinAuthModelV2.ErrCode.ERR_CORE_CONTRACT_NOT_FOUND);
       });
 
-      it.skip("fails with ERR_CONTRACT_ALREADY_EXISTS if old and new contract are the same", () => {
+      it("fails with ERR_CONTRACT_ALREADY_EXISTS if old and new contract are the same", () => {
         // arrange
         const sender = accounts.get("mia_wallet")!;
-        const oldContract = core.address;
-        const newContract = core.address;
+        const oldContract = coreV2.address;
+        const newContract = coreV2.address;
 
         chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(sender),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(sender),
         ]);
 
         // act
@@ -152,16 +152,16 @@ describe("[MiamiCoin Auth v2]", () => {
           .expectErr()
           .expectUint(MiamiCoinAuthModelV2.ErrCode.ERR_CONTRACT_ALREADY_EXISTS);
       });
-      it.skip("fails with ERR_CONTRACT_ALREADY_EXISTS if called with a target contract already in core contracts map", () => {
+      it("fails with ERR_CONTRACT_ALREADY_EXISTS if called with a target contract already in coreV2 contracts map", () => {
         // arrange
         const sender = accounts.get("mia_wallet")!;
-        const oldContract = core.address;
-        const newContract = core2.address;
+        const oldContract = coreV2.address;
+        const newContract = coreV2_2.address;
 
         chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(sender),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(sender),
           authV2.testSetCoreContractState(newContract, MiamiCoinAuthModelV2.CoreContractState.STATE_INACTIVE, sender),
         ]);
 
@@ -175,16 +175,16 @@ describe("[MiamiCoin Auth v2]", () => {
           .expectErr()
           .expectUint(MiamiCoinAuthModelV2.ErrCode.ERR_CONTRACT_ALREADY_EXISTS);
       });
-      it.skip("fails with ERR_UNAUTHORIZED if not called by city wallet", () => {
+      it("fails with ERR_UNAUTHORIZED if not called by city wallet", () => {
         // arrange
         const sender = accounts.get("wallet_1")!;
-        const oldContract = core.address;
-        const newContract = core2.address;
+        const oldContract = coreV2.address;
+        const newContract = coreV2_2.address;
 
         chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(sender),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(sender),
         ]);
 
         // act
@@ -197,16 +197,16 @@ describe("[MiamiCoin Auth v2]", () => {
           .expectErr()
           .expectUint(MiamiCoinAuthModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
-      it.skip("succeeds and updates core contract map and active variable", () => {
+      it("succeeds and updates core contract map and active variable", () => {
         // arrange
         const sender = accounts.get("mia_wallet")!;
-        const oldContract = core.address;
-        const newContract = core2.address;
+        const oldContract = coreV2.address;
+        const newContract = coreV2_2.address;
 
         chain.mineBlock([
-          core.testInitializeCore(oldContract),
-          core.testSetActivationThreshold(1),
-          core.registerUser(sender),
+          coreV2.testInitializeCore(oldContract),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(sender),
         ]);
 
         // act
@@ -229,7 +229,7 @@ describe("[MiamiCoin Auth v2]", () => {
         // TODO: why the +1 and -1 here ??
         const expectedOldContractData = {
           state: types.uint(MiamiCoinAuthModelV2.CoreContractState.STATE_INACTIVE),
-          startHeight: types.uint(MiamiCoinCoreModel.ACTIVATION_DELAY + 1),
+          startHeight: types.uint(MiamiCoinCoreModelV2.ACTIVATION_DELAY + 1),
           endHeight: types.uint(blockUpgrade.height - 1),
         };
         const expectedNewContractData = {
@@ -246,7 +246,7 @@ describe("[MiamiCoin Auth v2]", () => {
     });
 
     describe("execute-upgrade-core-contract-job()", () => {
-      it.skip("fails with ERR_UNAUTHORIZED if contract-caller is not an approver", () => {
+      it("fails with ERR_UNAUTHORIZED if contract-caller is not an approver", () => {
         // arrange
         const jobId = 1;
         const sender = accounts.get("wallet_1")!;
@@ -254,13 +254,13 @@ describe("[MiamiCoin Auth v2]", () => {
         const approver2 = accounts.get("wallet_3")!;
         const approver3 = accounts.get("wallet_4")!;
         const invalidApprover = accounts.get("wallet_6")!;
-        const oldContract = core.address;
-        const newContract = core2.address;
+        const oldContract = coreV2.address;
+        const newContract = coreV2_2.address;
 
         chain.mineBlock([
-          core.testInitializeCore(oldContract),
-          core.testSetActivationThreshold(1),
-          core.registerUser(sender),
+          coreV2.testInitializeCore(oldContract),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(sender),
           authV2.createJob(
             "upgrade core",
             authV2.address,
@@ -300,21 +300,21 @@ describe("[MiamiCoin Auth v2]", () => {
           .expectUint(MiamiCoinAuthModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
 
-      it.skip("fails with ERR_UNAUTHORIZED if submitted trait principal does not match job principal", () => {
+      it("fails with ERR_UNAUTHORIZED if submitted trait principal does not match job principal", () => {
         // arrange
         const jobId = 1;
         const sender = accounts.get("wallet_1")!;
         const approver1 = accounts.get("wallet_2")!;
         const approver2 = accounts.get("wallet_3")!;
         const approver3 = accounts.get("wallet_4")!;
-        const oldContract = core.address;
-        const newContract = core2.address;
-        const invalidContract = core3.address;
+        const oldContract = coreV2.address;
+        const newContract = coreV2_2.address;
+        const invalidContract = coreV2_3.address;
 
         chain.mineBlock([
-          core.testInitializeCore(oldContract),
-          core.testSetActivationThreshold(1),
-          core.registerUser(sender),
+          coreV2.testInitializeCore(oldContract),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(sender),
           authV2.createJob(
             "upgrade core",
             authV2.address,
@@ -354,19 +354,19 @@ describe("[MiamiCoin Auth v2]", () => {
           .expectUint(MiamiCoinAuthModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
 
-      it.skip("fails with ERR_CONTRACT_ALREADY_EXISTS if old and new contract are the same", () => {
+      it("fails with ERR_CONTRACT_ALREADY_EXISTS if old and new contract are the same", () => {
         // arrange
         const jobId = 1;
         const sender = accounts.get("wallet_1")!;
         const approver1 = accounts.get("wallet_2")!;
         const approver2 = accounts.get("wallet_3")!;
         const approver3 = accounts.get("wallet_4")!;
-        const oldContract = core.address;
+        const oldContract = coreV2.address;
 
         chain.mineBlock([
-          core.testInitializeCore(oldContract),
-          core.testSetActivationThreshold(1),
-          core.registerUser(sender),
+          coreV2.testInitializeCore(oldContract),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(sender),
           authV2.createJob(
             "upgrade core",
             authV2.address,
@@ -409,12 +409,12 @@ describe("[MiamiCoin Auth v2]", () => {
       it("fails with ERR_INCORRECT_CONTRACT_STATE if new contract is not in STATE_DEPLOYED", () => {
         // arrange
         const sender = accounts.get("mia_wallet")!;
-        const contract = core.address;
+        const contract = coreV2.address;
 
         chain.mineBlock([
-          core.testInitializeCore(contract),
-          core.testSetActivationThreshold(1),
-          core.registerUser(sender),
+          coreV2.testInitializeCore(contract),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(sender),
         ]);
 
         // act
@@ -442,20 +442,20 @@ describe("[MiamiCoin Auth v2]", () => {
           .expectUint(MiamiCoinAuthModelV2.ErrCode.ERR_INCORRECT_CONTRACT_STATE);
       });
 
-      it.skip("succeeds and updates core contract map and active variable", () => {
+      it("succeeds and updates core contract map and active variable", () => {
         // arrange
         const jobId = 1;
         const sender = accounts.get("wallet_1")!;
         const approver1 = accounts.get("wallet_2")!;
         const approver2 = accounts.get("wallet_3")!;
         const approver3 = accounts.get("wallet_4")!;
-        const oldContract = core.address;
-        const newContract = core2.address;
+        const oldContract = coreV2.address;
+        const newContract = coreV2_2.address;
 
         chain.mineBlock([
-          core.testInitializeCore(oldContract),
-          core.testSetActivationThreshold(1),
-          core.registerUser(sender),
+          coreV2.testInitializeCore(oldContract),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(sender),
           authV2.createJob(
             "upgrade core",
             authV2.address,
@@ -504,7 +504,7 @@ describe("[MiamiCoin Auth v2]", () => {
         // TODO: why the +1 and -1 here ??
         const expectedOldContractData = {
           state: types.uint(MiamiCoinAuthModelV2.CoreContractState.STATE_INACTIVE),
-          startHeight: types.uint(MiamiCoinCoreModel.ACTIVATION_DELAY + 1),
+          startHeight: types.uint(MiamiCoinCoreModelV2.ACTIVATION_DELAY + 1),
           endHeight: types.uint(blockUpgrade.height - 1),
         };
         const expectedNewContractData = {

@@ -1,20 +1,20 @@
 import { describe, run, Chain, beforeEach, it} from "../../../../deps.ts";
 import { MiamiCoinAuthModelV2 } from "../../../../models/miamicoin-auth-v2.model.ts";
-import { MiamiCoinCoreModel } from "../../../../models/miamicoin-core.model.ts";
+import { MiamiCoinCoreModelV2 } from "../../../../models/miamicoin-core-v2.model.ts";
 import { Accounts, Context } from "../../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
 let authV2: MiamiCoinAuthModelV2;
-let core: MiamiCoinCoreModel;
+let coreV2: MiamiCoinCoreModelV2;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
   authV2 = ctx.models.get(MiamiCoinAuthModelV2, "miamicoin-auth-v2");
-  core = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v1");
+  coreV2 = ctx.models.get(MiamiCoinCoreModelV2, "miamicoin-core-v2");
 })
 
 describe("[MiamiCoin Auth v2]", () => {
@@ -40,7 +40,7 @@ describe("[MiamiCoin Auth v2]", () => {
         // act
         const receipt = chain.mineBlock([
           authV2.setCityWallet(
-            core.address,
+            coreV2.address,
             newCityWallet,
             cityWallet
           ),
@@ -51,17 +51,17 @@ describe("[MiamiCoin Auth v2]", () => {
           .expectUint(MiamiCoinAuthModelV2.ErrCode.ERR_CORE_CONTRACT_NOT_FOUND);
       });
 
-      it.skip("fails with ERR_UNAUTHORIZED if not called by city wallet", () => {
+      it("fails with ERR_UNAUTHORIZED if not called by city wallet", () => {
         // arrange
         const sender = accounts.get("wallet_1")!;
         const newCityWallet = accounts.get("wallet_2")!;
         chain.mineBlock([
-          core.testInitializeCore(core.address),
+          coreV2.testInitializeCore(coreV2.address),
         ]);
         // act
         const receipt = chain.mineBlock([
           authV2.setCityWallet(
-            core.address,
+            coreV2.address,
             newCityWallet,
             sender
           ),
@@ -72,17 +72,17 @@ describe("[MiamiCoin Auth v2]", () => {
           .expectUint(MiamiCoinAuthModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
 
-      it.skip("fails with ERR_UNAUTHORIZED if not called by the active core contract", () => {
+      it("fails with ERR_UNAUTHORIZED if not called by the active core contract", () => {
         // arrange
         const cityWallet = accounts.get("mia_wallet")!;
         const newCityWallet = accounts.get("wallet_2")!;
         chain.mineBlock([
-          core.testInitializeCore(core.address),
+          coreV2.testInitializeCore(coreV2.address),
         ]);
         // act
         const receipt = chain.mineBlock([
           authV2.setCityWallet(
-            core.address,
+            coreV2.address,
             newCityWallet,
             cityWallet
           ),
@@ -93,19 +93,19 @@ describe("[MiamiCoin Auth v2]", () => {
           .expectUint(MiamiCoinAuthModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
 
-      it.skip("succeeds and updates city wallet variable when called by current city wallet", () => {
+      it("succeeds and updates city wallet variable when called by current city wallet", () => {
         // arrange
         const cityWallet = accounts.get("mia_wallet")!;
         const newCityWallet = accounts.get("wallet_2")!;
         chain.mineBlock([
-          core.testInitializeCore(core.address),
+          coreV2.testInitializeCore(coreV2.address),
           authV2.testSetActiveCoreContract(cityWallet),
         ]);
 
         // act
         const receipt = chain.mineBlock([
           authV2.setCityWallet(
-            core.address,
+            coreV2.address,
             newCityWallet,
             cityWallet
           ),
@@ -113,7 +113,7 @@ describe("[MiamiCoin Auth v2]", () => {
 
         // assert
         receipt.result.expectOk().expectBool(true);
-        core
+        coreV2
           .getCityWallet()
           .result.expectPrincipal(newCityWallet.address);
         authV2
@@ -123,7 +123,7 @@ describe("[MiamiCoin Auth v2]", () => {
       });
     });
     describe("execute-set-city-wallet-job()", () => {
-      it.skip("succeeds and updates city wallet variable when called by job approver", () => {
+      it("succeeds and updates city wallet variable when called by job approver", () => {
         // arrange
         const jobId = 1;
         const sender = accounts.get("wallet_1")!;
@@ -133,7 +133,7 @@ describe("[MiamiCoin Auth v2]", () => {
         const cityWallet = accounts.get("mia_wallet")!;
         const newCityWallet = accounts.get("wallet_2")!;
         chain.mineBlock([
-          core.testInitializeCore(core.address),
+          coreV2.testInitializeCore(coreV2.address),
           authV2.testSetActiveCoreContract(cityWallet),
         ]);
 
@@ -159,7 +159,7 @@ describe("[MiamiCoin Auth v2]", () => {
         const receipt = chain.mineBlock([
           authV2.executeSetCityWalletJob(
             jobId,
-            core.address,
+            coreV2.address,
             approver1
           ),
         ]).receipts[0];
@@ -167,7 +167,7 @@ describe("[MiamiCoin Auth v2]", () => {
         // asserts
         receipt.result.expectOk().expectBool(true);
 
-        core
+        coreV2
           .getCityWallet()
           .result.expectPrincipal(newCityWallet.address);
       });

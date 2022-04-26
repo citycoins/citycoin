@@ -612,7 +612,7 @@
 (define-public (test-set-active-core-contract)
   (begin
     (asserts! (is-test-env) ERR_UNAUTHORIZED)
-    (ok (var-set activeCoreContract .newyorkcitycoin-core-v1))
+    (ok (var-set activeCoreContract .newyorkcitycoin-core-v2))
   )
 )
 
