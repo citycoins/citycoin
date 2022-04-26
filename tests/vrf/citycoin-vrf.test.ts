@@ -28,18 +28,17 @@ describe("[CityCoin VRF]", () => {
   });
 
   it("v2 fails with ERR_FAIL if block height is in the future", () => {
-    // note: getSaveRnd test disabled due to error in Clarinet
     // arrange
-    // const user = accounts.get("wallet_1")!;
+    const user = accounts.get("wallet_1")!;
     const futureBlock = 10;
     // act
     const result = vrfV2.getRnd(futureBlock).result;
-    // const receipt = chain.mineBlock([
-    //   vrfV2.getSaveRnd(futureBlock, user),
-    // ]).receipts[0];
+    const receipt = chain.mineBlock([
+      vrfV2.getSaveRnd(futureBlock, user),
+    ]).receipts[0];
     // assert
     result.expectErr().expectUint(VrfModelV2.ErrCode.ERR_FAIL);
-    // receipt.result.expectErr().expectUint(VrfModelV2.ErrCode.ERR_FAIL);
+    receipt.result.expectErr().expectUint(VrfModelV2.ErrCode.ERR_FAIL);
   });
 
   it("succeeds and returns the same value from v1 and v2", () => {

@@ -19,7 +19,7 @@
     rnd (ok rnd)
     (match (read-rnd block)
       rnd (begin (map-set RandomUintAtBlock block rnd) (ok rnd))
-      err (err err)
+      err-val (err err-val)
     ) 
   )
 )
