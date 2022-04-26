@@ -3,7 +3,6 @@ import { CoreModel } from "../../../models/core.model.ts";
 import { TokenModel } from "../../../models/token.model.ts";
 import { Accounts, Context } from "../../../src/context.ts";
 
-
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
