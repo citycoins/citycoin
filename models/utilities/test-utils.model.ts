@@ -1,5 +1,5 @@
-import { Account, Tx } from "../deps.ts";
-import { Model } from "../src/model.ts";
+import { Account, Tx } from "../../deps.ts";
+import { Model } from "../../src/model.ts";
 
 export class TestUtilsModel extends Model {
   name = "test-utils";

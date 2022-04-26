@@ -1,15 +1,16 @@
-import { Account, ReadOnlyFn, Tx, types } from "../deps.ts";
-import { Model } from "../src/model.ts";
+import { Account, ReadOnlyFn, Tx, types } from "../../../deps.ts";
+import { Model } from "../../../src/model.ts";
 
 enum ErrCode {
   ERR_UNAUTHORIZED = 2000,
   ERR_TOKEN_NOT_ACTIVATED,
   ERR_TOKEN_ALREADY_ACTIVATED,
+  ERR_V1_BALANCE_NOT_FOUND,
   ERR_CORE_CONTRACT_NOT_FOUND = 6009,
 }
 
-export class MiamiCoinTokenModel extends Model {
-  name = "miamicoin-token";
+export class MiamiCoinTokenModelV2 extends Model {
+  name = "miamicoin-token-v2";
   static readonly ErrCode = ErrCode;
 
   //////////////////////////////////////////////////
@@ -39,14 +40,6 @@ export class MiamiCoinTokenModel extends Model {
         types.principal(to.address),
         memoVal,
       ],
-      sender.address
-    );
-  }
-
-  burn(amount: number, owner: Account, sender: Account): Tx {
-    return this.callPublic(
-      "burn",
-      [types.uint(amount), types.principal(owner.address)],
       sender.address
     );
   }
@@ -113,6 +106,18 @@ export class MiamiCoinTokenModel extends Model {
       [types.uint(amount), types.principal(recipient.address)],
       sender.address
     );
+  }
+
+  burn(amount: number, owner: Account, sender: Account): Tx {
+    return this.callPublic(
+      "burn",
+      [types.uint(amount), types.principal(owner.address)],
+      sender.address
+    );
+  }
+
+  convertToV2(sender: Account): Tx {
+    return this.callPublic("convert-to-v2", [], sender.address);
   }
 
   //////////////////////////////////////////////////

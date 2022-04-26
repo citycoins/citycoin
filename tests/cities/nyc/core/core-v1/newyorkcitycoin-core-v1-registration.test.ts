@@ -1,20 +1,17 @@
 import { assertEquals, describe, types, run, Chain, beforeEach, it } from "../../../../../deps.ts";
-import { NewYorkCityCoinCoreModel } from "../../../../../models/newyorkcitycoin-core.model.ts";
-import { NewYorkCityCoinTokenModel } from "../../../../../models/newyorkcitycoin-token.model.ts";
 import { Accounts, Context } from "../../../../../src/context.ts";
+import { NewYorkCityCoinCoreModel } from "../../../../../models/cities/nyc/newyorkcitycoin-core.model.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
 let core: NewYorkCityCoinCoreModel;
-let token: NewYorkCityCoinTokenModel;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
   core = ctx.models.get(NewYorkCityCoinCoreModel);
-  token = ctx.models.get(NewYorkCityCoinTokenModel);
 });
 
 describe("[NewYorkCityCoin Core]", () => {

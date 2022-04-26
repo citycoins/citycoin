@@ -1,5 +1,5 @@
-import { Account, Tx, types } from "../deps.ts";
-import { Model } from "../src/model.ts";
+import { Account, Tx, types } from "../../../deps.ts";
+import { Model } from "../../../src/model.ts";
 
 enum CoreContractState {
   STATE_DEPLOYED = 0,
@@ -21,8 +21,8 @@ enum ErrCode {
   ERR_UNKNOWN_ARGUMENT,
 }
 
-export class NewYorkCityCoinAuthModel extends Model {
-  name = "newyorkcitycoin-auth";
+export class MiamiCoinAuthModel extends Model {
+  name = "miamicoin-auth";
 
   static readonly ErrCode = ErrCode;
   static readonly CoreContractState = CoreContractState;

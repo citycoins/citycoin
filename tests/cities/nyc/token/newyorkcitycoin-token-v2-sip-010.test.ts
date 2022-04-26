@@ -1,6 +1,6 @@
 import { describe, assertEquals, types, run, Chain, it, beforeEach} from "../../../../deps.ts";
-import { NewYorkCityCoinTokenModelV2 } from "../../../../models/newyorkcitycoin-token-v2.model.ts";
 import { Accounts, Context } from "../../../../src/context.ts";
+import { NewYorkCityCoinTokenModelV2 } from "../../../../models/cities/nyc/newyorkcitycoin-token-v2.model.ts";
 
 let ctx: Context;
 let chain: Chain;

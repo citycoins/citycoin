@@ -15,6 +15,9 @@ on:
   # allow running manually
   workflow_dispatch:
 
+env:
+  CLARINET_DISABLE_HINTS: 1
+
 jobs:
   test-contracts:
     runs-on: ubuntu-latest

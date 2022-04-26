@@ -1,5 +1,5 @@
-import { Account, ReadOnlyFn, Tx, types } from "../deps.ts";
-import { Model } from "../src/model.ts";
+import { Account, ReadOnlyFn, Tx, types } from "../../../deps.ts";
+import { Model } from "../../../src/model.ts";
 
 enum ErrCode {
   ERR_UNAUTHORIZED = 2000,

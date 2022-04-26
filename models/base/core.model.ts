@@ -1,5 +1,5 @@
-import { Account, ReadOnlyFn, Tx, types } from "../deps.ts";
-import { Model } from "../src/model.ts";
+import { Account, ReadOnlyFn, Tx, types } from "../../deps.ts";
+import { Model } from "../../src/model.ts";
 
 enum ErrCode {
   ERR_FT_INSUFFICIENT_BALANCE = 1,
@@ -22,17 +22,15 @@ enum ErrCode {
   ERR_CANNOT_STACK,
   ERR_REWARD_CYCLE_NOT_COMPLETED,
   ERR_NOTHING_TO_REDEEM,
-  ERR_UNABLE_TO_FIND_CITY_WALLET,
-  ERR_CLAIM_IN_WRONG_CONTRACT
 }
 
-export class NewYorkCityCoinCoreModelV2 extends Model {
-  name = "newyorkcitycoin-core-v2"
+export class CoreModel extends Model {
+  name = "citycoin-core-v1"
 
   static readonly ErrCode = ErrCode;
   static readonly ACTIVATION_DELAY = 150;
   static readonly ACTIVATION_THRESHOLD = 20;
-  static readonly TOKEN_EPOCH_LENGTH = 25000;
+  static readonly TOKEN_HALVING_BLOCKS = 210000;
   static readonly REWARD_CYCLE_LENGTH = 2100;
   static readonly SPLIT_CITY_PCT = 0.3;
   static readonly TOKEN_REWARD_MATURITY = 100;

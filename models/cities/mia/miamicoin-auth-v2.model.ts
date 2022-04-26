@@ -1,5 +1,5 @@
-import { Account, Tx, types } from "../deps.ts";
-import { Model } from "../src/model.ts";
+import { Account, Tx, types } from "../../../deps.ts";
+import { Model } from "../../../src/model.ts";
 
 enum CoreContractState {
   STATE_DEPLOYED = 0,
@@ -23,8 +23,8 @@ enum ErrCode {
   ERR_CONTRACT_ALREADY_EXISTS,
 }
 
-export class NewYorkCityCoinAuthModelV2 extends Model {
-  name = "newyorkcitycoin-auth-v2";
+export class MiamiCoinAuthModelV2 extends Model {
+  name = "miamicoin-auth-v2";
 
   static readonly ErrCode = ErrCode;
   static readonly CoreContractState = CoreContractState;

@@ -1,5 +1,5 @@
-import { Account, Tx, types } from "../deps.ts";
-import { Model } from "../src/model.ts";
+import { Account, Tx, types } from "../../../deps.ts";
+import { Model } from "../../../src/model.ts";
 
 enum CoreContractState {
   STATE_DEPLOYED = 0,
@@ -19,10 +19,12 @@ enum ErrCode {
   ERR_NO_ACTIVE_CORE_CONTRACT,
   ERR_CORE_CONTRACT_NOT_FOUND,
   ERR_UNKNOWN_ARGUMENT,
+  ERR_INCORRECT_CONTRACT_STATE,
+  ERR_CONTRACT_ALREADY_EXISTS,
 }
 
-export class MiamiCoinAuthModel extends Model {
-  name = "miamicoin-auth";
+export class NewYorkCityCoinAuthModelV2 extends Model {
+  name = "newyorkcitycoin-auth-v2";
 
   static readonly ErrCode = ErrCode;
   static readonly CoreContractState = CoreContractState;
@@ -254,6 +256,14 @@ export class MiamiCoinAuthModel extends Model {
     return this.callPublic(
       "test-set-active-core-contract",
       [],
+      sender.address
+    );
+  }
+
+  testSetCoreContractState(targetContract: string, state: number, sender: Account): Tx {
+    return this.callPublic(
+      "test-set-core-contract-state",
+      [types.principal(targetContract), types.uint(state)],
       sender.address
     );
   }
