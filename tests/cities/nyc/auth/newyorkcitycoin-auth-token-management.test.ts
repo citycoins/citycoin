@@ -1,7 +1,7 @@
 import { describe, run, Chain, beforeEach, it} from "../../../../deps.ts";
-import { NewYorkCityCoinAuthModel } from "../../../../models/newyorkcitycoin-auth.model.ts";
-import { NewYorkCityCoinTokenModel } from "../../../../models/newyorkcitycoin-token.model.ts";
 import { Accounts, Context } from "../../../../src/context.ts";
+import { NewYorkCityCoinAuthModel } from "../../../../models/cities/nyc/newyorkcitycoin-auth.model.ts";
+import { NewYorkCityCoinTokenModel } from "../../../../models/cities/nyc/newyorkcitycoin-token.model.ts";
 
 let ctx: Context;
 let chain: Chain;

@@ -1,5 +1,5 @@
-import { Account, Tx, types } from "../deps.ts";
-import { Model } from "../src/model.ts";
+import { Account, Tx, types } from "../../deps.ts";
+import { Model } from "../../src/model.ts";
 
 enum ContractState {
   STATE_DEPLOYED = 0,

@@ -1,15 +1,11 @@
 import { describe, run, Chain, beforeEach, it} from "../../../deps.ts";
-import { AuthModel } from "../../../models/auth.model.ts";
-import { CoreModel } from "../../../models/core.model.ts";
-import { TokenModel } from "../../../models/token.model.ts";
 import { Accounts, Context } from "../../../src/context.ts";
+import { AuthModel } from "../../../models/base/auth.model.ts";
+import { TokenModel } from "../../../models/base/token.model.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let core: CoreModel;
-let core2: CoreModel;
-let core3: CoreModel;
 let auth: AuthModel;
 let token: TokenModel;
 
@@ -18,9 +14,6 @@ beforeEach(() => {
   chain = ctx.chain;
   accounts = ctx.accounts;
   auth = ctx.models.get(AuthModel);
-  core = ctx.models.get(CoreModel, "citycoin-core-v1");
-  core2 = ctx.models.get(CoreModel, "citycoin-core-v2");
-  core3 = ctx.models.get(CoreModel, "citycoin-core-v3");
   token = ctx.models.get(TokenModel);
 })
 

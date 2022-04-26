@@ -1,7 +1,7 @@
 import { describe, assertEquals, run, Chain, it, beforeEach} from "../../deps.ts";
-import { VrfModel } from "../../models/vrf.model.ts";
-import { VrfModelV2 } from "../../models/vrf-v2.model.ts";
 import { Accounts, Context } from "../../src/context.ts";
+import { VrfModel } from "../../models/vrf/vrf.model.ts";
+import { VrfModelV2 } from "../../models/vrf/vrf-v2.model.ts";
 
 let ctx: Context;
 let chain: Chain;

@@ -1,7 +1,7 @@
 import { assertEquals, describe, run, Chain, beforeEach, it } from "../../../../../deps.ts";
-import { NewYorkCityCoinCoreModelV2 } from "../../../../../models/newyorkcitycoin-core-v2.model.ts";
-import { NewYorkCityCoinTokenModelV2 } from "../../../../../models/newyorkcitycoin-token-v2.model.ts";
 import { Accounts, Context } from "../../../../../src/context.ts";
+import { NewYorkCityCoinCoreModelV2 } from "../../../../../models/cities/nyc/newyorkcitycoin-core-v2.model.ts";
+import { NewYorkCityCoinTokenModelV2 } from "../../../../../models/cities/nyc/newyorkcitycoin-token-v2.model.ts";
 
 let ctx: Context;
 let chain: Chain;

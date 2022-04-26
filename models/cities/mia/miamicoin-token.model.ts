@@ -1,5 +1,5 @@
-import { Account, ReadOnlyFn, Tx, types } from "../deps.ts";
-import { Model } from "../src/model.ts";
+import { Account, ReadOnlyFn, Tx, types } from "../../../deps.ts";
+import { Model } from "../../../src/model.ts";
 
 enum ErrCode {
   ERR_UNAUTHORIZED = 2000,
@@ -8,8 +8,8 @@ enum ErrCode {
   ERR_CORE_CONTRACT_NOT_FOUND = 6009,
 }
 
-export class TokenModel extends Model {
-  name = "citycoin-token";
+export class MiamiCoinTokenModel extends Model {
+  name = "miamicoin-token";
   static readonly ErrCode = ErrCode;
 
   //////////////////////////////////////////////////

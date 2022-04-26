@@ -1,5 +1,5 @@
-import { Account, ReadOnlyFn, Tx, types } from "../deps.ts";
-import { Model } from "../src/model.ts";
+import { Account, ReadOnlyFn, Tx, types } from "../../../deps.ts";
+import { Model } from "../../../src/model.ts";
 
 enum ErrCode {
   ERR_FT_INSUFFICIENT_BALANCE = 1,
@@ -26,8 +26,8 @@ enum ErrCode {
   ERR_CLAIM_IN_WRONG_CONTRACT
 }
 
-export class MiamiCoinCoreModel extends Model {
-  name = "miamicoin-core-v1"
+export class NewYorkCityCoinCoreModel extends Model {
+  name = "newyorkcitycoin-core-v1"
 
   static readonly ErrCode = ErrCode;
   static readonly ACTIVATION_DELAY = 150;
@@ -256,14 +256,6 @@ export class MiamiCoinCoreModel extends Model {
       "test-initialize-core",
       [types.principal(coreContract)],
       this.deployer.address
-    );
-  }
-
-  testBurn(amount: number, recipient: Account, sender: Account): Tx {
-    return this.callPublic(
-      "test-burn",
-      [types.uint(amount), types.principal(recipient.address)],
-      sender.address
     );
   }
 

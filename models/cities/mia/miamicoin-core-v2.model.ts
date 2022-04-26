@@ -1,5 +1,5 @@
-import { Account, ReadOnlyFn, Tx, types } from "../deps.ts";
-import { Model } from "../src/model.ts";
+import { Account, ReadOnlyFn, Tx, types } from "../../../deps.ts";
+import { Model } from "../../../src/model.ts";
 
 enum ErrCode {
   ERR_FT_INSUFFICIENT_BALANCE = 1,
@@ -26,13 +26,13 @@ enum ErrCode {
   ERR_CLAIM_IN_WRONG_CONTRACT
 }
 
-export class NewYorkCityCoinCoreModel extends Model {
-  name = "newyorkcitycoin-core-v1"
+export class MiamiCoinCoreModelV2 extends Model {
+  name = "miamicoin-core-v2"
 
   static readonly ErrCode = ErrCode;
   static readonly ACTIVATION_DELAY = 150;
   static readonly ACTIVATION_THRESHOLD = 20;
-  static readonly TOKEN_HALVING_BLOCKS = 210000;
+  static readonly TOKEN_EPOCH_LENGTH = 25000;
   static readonly REWARD_CYCLE_LENGTH = 2100;
   static readonly SPLIT_CITY_PCT = 0.3;
   static readonly TOKEN_REWARD_MATURITY = 100;

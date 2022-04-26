@@ -1,5 +1,5 @@
-import { ReadOnlyFn, types } from "../deps.ts";
-import { Model } from "../src/model.ts";
+import { ReadOnlyFn, types } from "../../deps.ts";
+import { Model } from "../../src/model.ts";
 
 export class VrfModel extends Model {
   name = "citycoin-vrf";

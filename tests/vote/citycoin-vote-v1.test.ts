@@ -1,8 +1,8 @@
-import { describe, assertEquals, types, Account, run, Chain, it, beforeEach} from "../../deps.ts";
-import { CoreModel } from "../../models/core.model.ts";
-import { TokenModel } from "../../models/token.model.ts";
-import { VoteModel } from "../../models/vote.model.ts";
+import { describe, assertEquals, types, run, Chain, it, beforeEach} from "../../deps.ts";
 import { Accounts, Context } from "../../src/context.ts";
+import { CoreModel } from "../../models/base/core.model.ts";
+import { TokenModel } from "../../models/base/token.model.ts";
+import { VoteModel } from "../../models/vote/vote.model.ts";
 
 let ctx: Context;
 let chain: Chain;

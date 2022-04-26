@@ -1,7 +1,7 @@
 import { describe, run, Chain, beforeEach, it} from "../../../../deps.ts";
-import { MiamiCoinAuthModel } from "../../../../models/miamicoin-auth.model.ts";
-import { MiamiCoinTokenModel } from "../../../../models/miamicoin-token.model.ts";
 import { Accounts, Context } from "../../../../src/context.ts";
+import { MiamiCoinAuthModel } from "../../../../models/cities/mia/miamicoin-auth.model.ts";
+import { MiamiCoinTokenModel } from "../../../../models/cities/mia/miamicoin-token.model.ts";
 
 let ctx: Context;
 let chain: Chain;
