@@ -1,5 +1,5 @@
 import { describe, run, Chain, it, beforeEach, types} from "../../../../deps.ts";
-import { NewYorkCityCoinCoreModel } from "../../../../models/newyorkcitycoin-core.model.ts";
+import { NewYorkCityCoinCoreModelV2 } from "../../../../models/newyorkcitycoin-core-v2.model.ts";
 import { NewYorkCityCoinTokenModel } from "../../../../models/newyorkcitycoin-token.model.ts";
 import { NewYorkCityCoinTokenModelV2 } from "../../../../models/newyorkcitycoin-token-v2.model.ts";
 import { Accounts, Context } from "../../../../src/context.ts";
@@ -7,7 +7,7 @@ import { Accounts, Context } from "../../../../src/context.ts";
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let core: NewYorkCityCoinCoreModel;
+let coreV2: NewYorkCityCoinCoreModelV2;
 let token: NewYorkCityCoinTokenModel;
 let tokenV2: NewYorkCityCoinTokenModelV2;
 
@@ -15,7 +15,7 @@ beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  core = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1");
+  coreV2 = ctx.models.get(NewYorkCityCoinCoreModelV2, "newyorkcitycoin-core-v2");
   token = ctx.models.get(NewYorkCityCoinTokenModel, "newyorkcitycoin-token");
   tokenV2 = ctx.models.get(NewYorkCityCoinTokenModelV2, "newyorkcitycoin-token-v2");
 })
@@ -44,7 +44,7 @@ describe("[NewYorkCityCoin Token v2]", () => {
         const recipient = accounts.get("wallet_3")!;
 
         chain.mineBlock([
-          core.testInitializeCore(core.address),
+          coreV2.testInitializeCore(coreV2.address),
         ]);
 
         let block = chain.mineBlock([

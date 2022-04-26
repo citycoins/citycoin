@@ -1,20 +1,20 @@
-import { assertEquals, describe, run, Chain, beforeEach, it } from "../../../../deps.ts";
-import { NewYorkCityCoinCoreModel } from "../../../../models/newyorkcitycoin-core.model.ts";
-import { Accounts, Context } from "../../../../src/context.ts";
+import { assertEquals, describe, run, Chain, beforeEach, it } from "../../../../../deps.ts";
+import { NewYorkCityCoinCoreModelV2 } from "../../../../../models/newyorkcitycoin-core-v2.model.ts";
+import { Accounts, Context } from "../../../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let core: NewYorkCityCoinCoreModel;
+let coreV2: NewYorkCityCoinCoreModelV2;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  core = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1");
+  coreV2 = ctx.models.get(NewYorkCityCoinCoreModelV2, "newyorkcitycoin-core-v2");
 });
 
-describe("[NewYorkCityCoin Core]", () => {
+describe("[NewYorkCityCoin Core v2]", () => {
   //////////////////////////////////////////////////
   // MINING CLAIM ACTIONS
   //////////////////////////////////////////////////
@@ -26,13 +26,13 @@ describe("[NewYorkCityCoin Core]", () => {
 
         // act
         const receipt = chain.mineBlock([
-          core.claimMiningReward(0, miner),
+          coreV2.claimMiningReward(0, miner),
         ]).receipts[0];
 
         // assert
         receipt.result
           .expectErr()
-          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_USER_ID_NOT_FOUND);
+          .expectUint(NewYorkCityCoinCoreModelV2.ErrCode.ERR_USER_ID_NOT_FOUND);
       });
 
       it("fails with ERR_NO_MINERS_AT_BLOCK when called with block height at which nobody decided to mine", () => {
@@ -40,19 +40,19 @@ describe("[NewYorkCityCoin Core]", () => {
         const miner = accounts.get("wallet_2")!;
         chain.mineBlock([])
         chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.registerUser(miner)
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.registerUser(miner)
         ]);
 
         // act
         const receipt = chain.mineBlock([
-          core.claimMiningReward(0, miner),
+          coreV2.claimMiningReward(0, miner),
         ]).receipts[0];
 
         // assert
         receipt.result
           .expectErr()
-          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_NO_MINERS_AT_BLOCK);
+          .expectUint(NewYorkCityCoinCoreModelV2.ErrCode.ERR_NO_MINERS_AT_BLOCK);
       });
 
       it("fails with ERR_USER_DID_NOT_MINE_IN_BLOCK when called by user who didn't mine specific block", () => {
@@ -61,28 +61,28 @@ describe("[NewYorkCityCoin Core]", () => {
         const miner = accounts.get("wallet_2")!;
         const amount = 2000;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         const block = chain.mineBlock([
-          core.mineTokens(amount, otherMiner),
+          coreV2.mineTokens(amount, otherMiner),
         ]);
 
         // act
         const receipt = chain.mineBlock([
-          core.claimMiningReward(block.height - 1, miner),
+          coreV2.claimMiningReward(block.height - 1, miner),
         ]);
 
         // assert
         receipt.receipts[0].result
           .expectErr()
-          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_USER_DID_NOT_MINE_IN_BLOCK);
+          .expectUint(NewYorkCityCoinCoreModelV2.ErrCode.ERR_USER_DID_NOT_MINE_IN_BLOCK);
       });
 
       it("fails with ERR_CLAIMED_BEFORE_MATURITY when called before maturity window passes", () => {
@@ -90,26 +90,26 @@ describe("[NewYorkCityCoin Core]", () => {
         const miner = accounts.get("wallet_2")!;
         const amount = 2000;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
-        const block = chain.mineBlock([core.mineTokens(amount, miner)]);
+        const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
 
         // act
         const receipt = chain.mineBlock([
-          core.claimMiningReward(block.height - 1, miner),
+          coreV2.claimMiningReward(block.height - 1, miner),
         ]).receipts[0];
 
         // assert
         receipt.result
           .expectErr()
-          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_CLAIMED_BEFORE_MATURITY);
+          .expectUint(NewYorkCityCoinCoreModelV2.ErrCode.ERR_CLAIMED_BEFORE_MATURITY);
       });
 
       it("fails with ERR_REWARD_ALREADY_CLAIMED when trying to claim rewards a 2nd time", () => {
@@ -117,28 +117,28 @@ describe("[NewYorkCityCoin Core]", () => {
         const miner = accounts.get("wallet_2")!;
         const amount = 2000;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
-        const block = chain.mineBlock([core.mineTokens(amount, miner)]);
-        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
+        const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModelV2.TOKEN_REWARD_MATURITY);
 
         // act
         const receipt = chain.mineBlock([
-          core.claimMiningReward(block.height - 1, miner),
-          core.claimMiningReward(block.height - 1, miner),
+          coreV2.claimMiningReward(block.height - 1, miner),
+          coreV2.claimMiningReward(block.height - 1, miner),
         ]).receipts[1];
 
         // assert
         receipt.result
           .expectErr()
-          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_REWARD_ALREADY_CLAIMED);
+          .expectUint(NewYorkCityCoinCoreModelV2.ErrCode.ERR_REWARD_ALREADY_CLAIMED);
       });
 
       it("fails with ERR_MINER_DID_NOT_WIN when trying to claim reward owed to someone else", () => {
@@ -147,30 +147,30 @@ describe("[NewYorkCityCoin Core]", () => {
         const otherMiner = accounts.get("wallet_3")!;
         const amount = 2;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         const block = chain.mineBlock([
-          core.mineTokens(amount, miner),
-          core.mineTokens(amount * 10000, otherMiner),
+          coreV2.mineTokens(amount, miner),
+          coreV2.mineTokens(amount * 10000, otherMiner),
         ]);
-        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModelV2.TOKEN_REWARD_MATURITY);
 
         // act
         const receipt = chain.mineBlock([
-          core.claimMiningReward(block.height - 1, miner),
+          coreV2.claimMiningReward(block.height - 1, miner),
         ]).receipts[0];
 
         // assert
         receipt.result
           .expectErr()
-          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_MINER_DID_NOT_WIN);
+          .expectUint(NewYorkCityCoinCoreModelV2.ErrCode.ERR_MINER_DID_NOT_WIN);
       });
 
       it("succeeds and mints 250000 tokens in 1st issuance cycle, during bonus period", () => {
@@ -178,21 +178,21 @@ describe("[NewYorkCityCoin Core]", () => {
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
-        const block = chain.mineBlock([core.mineTokens(amount, miner)]);
-        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
+        const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModelV2.TOKEN_REWARD_MATURITY);
 
         // act
         const receipt = chain.mineBlock([
-          core.claimMiningReward(block.height - 1, miner),
+          coreV2.claimMiningReward(block.height - 1, miner),
         ]).receipts[0];
 
         // assert
@@ -212,23 +212,23 @@ describe("[NewYorkCityCoin Core]", () => {
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(
-          activationBlockHeight + NewYorkCityCoinCoreModel.BONUS_PERIOD_LENGTH + 1
+          activationBlockHeight + NewYorkCityCoinCoreModelV2.BONUS_PERIOD_LENGTH + 1
         );
 
-        const block = chain.mineBlock([core.mineTokens(amount, miner)]);
-        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
+        const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModelV2.TOKEN_REWARD_MATURITY);
 
         // act
         const receipt = chain.mineBlock([
-          core.claimMiningReward(block.height - 1, miner),
+          coreV2.claimMiningReward(block.height - 1, miner),
         ]).receipts[0];
 
         // assert
@@ -248,23 +248,23 @@ describe("[NewYorkCityCoin Core]", () => {
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(
-          activationBlockHeight + NewYorkCityCoinCoreModel.TOKEN_HALVING_BLOCKS + 1
+          activationBlockHeight + NewYorkCityCoinCoreModelV2.BONUS_PERIOD_LENGTH + NewYorkCityCoinCoreModelV2.TOKEN_EPOCH_LENGTH + 1
         );
 
-        const block = chain.mineBlock([core.mineTokens(amount, miner)]);
-        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
+        const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModelV2.TOKEN_REWARD_MATURITY);
 
         // act
         const receipt = chain.mineBlock([
-          core.claimMiningReward(block.height - 1, miner),
+          coreV2.claimMiningReward(block.height - 1, miner),
         ]).receipts[0];
 
         // assert
@@ -284,23 +284,23 @@ describe("[NewYorkCityCoin Core]", () => {
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(
-          activationBlockHeight + NewYorkCityCoinCoreModel.TOKEN_HALVING_BLOCKS * 2 + 1
+          activationBlockHeight + NewYorkCityCoinCoreModelV2.BONUS_PERIOD_LENGTH + NewYorkCityCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 2 + 1
         );
 
-        const block = chain.mineBlock([core.mineTokens(amount, miner)]);
-        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
+        const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModelV2.TOKEN_REWARD_MATURITY);
 
         // act
         const receipt = chain.mineBlock([
-          core.claimMiningReward(block.height - 1, miner),
+          coreV2.claimMiningReward(block.height - 1, miner),
         ]).receipts[0];
 
         // assert
@@ -320,23 +320,23 @@ describe("[NewYorkCityCoin Core]", () => {
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(
-          activationBlockHeight + NewYorkCityCoinCoreModel.TOKEN_HALVING_BLOCKS * 3 + 1
+          activationBlockHeight + NewYorkCityCoinCoreModelV2.BONUS_PERIOD_LENGTH + NewYorkCityCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 3 + 1
         );
 
-        const block = chain.mineBlock([core.mineTokens(amount, miner)]);
-        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
+        const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModelV2.TOKEN_REWARD_MATURITY);
 
         // act
         const receipt = chain.mineBlock([
-          core.claimMiningReward(block.height - 1, miner),
+          coreV2.claimMiningReward(block.height - 1, miner),
         ]).receipts[0];
 
         // assert
@@ -356,23 +356,23 @@ describe("[NewYorkCityCoin Core]", () => {
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(
-          activationBlockHeight + NewYorkCityCoinCoreModel.TOKEN_HALVING_BLOCKS * 4 + 1
+          activationBlockHeight + NewYorkCityCoinCoreModelV2.BONUS_PERIOD_LENGTH + NewYorkCityCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 4 + 1
         );
 
-        const block = chain.mineBlock([core.mineTokens(amount, miner)]);
-        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
+        const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModelV2.TOKEN_REWARD_MATURITY);
 
         // act
         const receipt = chain.mineBlock([
-          core.claimMiningReward(block.height - 1, miner),
+          coreV2.claimMiningReward(block.height - 1, miner),
         ]).receipts[0];
 
         // assert
@@ -392,23 +392,23 @@ describe("[NewYorkCityCoin Core]", () => {
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(miner),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(
-          activationBlockHeight + NewYorkCityCoinCoreModel.TOKEN_HALVING_BLOCKS * 5 + 1
+          activationBlockHeight + NewYorkCityCoinCoreModelV2.BONUS_PERIOD_LENGTH + NewYorkCityCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 5 + 1
         );
 
-        const block = chain.mineBlock([core.mineTokens(amount, miner)]);
-        chain.mineEmptyBlock(NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY);
+        const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
+        chain.mineEmptyBlock(NewYorkCityCoinCoreModelV2.TOKEN_REWARD_MATURITY);
 
         // act
         const receipt = chain.mineBlock([
-          core.claimMiningReward(block.height - 1, miner),
+          coreV2.claimMiningReward(block.height - 1, miner),
         ]).receipts[0];
 
         // assert
@@ -431,7 +431,7 @@ describe("[NewYorkCityCoin Core]", () => {
         const minerBlockHeight = 1;
 
         // act
-        const result = core.isBlockWinner(
+        const result = coreV2.isBlockWinner(
           user,
           minerBlockHeight
         ).result;
@@ -445,13 +445,13 @@ describe("[NewYorkCityCoin Core]", () => {
         const user = accounts.get("wallet_1")!;
         const minerBlockHeight = 1;
         chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(user),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(user),
         ]);
 
         // act
-        const result = core.isBlockWinner(
+        const result = coreV2.isBlockWinner(
           user,
           minerBlockHeight
         ).result;
@@ -465,21 +465,21 @@ describe("[NewYorkCityCoin Core]", () => {
         const user = accounts.get("wallet_1")!;
         const user2 = accounts.get("wallet_2")!;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(user),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         const minerBlockHeight = chain.mineBlock([
-          core.mineTokens(200, user2),
+          coreV2.mineTokens(200, user2),
         ]).height;
 
         // act
-        const result = core.isBlockWinner(
+        const result = coreV2.isBlockWinner(
           user,
           minerBlockHeight
         ).result;
@@ -492,20 +492,20 @@ describe("[NewYorkCityCoin Core]", () => {
         // arrange
         const user = accounts.get("wallet_1")!;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(user),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         const minerBlockHeight =
-          chain.mineBlock([core.mineTokens(200, user)]).height - 1;
+          chain.mineBlock([coreV2.mineTokens(200, user)]).height - 1;
 
         // act
-        const result = core.isBlockWinner(
+        const result = coreV2.isBlockWinner(
           user,
           minerBlockHeight
         ).result;
@@ -520,34 +520,34 @@ describe("[NewYorkCityCoin Core]", () => {
         const user2 = accounts.get("wallet_2")!;
 
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(user),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         const minerBlockHeight =
           chain.mineBlock([
-            core.mineTokens(1, user),
-            core.mineTokens(200000, user2),
+            coreV2.mineTokens(1, user),
+            coreV2.mineTokens(200000, user2),
           ]).height - 1;
 
         chain.mineEmptyBlockUntil(
-          minerBlockHeight + NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY + 1
+          minerBlockHeight + NewYorkCityCoinCoreModelV2.TOKEN_REWARD_MATURITY + 1
         );
 
         // act
-        const result = core.isBlockWinner(
+        const result = coreV2.isBlockWinner(
           user,
           minerBlockHeight
         ).result;
 
         // assert
         result.expectBool(false);
-        core
+        coreV2
           .isBlockWinner(user2, minerBlockHeight)
           .result.expectBool(true);
       });
@@ -558,27 +558,27 @@ describe("[NewYorkCityCoin Core]", () => {
         const user2 = accounts.get("wallet_2")!;
 
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(user),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         const minerBlockHeight =
           chain.mineBlock([
-            core.mineTokens(200000, user),
-            core.mineTokens(1, user2),
+            coreV2.mineTokens(200000, user),
+            coreV2.mineTokens(1, user2),
           ]).height - 1;
 
         chain.mineEmptyBlockUntil(
-          minerBlockHeight + NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY + 1
+          minerBlockHeight + NewYorkCityCoinCoreModelV2.TOKEN_REWARD_MATURITY + 1
         );
 
         // act
-        const result = core.isBlockWinner(
+        const result = coreV2.isBlockWinner(
           user,
           minerBlockHeight
         ).result;
@@ -595,7 +595,7 @@ describe("[NewYorkCityCoin Core]", () => {
         const minerBlockHeight = 1;
 
         // act
-        const result = core.canClaimMiningReward(
+        const result = coreV2.canClaimMiningReward(
           user,
           minerBlockHeight
         ).result;
@@ -609,13 +609,13 @@ describe("[NewYorkCityCoin Core]", () => {
         const user = accounts.get("wallet_1")!;
         const minerBlockHeight = 1;
         chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(user),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(user),
         ]);
 
         // act
-        const result = core.canClaimMiningReward(
+        const result = coreV2.canClaimMiningReward(
           user,
           minerBlockHeight
         ).result;
@@ -629,21 +629,21 @@ describe("[NewYorkCityCoin Core]", () => {
         const user = accounts.get("wallet_1")!;
         const user2 = accounts.get("wallet_2")!;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(user),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         const minerBlockHeight = chain.mineBlock([
-          core.mineTokens(200, user2),
+          coreV2.mineTokens(200, user2),
         ]).height;
 
         // act
-        const result = core.canClaimMiningReward(
+        const result = coreV2.canClaimMiningReward(
           user,
           minerBlockHeight
         ).result;
@@ -656,20 +656,20 @@ describe("[NewYorkCityCoin Core]", () => {
         // arrange
         const user = accounts.get("wallet_1")!;
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(user),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         const minerBlockHeight =
-          chain.mineBlock([core.mineTokens(200, user)]).height - 1;
+          chain.mineBlock([coreV2.mineTokens(200, user)]).height - 1;
 
         // act
-        const result = core.canClaimMiningReward(
+        const result = coreV2.canClaimMiningReward(
           user,
           minerBlockHeight
         ).result;
@@ -684,34 +684,34 @@ describe("[NewYorkCityCoin Core]", () => {
         const user2 = accounts.get("wallet_2")!;
 
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(user),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         const minerBlockHeight =
           chain.mineBlock([
-            core.mineTokens(1, user),
-            core.mineTokens(200000, user2),
+            coreV2.mineTokens(1, user),
+            coreV2.mineTokens(200000, user2),
           ]).height - 1;
 
         chain.mineEmptyBlockUntil(
-          minerBlockHeight + NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY + 1
+          minerBlockHeight + NewYorkCityCoinCoreModelV2.TOKEN_REWARD_MATURITY + 1
         );
 
         // act
-        const result = core.canClaimMiningReward(
+        const result = coreV2.canClaimMiningReward(
           user,
           minerBlockHeight
         ).result;
 
         // assert
         result.expectBool(false);
-        core
+        coreV2
           .canClaimMiningReward(user2, minerBlockHeight)
           .result.expectBool(true);
       });
@@ -722,30 +722,30 @@ describe("[NewYorkCityCoin Core]", () => {
         const user2 = accounts.get("wallet_2")!;
 
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(user),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         const minerBlockHeight =
           chain.mineBlock([
-            core.mineTokens(200000, user),
-            core.mineTokens(1, user2),
+            coreV2.mineTokens(200000, user),
+            coreV2.mineTokens(1, user2),
           ]).height - 1;
 
         chain.mineEmptyBlockUntil(
-          minerBlockHeight + NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY + 1
+          minerBlockHeight + NewYorkCityCoinCoreModelV2.TOKEN_REWARD_MATURITY + 1
         );
         chain.mineBlock([
-          core.claimMiningReward(minerBlockHeight, user),
+          coreV2.claimMiningReward(minerBlockHeight, user),
         ]);
 
         // act
-        const result = core.canClaimMiningReward(
+        const result = coreV2.canClaimMiningReward(
           user,
           minerBlockHeight
         ).result;
@@ -760,27 +760,27 @@ describe("[NewYorkCityCoin Core]", () => {
         const user2 = accounts.get("wallet_2")!;
 
         const setupBlock = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(user),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModel.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         const minerBlockHeight =
           chain.mineBlock([
-            core.mineTokens(200000, user),
-            core.mineTokens(1, user2),
+            coreV2.mineTokens(200000, user),
+            coreV2.mineTokens(1, user2),
           ]).height - 1;
 
         chain.mineEmptyBlockUntil(
-          minerBlockHeight + NewYorkCityCoinCoreModel.TOKEN_REWARD_MATURITY + 1
+          minerBlockHeight + NewYorkCityCoinCoreModelV2.TOKEN_REWARD_MATURITY + 1
         );
 
         // act
-        const result = core.canClaimMiningReward(
+        const result = coreV2.canClaimMiningReward(
           user,
           minerBlockHeight
         ).result;

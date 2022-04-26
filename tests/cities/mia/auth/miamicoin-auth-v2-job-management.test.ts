@@ -1,20 +1,20 @@
 import { assertEquals, describe, types, run, Chain, beforeEach, it} from "../../../../deps.ts";
 import { MiamiCoinAuthModelV2 } from "../../../../models/miamicoin-auth-v2.model.ts";
-import { MiamiCoinCoreModel } from "../../../../models/miamicoin-core.model.ts";
+import { MiamiCoinCoreModelV2 } from "../../../../models/miamicoin-core-v2.model.ts";
 import { Accounts, Context } from "../../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
 let authV2: MiamiCoinAuthModelV2;
-let core: MiamiCoinCoreModel;
+let coreV2: MiamiCoinCoreModelV2;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
   authV2 = ctx.models.get(MiamiCoinAuthModelV2, "miamicoin-auth-v2");
-  core = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v1");
+  coreV2 = ctx.models.get(MiamiCoinCoreModelV2, "miamicoin-core-v2");
 })
 
 describe("[MiamiCoin Auth v2]", () => {
@@ -33,7 +33,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("succeeds and returns u1 after a job has been created", () => {
         // arrange
         const name = "job_1";
-        const target = core.address;
+        const target = coreV2.address;
         const sender = accounts.get("wallet_1")!;
 
         // act
@@ -50,7 +50,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("fails with ERR_UNAUTHORIZED if not called by an approver", () => {
         // arrange
         const name = "job_1";
-        const target = core.address;
+        const target = coreV2.address;
         const sender = accounts.get("deployer")!;
 
         // act
@@ -67,7 +67,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("succeeds and creates new job if called by an approver", () => {
         // arrange
         const name = "job_1";
-        const target = core.address;
+        const target = coreV2.address;
         const sender = accounts.get("wallet_1")!;
 
         // act
@@ -95,7 +95,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("succeeds and returns some with job details for known job ID", () => {
         // arrange
         const name = "job123";
-        const target = core.address;
+        const target = coreV2.address;
         const sender = accounts.get("wallet_1")!;
         chain.mineBlock([authV2.createJob(name, target, sender)]);
 
@@ -137,7 +137,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("fails with ERR_UNAUTHORIZED while activating job by someone who is not its creator", () => {
         // arrange
         const name = "job-123456";
-        const target = core.address;
+        const target = coreV2.address;
         const creator = accounts.get("wallet_1")!;
         const jobId = 1;
         const wallet = accounts.get("wallet_4")!;
@@ -158,7 +158,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("fails with ERR_JOB_IS_ACTIVE while activating job that is already active", () => {
         // arrange
         const name = "job-123456";
-        const target = core.address;
+        const target = coreV2.address;
         const creator = accounts.get("wallet_1")!;
         const jobId = 1;
         chain.mineBlock([
@@ -180,7 +180,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("succeeds and activates job if called by its creator", () => {
         // arrange
         const name = "job-123456";
-        const target = core.address;
+        const target = coreV2.address;
         const creator = accounts.get("wallet_1")!;
         const jobId = 1;
         chain.mineBlock([authV2.createJob(name, target, creator)]);
@@ -189,8 +189,6 @@ describe("[MiamiCoin Auth v2]", () => {
         const block = chain.mineBlock([
           authV2.activateJob(jobId, creator),
         ]);
-
-        console.log(block)
 
         // assert
         block.receipts[0].result.expectOk().expectBool(true);
@@ -234,7 +232,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("fails with ERR_JOB_IS_NOT_ACTIVE while approving inactive job ID", () => {
         // arrange
         const name = "job-123456";
-        const target = core.address;
+        const target = coreV2.address;
         const creator = accounts.get("wallet_1")!;
         const approver = accounts.get("wallet_2")!;
         const jobId = 1;
@@ -254,7 +252,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("fails with ERR_ALREADY_VOTED_THIS_WAY while approving job previously approved", () => {
         // arrange
         const name = "job-123456";
-        const target = core.address;
+        const target = coreV2.address;
         const creator = accounts.get("wallet_1")!;
         const approver = accounts.get("wallet_2")!;
         const jobId = 1;
@@ -278,7 +276,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("fails with ERR_UNAUTHORIZED while approving job by user who is not an approver", () => {
         // arrange
         const name = "job-123456";
-        const target = core.address;
+        const target = coreV2.address;
         const creator = accounts.get("wallet_1")!;
         const approver = accounts.get("wallet_8")!;
         const jobId = 1;
@@ -301,7 +299,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("succeeds and saves approvals", () => {
         // arrange
         const name = "job-123456";
-        const target = core.address;
+        const target = coreV2.address;
         const creator = accounts.get("wallet_1")!;
         const approver1 = accounts.get("wallet_2")!;
         const approver2 = accounts.get("wallet_3")!;
@@ -342,7 +340,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("succeeds and approves previously disapproved job", () => {
         // arrange
         const name = "job-123456";
-        const target = core.address;
+        const target = coreV2.address;
         const creator = accounts.get("wallet_1")!;
         const approver1 = accounts.get("wallet_2")!;
         const approver2 = accounts.get("wallet_3")!;
@@ -402,7 +400,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("fails with ERR_JOB_IS_NOT_ACTIVE while disapproving inactive job ID", () => {
         // arrange
         const name = "job-123456";
-        const target = core.address;
+        const target = coreV2.address;
         const creator = accounts.get("wallet_1")!;
         const approver = accounts.get("wallet_2")!;
         const jobId = 1;
@@ -422,7 +420,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("fails with ERR_ALREADY_VOTED_THIS_WAY while disapproving job previously disapproved", () => {
         // arrange
         const name = "job-123456";
-        const target = core.address;
+        const target = coreV2.address;
         const creator = accounts.get("wallet_1")!;
         const approver = accounts.get("wallet_2")!;
         const jobId = 1;
@@ -446,7 +444,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("fails with ERR_UNAUTHORIZED while disapproving job by user who is not an approver", () => {
         // arrange
         const name = "job-123456";
-        const target = core.address;
+        const target = coreV2.address;
         const creator = accounts.get("wallet_1")!;
         const approver = accounts.get("wallet_8")!;
         const jobId = 1;
@@ -469,7 +467,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("succeeds and saves disapprovals", () => {
         // arrange
         const name = "job-123456";
-        const target = core.address;
+        const target = coreV2.address;
         const creator = accounts.get("wallet_1")!;
         const approver1 = accounts.get("wallet_2")!;
         const approver2 = accounts.get("wallet_3")!;
@@ -510,7 +508,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("succeeds and disapproves previously approved job", () => {
         // arrange
         const name = "job-123456";
-        const target = core.address;
+        const target = coreV2.address;
         const creator = accounts.get("wallet_1")!;
         const approver1 = accounts.get("wallet_2")!;
         const approver2 = accounts.get("wallet_3")!;
@@ -565,7 +563,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("succeeds and returns false when called with inactive job ID", () => {
         // arrange
         const name = "job-123456";
-        const target = core.address;
+        const target = coreV2.address;
         const creator = accounts.get("wallet_1")!;
         const jobId = 1;
         chain.mineBlock([authV2.createJob(name, target, creator)]);
@@ -580,7 +578,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("succeeds and returns false when called with an active job without any approvals", () => {
         // arrange
         const name = "job-123456";
-        const target = core.address;
+        const target = coreV2.address;
         const creator = accounts.get("wallet_1")!;
         const jobId = 1;
         chain.mineBlock([
@@ -598,7 +596,7 @@ describe("[MiamiCoin Auth v2]", () => {
       it("succeeds and returns true when asked about an active job with 3 or more approvals", () => {
         // arrange
         const name = "job-123456";
-        const target = core.address;
+        const target = coreV2.address;
         const creator = accounts.get("wallet_1")!;
         const approver1 = accounts.get("wallet_2")!;
         const approver2 = accounts.get("wallet_3")!;
@@ -641,7 +639,7 @@ describe("[MiamiCoin Auth v2]", () => {
         // arrange
         const name = "job-name";
         const creator = accounts.get("wallet_1")!;
-        const target = core.address;
+        const target = coreV2.address;
         const jobId = 1;
         const sender = accounts.get("wallet_1")!;
         chain.mineBlock([authV2.createJob(name, target, creator)]);
@@ -661,7 +659,7 @@ describe("[MiamiCoin Auth v2]", () => {
         // arrange
         const name = "job-name";
         const creator = accounts.get("wallet_1")!;
-        const target = core.address;
+        const target = coreV2.address;
         const jobId = 1;
         const sender = accounts.get("wallet_1")!;
         chain.mineBlock([
@@ -684,7 +682,7 @@ describe("[MiamiCoin Auth v2]", () => {
         // arrange
         const name = "job-name";
         const creator = accounts.get("wallet_1")!;
-        const target = core.address;
+        const target = coreV2.address;
         const jobId = 1;
         const approver1 = accounts.get("wallet_2")!;
         const approver2 = accounts.get("wallet_3")!;

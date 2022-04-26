@@ -1,17 +1,13 @@
 import { assertEquals, describe, types, run, Chain, beforeEach, it} from "../../../../deps.ts";
 import { MiamiCoinAuthModel } from "../../../../models/miamicoin-auth.model.ts";
 import { MiamiCoinCoreModel } from "../../../../models/miamicoin-core.model.ts";
-import { MiamiCoinTokenModel } from "../../../../models/miamicoin-token.model.ts";
 import { Accounts, Context } from "../../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
 let core: MiamiCoinCoreModel;
-let core2: MiamiCoinCoreModel;
-let core3: MiamiCoinCoreModel;
 let auth: MiamiCoinAuthModel;
-let token: MiamiCoinTokenModel;
 
 beforeEach(() => {
   ctx = new Context();
@@ -19,9 +15,6 @@ beforeEach(() => {
   accounts = ctx.accounts;
   auth = ctx.models.get(MiamiCoinAuthModel, "miamicoin-auth");
   core = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v1");
-  core2 = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v2");
-  core3 = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v3");
-  token = ctx.models.get(MiamiCoinTokenModel, "miamicoin-token");
 })
 
 describe("[MiamiCoin Auth]", () => {

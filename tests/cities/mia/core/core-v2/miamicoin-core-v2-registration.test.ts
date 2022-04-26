@@ -1,23 +1,20 @@
-import { assertEquals, describe, types, run, Chain, beforeEach, it } from "../../../../deps.ts";
-import { MiamiCoinCoreModel } from "../../../../models/miamicoin-core.model.ts";
-import { MiamiCoinTokenModel } from "../../../../models/miamicoin-token.model.ts";
-import { Accounts, Context } from "../../../../src/context.ts";
+import { assertEquals, describe, types, run, Chain, beforeEach, it } from "../../../../../deps.ts";
+import { MiamiCoinCoreModelV2 } from "../../../../../models/miamicoin-core-v2.model.ts";
+import { Accounts, Context } from "../../../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let core: MiamiCoinCoreModel;
-let token: MiamiCoinTokenModel;
+let coreV2: MiamiCoinCoreModelV2;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  core = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v1");
-  token = ctx.models.get(MiamiCoinTokenModel, "miamicoin-token");
+  coreV2 = ctx.models.get(MiamiCoinCoreModelV2, "miamicoin-core-v2");
 });
 
-describe("[MiamiCoin Core]", () => {
+describe("[MiamiCoin Core v2]", () => {
   //////////////////////////////////////////////////
   // REGISTRATION
   //////////////////////////////////////////////////
@@ -25,26 +22,26 @@ describe("[MiamiCoin Core]", () => {
     describe("get-activation-block()", () => {
       it("fails with ERR_CONTRACT_NOT_ACTIVATED if called before contract is activated", () => {
         // act
-        const result = core.getActivationBlock().result;
+        const result = coreV2.getActivationBlock().result;
 
         // assert
         result
           .expectErr()
-          .expectUint(MiamiCoinCoreModel.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
+          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
       });
       it("succeeds and returns activation height", () => {
         // arrange
         const user = accounts.get("wallet_4")!;
         const block = chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(user),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          block.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
         // act
-        const result = core.getActivationBlock().result;
+        const result = coreV2.getActivationBlock().result;
 
         // assert
         result.expectOk().expectUint(activationBlockHeight);
@@ -53,23 +50,23 @@ describe("[MiamiCoin Core]", () => {
     describe("get-activation-delay()", () => {
       it("succeeds and returns activation delay", () => {
         // act
-        const result = core.getActivationDelay().result;
+        const result = coreV2.getActivationDelay().result;
         // assert
-        result.expectUint(MiamiCoinCoreModel.ACTIVATION_DELAY);
+        result.expectUint(MiamiCoinCoreModelV2.ACTIVATION_DELAY);
       });
     });
     describe("get-activation-threshold()", () => {
       it("succeeds and returns activation threshold", () => {
         // act
-        const result = core.getActivationThreshold().result;
+        const result = coreV2.getActivationThreshold().result;
         // assert
-        result.expectUint(MiamiCoinCoreModel.ACTIVATION_THRESHOLD);
+        result.expectUint(MiamiCoinCoreModelV2.ACTIVATION_THRESHOLD);
       });
     });
     describe("get-registered-users-nonce()", () => {
       it("succeeds and returns u0 if no users are registered", () => {
         // act
-        const result = core.getRegisteredUsersNonce().result;
+        const result = coreV2.getRegisteredUsersNonce().result;
         // assert
         result.expectUint(0);
       });
@@ -77,11 +74,11 @@ describe("[MiamiCoin Core]", () => {
         // arrange
         const user = accounts.get("wallet_5")!;
         chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.registerUser(user)
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.registerUser(user)
         ]);
         // act
-        const result = core.getRegisteredUsersNonce().result;
+        const result = coreV2.getRegisteredUsersNonce().result;
         // assert
         result.expectUint(1);
       });
@@ -92,11 +89,11 @@ describe("[MiamiCoin Core]", () => {
         const user = accounts.get("wallet_4")!;
 
         // act
-        const receipt = chain.mineBlock([core.registerUser(user)])
+        const receipt = chain.mineBlock([coreV2.registerUser(user)])
           .receipts[0];
 
         // assert
-        receipt.result.expectErr().expectUint(MiamiCoinCoreModel.ErrCode.ERR_UNAUTHORIZED);
+        receipt.result.expectErr().expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_UNAUTHORIZED);
       })
       it("succeeds and registers new user and emits print event with memo when supplied", () => {
         // arrange
@@ -104,20 +101,20 @@ describe("[MiamiCoin Core]", () => {
         const memo = "hello world";
 
         // act
-        chain.mineBlock([core.testInitializeCore(core.address)])
-        const receipt = chain.mineBlock([core.registerUser(user, memo)])
+        chain.mineBlock([coreV2.testInitializeCore(coreV2.address)])
+        const receipt = chain.mineBlock([coreV2.registerUser(user, memo)])
           .receipts[0];
 
         // assert
         receipt.result.expectOk().expectBool(true);
-        core.getUserId(user).result.expectSome().expectUint(1);
+        coreV2.getUserId(user).result.expectSome().expectUint(1);
 
         assertEquals(receipt.events.length, 1);
 
         const expectedEvent = {
           type: "contract_event",
           contract_event: {
-            contract_identifier: core.address,
+            contract_identifier: coreV2.address,
             topic: "print",
             value: types.some(types.utf8(memo)),
           },
@@ -131,13 +128,13 @@ describe("[MiamiCoin Core]", () => {
         const user = accounts.get("wallet_4")!;
 
         // act
-        chain.mineBlock([core.testInitializeCore(core.address)])
-        const receipt = chain.mineBlock([core.registerUser(user)])
+        chain.mineBlock([coreV2.testInitializeCore(coreV2.address)])
+        const receipt = chain.mineBlock([coreV2.registerUser(user)])
           .receipts[0];
 
         // assert
         receipt.result.expectOk().expectBool(true);
-        core.getUserId(user).result.expectSome().expectUint(1);
+        coreV2.getUserId(user).result.expectSome().expectUint(1);
 
         assertEquals(receipt.events.length, 0);
       });
@@ -145,9 +142,9 @@ describe("[MiamiCoin Core]", () => {
       it("fails with ERR_USER_ALREADY_REGISTERED while trying to register user a 2nd time", () => {
         // arrange
         const user = accounts.get("wallet_4")!;
-        const registerUserTx = core.registerUser(user);
+        const registerUserTx = coreV2.registerUser(user);
         chain.mineBlock([
-          core.testInitializeCore(core.address),
+          coreV2.testInitializeCore(coreV2.address),
           registerUserTx
         ]);
 
@@ -157,7 +154,7 @@ describe("[MiamiCoin Core]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(MiamiCoinCoreModel.ErrCode.ERR_USER_ALREADY_REGISTERED);
+          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_USER_ALREADY_REGISTERED);
       });
 
       it("fails with ERR_ACTIVATION_THRESHOLD_REACHED when user wants to register after reaching activation threshold", () => {
@@ -165,19 +162,19 @@ describe("[MiamiCoin Core]", () => {
         const user1 = accounts.get("wallet_4")!;
         const user2 = accounts.get("wallet_5")!;
         chain.mineBlock([
-          core.testInitializeCore(core.address),
-          core.testSetActivationThreshold(1),
-          core.registerUser(user1),
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(user1),
         ]);
 
         // act
-        const receipt = chain.mineBlock([core.registerUser(user2)])
+        const receipt = chain.mineBlock([coreV2.registerUser(user2)])
           .receipts[0];
 
         // assert
         receipt.result
           .expectErr()
-          .expectUint(MiamiCoinCoreModel.ErrCode.ERR_ACTIVATION_THRESHOLD_REACHED);
+          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_ACTIVATION_THRESHOLD_REACHED);
       });
     });
   });

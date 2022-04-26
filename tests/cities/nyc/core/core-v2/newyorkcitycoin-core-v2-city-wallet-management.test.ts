@@ -1,20 +1,20 @@
-import { describe, run, Chain, beforeEach, it } from "../../../../deps.ts";
-import { NewYorkCityCoinCoreModel } from "../../../../models/newyorkcitycoin-core.model.ts";
-import { Accounts, Context } from "../../../../src/context.ts";
+import { describe, run, Chain, beforeEach, it } from "../../../../../deps.ts";
+import { NewYorkCityCoinCoreModelV2 } from "../../../../../models/newyorkcitycoin-core-v2.model.ts";
+import { Accounts, Context } from "../../../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
-let core: NewYorkCityCoinCoreModel;
+let coreV2: NewYorkCityCoinCoreModelV2;
 
 beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  core = ctx.models.get(NewYorkCityCoinCoreModel, "newyorkcitycoin-core-v1");
+  coreV2 = ctx.models.get(NewYorkCityCoinCoreModelV2, "newyorkcitycoin-core-v2");
 });
 
-describe("[NewYorkCityCoin Core]", () => {
+describe("[NewYorkCityCoin Core v2]", () => {
   //////////////////////////////////////////////////
   // CITY WALLET MANAGEMENT
   //////////////////////////////////////////////////
@@ -22,19 +22,19 @@ describe("[NewYorkCityCoin Core]", () => {
     describe("get-city-wallet()", () => {
       it("succeeds and returns current city wallet variable as contract address before initialization", () => {
         // arrange
-        const result = core.getCityWallet().result;
+        const result = coreV2.getCityWallet().result;
 
         // assert
-        result.expectPrincipal(core.address);
+        result.expectPrincipal(coreV2.address);
       });
       it("succeeds and returns current city wallet variable as city wallet address after initialization", () => {
         // arrange
         const cityWallet = accounts.get("nyc_wallet")!;
         chain.mineBlock([
-          core.testInitializeCore(core.address),
+          coreV2.testInitializeCore(coreV2.address),
         ]);
 
-        const result = core.getCityWallet().result;
+        const result = coreV2.getCityWallet().result;
 
         // assert
         result.expectPrincipal(cityWallet.address);
@@ -47,13 +47,13 @@ describe("[NewYorkCityCoin Core]", () => {
 
         // act
         const receipt = chain.mineBlock([
-          core.setCityWallet(wallet, wallet),
+          coreV2.setCityWallet(wallet, wallet),
         ]).receipts[0];
 
         // assert
         receipt.result
           .expectErr()
-          .expectUint(NewYorkCityCoinCoreModel.ErrCode.ERR_UNAUTHORIZED);
+          .expectUint(NewYorkCityCoinCoreModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
     });
   });
