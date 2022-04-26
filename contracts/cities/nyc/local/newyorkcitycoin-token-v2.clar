@@ -4,6 +4,7 @@
 ;; TRAIT DEFINITIONS
 
 (impl-trait .citycoin-token-trait.citycoin-token)
+(impl-trait .citycoin-token-v2-trait.citycoin-token-v2)
 (use-trait coreTrait .citycoin-core-trait.citycoin-core)
 
 ;; ERROR CODES
@@ -148,6 +149,15 @@
   (begin
     (asserts! (is-authorized-auth) ERR_UNAUTHORIZED)
     (ok (var-set tokenUri newUri))
+  )
+)
+
+;; set token emissions schedule to new values, only accessible by Auth
+(define-public (set-token-emissions (newEmissions (list 5 uint)))
+  (begin
+    (asserts! (is-authorized-auth) ERR_UNAUTHORIZED)
+    (print newEmissions)
+    (ok true)
   )
 )
 

@@ -88,7 +88,7 @@ depends_on = ["miamicoin-auth", "citycoin-token-trait", "sip-010-trait-ft-standa
 
 [contracts.miamicoin-auth-v2]
 path = "contracts/cities/mia/local/miamicoin-auth-v2.clar"
-depends_on = ["citycoin-core-trait", "citycoin-token-trait"]
+depends_on = ["citycoin-core-trait", "citycoin-token-trait", "citycoin-token-v2-trait"]
 
 [contracts.miamicoin-core-v2]
 path = "contracts/cities/mia/local/miamicoin-core-v2.clar"
@@ -104,7 +104,7 @@ depends_on = ["miamicoin-auth-v2", "miamicoin-token-v2", "citycoin-vrf-v2", "cit
 
 [contracts.miamicoin-token-v2]
 path = "contracts/cities/mia/local/miamicoin-token-v2.clar"
-depends_on = ["miamicoin-token", "miamicoin-auth-v2", "citycoin-token-trait", "sip-010-trait-ft-standard"]
+depends_on = ["miamicoin-token", "miamicoin-auth-v2", "citycoin-token-trait", "citycoin-token-v2-trait", "sip-010-trait-ft-standard"]
 
 ## NYC V1
 
@@ -132,7 +132,7 @@ depends_on = ["newyorkcitycoin-auth", "citycoin-token-trait", "sip-010-trait-ft-
 
 [contracts.newyorkcitycoin-auth-v2]
 path = "contracts/cities/nyc/local/newyorkcitycoin-auth-v2.clar"
-depends_on = ["citycoin-core-trait", "citycoin-token-trait"]
+depends_on = ["citycoin-core-trait", "citycoin-token-trait", "citycoin-token-v2-trait"]
 
 [contracts.newyorkcitycoin-core-v2]
 path = "contracts/cities/nyc/local/newyorkcitycoin-core-v2.clar"
@@ -148,7 +148,7 @@ depends_on = ["newyorkcitycoin-auth-v2", "newyorkcitycoin-token-v2", "citycoin-v
 
 [contracts.newyorkcitycoin-token-v2]
 path = "contracts/cities/nyc/local/newyorkcitycoin-token-v2.clar"
-depends_on = ["newyorkcitycoin-token", "newyorkcitycoin-auth-v2", "citycoin-token-trait", "sip-010-trait-ft-standard"]
+depends_on = ["newyorkcitycoin-token", "newyorkcitycoin-auth-v2", "citycoin-token-trait", "citycoin-token-v2-trait", "sip-010-trait-ft-standard"]
 
 # Base
 
@@ -158,6 +158,10 @@ depends_on = []
 
 [contracts.citycoin-token-trait]
 path = "contracts/base/local/citycoin-token-trait.clar"
+depends_on = []
+
+[contracts.citycoin-token-v2-trait]
+path = "contracts/base/local/citycoin-token-v2-trait.clar"
 depends_on = []
 
 [contracts.citycoin-auth]

@@ -6,7 +6,7 @@
 ;; TRAIT DEFINITIONS
 
 (use-trait coreTrait .citycoin-core-trait.citycoin-core)
-(use-trait tokenTrait .citycoin-token-trait.citycoin-token)
+(use-trait tokenTraitV2 .citycoin-token-v2-trait.citycoin-token-v2)
 
 ;; ERRORS
 
@@ -540,10 +540,18 @@
 
 ;; TOKEN MANAGEMENT
 
-(define-public (set-token-uri (targetContract <tokenTrait>) (newUri (optional (string-utf8 256))))
+(define-public (set-token-uri (targetContract <tokenTraitV2>) (newUri (optional (string-utf8 256))))
   (begin
     (asserts! (is-authorized-city) ERR_UNAUTHORIZED)
     (as-contract (try! (contract-call? targetContract set-token-uri newUri)))
+    (ok true)
+  )
+)
+
+(define-public (set-token-emissions (targetContract <tokenTraitV2>) (newEmissions (list 5 uint)))
+  (begin
+    (asserts! (is-authorized-city) ERR_UNAUTHORIZED)
+    (as-contract (try! (contract-call? targetContract set-token-emissions newEmissions)))
     (ok true)
   )
 )
