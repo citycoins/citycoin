@@ -33,13 +33,20 @@ jobs:
       - name: "Rename MIA auth coverage file"
         run: |
           mv coverage.lcov mia-auth-coverage.lcov
-      - name: "Execute MIA core tests"
+      - name: "Execute MIA core v1 tests"
         uses: docker://hirosystems/clarinet:latest
         with:
-          args: test --coverage tests/cities/mia/core/
-      - name: "Rename MIA core coverage file"
+          args: test --coverage tests/cities/mia/core/core-v1
+      - name: "Rename MIA core v1 coverage file"
         run: |
-          mv coverage.lcov mia-core-coverage.lcov
+          mv coverage.lcov mia-core-v1-coverage.lcov
+      - name: "Execute MIA core v2 tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/cities/mia/core/core-v2
+      - name: "Rename MIA core v2 coverage file"
+        run: |
+          mv coverage.lcov mia-core-v2-coverage.lcov
       - name: "Execute MIA token tests"
         uses: docker://hirosystems/clarinet:latest
         with:
@@ -55,13 +62,20 @@ jobs:
       - name: "Rename NYC auth coverage file"
         run: |
           mv coverage.lcov nyc-auth-coverage.lcov
-      - name: "Execute NYC core tests"
+      - name: "Execute NYC core v1 tests"
         uses: docker://hirosystems/clarinet:latest
         with:
-          args: test --coverage tests/cities/nyc/core/
-      - name: "Rename NYC core coverage file"
+          args: test --coverage tests/cities/nyc/core/core-v1
+      - name: "Rename NYC core v1 coverage file"
         run: |
-          mv coverage.lcov nyc-core-coverage.lcov
+          mv coverage.lcov nyc-core-v1-coverage.lcov
+      - name: "Execute NYC core v2 tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/cities/nyc/core/core-v2
+      - name: "Rename NYC core v2 coverage file"
+        run: |
+          mv coverage.lcov nyc-core-v2-coverage.lcov
       - name: "Execute NYC token tests"
         uses: docker://hirosystems/clarinet:latest
         with:
