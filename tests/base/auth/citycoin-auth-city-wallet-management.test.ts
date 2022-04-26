@@ -1,8 +1,8 @@
-import { describe, run, Chain, beforeEach, it} from "../../deps.ts";
-import { AuthModel } from "../../models/auth.model.ts";
-import { CoreModel } from "../../models/core.model.ts";
-import { TokenModel } from "../../models/token.model.ts";
-import { Accounts, Context } from "../../src/context.ts";
+import { describe, run, Chain, beforeEach, it} from "../../../deps.ts";
+import { AuthModel } from "../../../models/auth.model.ts";
+import { CoreModel } from "../../../models/core.model.ts";
+import { TokenModel } from "../../../models/token.model.ts";
+import { Accounts, Context } from "../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;

@@ -25,7 +25,7 @@ jobs:
         uses: docker://hirosystems/clarinet:latest
         with:
           args: check
-      # mia tests
+      # MIA tests
       - name: "Execute MIA auth tests"
         uses: docker://hirosystems/clarinet:latest
         with:
@@ -54,7 +54,7 @@ jobs:
       - name: "Rename MIA token coverage file"
         run: |
           mv coverage.lcov mia-token-coverage.lcov
-      # nyc tests
+      # NYC tests
       - name: "Execute NYC auth tests"
         uses: docker://hirosystems/clarinet:latest
         with:
@@ -83,14 +83,29 @@ jobs:
       - name: "Rename NYC token coverage file"
         run: |
           mv coverage.lcov nyc-token-coverage.lcov
-      # citycoin tests
-      - name: "Execute core tests"
+      # Base tests
+      - name: "Execute base auth tests"
         uses: docker://hirosystems/clarinet:latest
         with:
-          args: test --coverage tests/core/
+          args: test --coverage tests/base/auth
+      - name: "Rename base auth coverage file"
+        run: |
+          mv coverage.lcov base-auth-coverage.lcov
+      - name: "Execute base core tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/base/core
       - name: "Rename core coverage file"
         run: |
-          mv coverage.lcov core-coverage.lcov
+          mv coverage.lcov base-core-coverage.lcov
+      - name: "Execute base token tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/base/token
+      - name: "Rename base token coverage file"
+        run: |
+          mv coverage.lcov base-token-coverage.lcov
+      # Misc tests
       - name: "Execute tardis tests"
         uses: docker://hirosystems/clarinet:latest
         with:

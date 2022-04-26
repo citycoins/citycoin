@@ -1,7 +1,7 @@
-import { describe, assertEquals, types, Account, run, Chain, it, beforeEach} from "../../deps.ts";
-import { CoreModel } from "../../models/core.model.ts";
-import { SendManyRecord, TokenModel } from "../../models/token.model.ts";
-import { Accounts, Context } from "../../src/context.ts";
+import { describe, assertEquals, types, Account, run, Chain, it, beforeEach} from "../../../deps.ts";
+import { CoreModel } from "../../../models/core.model.ts";
+import { SendManyRecord, TokenModel } from "../../../models/token.model.ts";
+import { Accounts, Context } from "../../../src/context.ts";
 
 let ctx: Context;
 let chain: Chain;
