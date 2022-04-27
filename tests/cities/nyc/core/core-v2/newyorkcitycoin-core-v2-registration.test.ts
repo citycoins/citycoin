@@ -107,7 +107,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
         receipt.result.expectOk().expectBool(true);
         coreV2.getUserId(user).result.expectSome().expectUint(1);
 
-        assertEquals(receipt.events.length, 2);
+        assertEquals(receipt.events.length, 4);
 
         const expectedEvent = {
           type: "contract_event",
@@ -134,7 +134,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
         receipt.result.expectOk().expectBool(true);
         coreV2.getUserId(user).result.expectSome().expectUint(1);
 
-        assertEquals(receipt.events.length, 1);
+        assertEquals(receipt.events.length, 3);
       });
 
       it("fails with ERR_USER_ALREADY_REGISTERED while trying to register user a 2nd time", () => {
