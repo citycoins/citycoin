@@ -13,6 +13,7 @@
 (define-constant ERR_TOKEN_NOT_ACTIVATED (err u2001))
 (define-constant ERR_TOKEN_ALREADY_ACTIVATED (err u2002))
 (define-constant ERR_V1_BALANCE_NOT_FOUND (err u2003))
+(define-constant ERR_INVALID_COINBASE_THRESHOLD (err u2004))
 
 ;; SIP-010 DEFINITION
 
@@ -68,12 +69,22 @@
 (define-constant TOKEN_BONUS_PERIOD u10000)
 (define-constant TOKEN_EPOCH_LENGTH u25000)
 
-;; store block height at each halving, set by register-user in core contract 
+;; coinbase thresholds per halving, used to select coinbase rewards in core
+;; initially set by register-user in core contract
 (define-data-var coinbaseThreshold1 uint u0)
 (define-data-var coinbaseThreshold2 uint u0)
 (define-data-var coinbaseThreshold3 uint u0)
 (define-data-var coinbaseThreshold4 uint u0)
 (define-data-var coinbaseThreshold5 uint u0)
+
+;; coinbase rewards per threshold per CCIP-008
+(define-data-var coinbaseAmountBonus uint (* MICRO_CITYCOINS u250000))
+(define-data-var coinbaseAmount1 uint (* MICRO_CITYCOINS u100000))
+(define-data-var coinbaseAmount2 uint (* MICRO_CITYCOINS u50000))
+(define-data-var coinbaseAmount3 uint (* MICRO_CITYCOINS u25000))
+(define-data-var coinbaseAmount4 uint (* MICRO_CITYCOINS u12500))
+(define-data-var coinbaseAmount5 uint (* MICRO_CITYCOINS u6250))
+(define-data-var coinbaseAmountDefault uint (* MICRO_CITYCOINS u3125))
 
 ;; once activated, thresholds cannot be updated again
 (define-data-var tokenActivated bool false)
@@ -88,18 +99,21 @@
   (let
     (
       (coreContractMap (try! (contract-call? .newyorkcitycoin-auth-v2 get-core-contract-info coreContract)))
+      (threshold1 (+ stacksHeight TOKEN_BONUS_PERIOD TOKEN_EPOCH_LENGTH))        ;; 35,000 blocks
+      (threshold2 (+ stacksHeight TOKEN_BONUS_PERIOD (* u2 TOKEN_EPOCH_LENGTH))) ;; 85,000 blocks
+      (threshold3 (+ stacksHeight TOKEN_BONUS_PERIOD (* u3 TOKEN_EPOCH_LENGTH))) ;; 185,000 blocks
+      (threshold4 (+ stacksHeight TOKEN_BONUS_PERIOD (* u4 TOKEN_EPOCH_LENGTH))) ;; 385,000 blocks
+      (threshold5 (+ stacksHeight TOKEN_BONUS_PERIOD (* u5 TOKEN_EPOCH_LENGTH))) ;; 785,000 blocks
     )
     (asserts! (is-eq (get state coreContractMap) STATE_ACTIVE) ERR_UNAUTHORIZED)
     (asserts! (not (var-get tokenActivated)) ERR_TOKEN_ALREADY_ACTIVATED)
     (var-set tokenActivated true)
-    (var-set coinbaseThreshold1 (+ stacksHeight TOKEN_BONUS_PERIOD TOKEN_EPOCH_LENGTH))        ;; 35,000 blocks
-    (var-set coinbaseThreshold2 (+ stacksHeight TOKEN_BONUS_PERIOD (* u2 TOKEN_EPOCH_LENGTH))) ;; 85,000 blocks
-    (var-set coinbaseThreshold3 (+ stacksHeight TOKEN_BONUS_PERIOD (* u3 TOKEN_EPOCH_LENGTH))) ;; 185,000 blocks
-    (var-set coinbaseThreshold4 (+ stacksHeight TOKEN_BONUS_PERIOD (* u4 TOKEN_EPOCH_LENGTH))) ;; 385,000 blocks
-    (var-set coinbaseThreshold5 (+ stacksHeight TOKEN_BONUS_PERIOD (* u5 TOKEN_EPOCH_LENGTH))) ;; 785,000 blocks
+    (try! (set-coinbase-thresholds threshold1 threshold2 threshold3 threshold4 threshold5))
     (ok true)
   )
 )
+
+;; COINBASE THRESHOLDS
 
 ;; return coinbase thresholds if token activated
 (define-read-only (get-coinbase-thresholds)
@@ -118,7 +132,43 @@
   )
 )
 
-;; CONVERSION
+(define-private (set-coinbase-thresholds (threshold1 uint) (threshold2 uint) (threshold3 uint) (threshold4 uint) (threshold5 uint))
+  (begin
+    ;; check that all thresholds increase in value
+    (asserts! (and (> threshold1 u0) (> threshold2 threshold1) (> threshold3 threshold2) (> threshold4 threshold3) (> threshold5 threshold4)) ERR_INVALID_COINBASE_THRESHOLD)
+    ;; set coinbase thresholds
+    (var-set coinbaseThreshold1 threshold1)
+    (var-set coinbaseThreshold2 threshold2)
+    (var-set coinbaseThreshold3 threshold3)
+    (var-set coinbaseThreshold4 threshold4)
+    (var-set coinbaseThreshold5 threshold5)
+    ;; print coinbase thresholds
+    (print {
+      coinbaseThreshold1: threshold1,
+      coinbaseThreshold2: threshold2,
+      coinbaseThreshold3: threshold3,
+      coinbaseThreshold4: threshold4,
+      coinbaseThreshold5: threshold5
+    })
+    (ok true)
+  )
+)
+
+;; only accessible by auth
+(define-public (update-coinbase-thresholds (threshold1 uint) (threshold2 uint) (threshold3 uint) (threshold4 uint) (threshold5 uint))
+  (begin
+    (asserts! (is-authorized-auth) ERR_UNAUTHORIZED)
+    ;; (asserts! (var-get tokenActivated) ERR_TOKEN_NOT_ACTIVATED)
+    (try! (set-coinbase-thresholds threshold1 threshold2 threshold3 threshold4 threshold5))
+    (ok true)
+  )
+)
+
+;; COINBASE REWARDS
+
+
+
+;; V1 TO V2 CONVERSION
 
 (define-public (convert-to-v2)
   (let
