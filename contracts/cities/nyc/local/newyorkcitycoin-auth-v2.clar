@@ -548,10 +548,18 @@
   )
 )
 
-(define-public (set-token-emissions (targetContract <tokenTraitV2>) (newEmissions (list 5 uint)))
+(define-public (update-coinbase-thresholds (targetContract <tokenTraitV2>) (threshold1 uint) (threshold2 uint) (threshold3 uint) (threshold4 uint) (threshold5 uint))
   (begin
     (asserts! (is-authorized-city) ERR_UNAUTHORIZED)
-    (as-contract (try! (contract-call? targetContract set-token-emissions newEmissions)))
+    (as-contract (try! (contract-call? targetContract update-coinbase-thresholds threshold1 threshold2 threshold3 threshold4 threshold5)))
+    (ok true)
+  )
+)
+
+(define-public (update-coinbase-amounts (targetContract <tokenTraitV2>) (amount1 uint) (amount2 uint) (amount3 uint) (amount4 uint) (amount5 uint))
+  (begin
+    (asserts! (is-authorized-city) ERR_UNAUTHORIZED)
+    (as-contract (try! (contract-call? targetContract update-coinbase-amounts amount1 amount2 amount3 amount4 amount5)))
     (ok true)
   )
 )

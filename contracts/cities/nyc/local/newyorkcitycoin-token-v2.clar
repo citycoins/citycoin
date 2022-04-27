@@ -166,7 +166,21 @@
 
 ;; COINBASE REWARDS
 
-
+(define-public (update-coinbase-amounts (amount1 uint) (amount2 uint) (amount3 uint) (amount4 uint) (amount5 uint))
+  (begin
+    (asserts! (is-authorized-auth) ERR_UNAUTHORIZED)
+    ;; (asserts! (var-get tokenActivated) ERR_TOKEN_NOT_ACTIVATED)
+    ;; (try! (set-coinbase-thresholds threshold1 threshold2 threshold3 threshold4 threshold5))
+    (print {
+      coinbaseAmount1: amount1,
+      coinbaseAmount2: amount2,
+      coinbaseAmount3: amount3,
+      coinbaseAmount4: amount4,
+      coinbaseAmount5: amount5
+    })
+    (ok true)
+  )
+)
 
 ;; V1 TO V2 CONVERSION
 

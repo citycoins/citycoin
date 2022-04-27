@@ -27,5 +27,13 @@
       (response bool uint)
     )
 
+    (update-coinbase-thresholds (uint uint uint uint uint)
+      (response bool uint)
+    )
+
+    (update-coinbase-amounts (uint uint uint uint uint)
+      (response bool uint)
+    )
+
   )
 )
