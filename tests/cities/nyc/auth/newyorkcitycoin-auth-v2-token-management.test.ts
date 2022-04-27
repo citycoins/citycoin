@@ -1,12 +1,14 @@
-import { describe, run, Chain, beforeEach, it} from "../../../../deps.ts";
+import { describe, run, Chain, beforeEach, it, assertEquals, types} from "../../../../deps.ts";
 import { Accounts, Context } from "../../../../src/context.ts";
 import { NewYorkCityCoinAuthModelV2 } from "../../../../models/cities/nyc/newyorkcitycoin-auth-v2.model.ts";
+import { NewYorkCityCoinCoreModelV2 } from "../../../../models/cities/nyc/newyorkcitycoin-core-v2.model.ts";
 import { NewYorkCityCoinTokenModelV2 } from "../../../../models/cities/nyc/newyorkcitycoin-token-v2.model.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
 let authV2: NewYorkCityCoinAuthModelV2;
+let coreV2: NewYorkCityCoinCoreModelV2;
 let token: NewYorkCityCoinTokenModelV2;
 
 beforeEach(() => {
@@ -14,6 +16,7 @@ beforeEach(() => {
   chain = ctx.chain;
   accounts = ctx.accounts;
   authV2 = ctx.models.get(NewYorkCityCoinAuthModelV2, "newyorkcitycoin-auth-v2");
+  coreV2 = ctx.models.get(NewYorkCityCoinCoreModelV2, "newyorkcitycoin-core-v2");
   token = ctx.models.get(NewYorkCityCoinTokenModelV2, "newyorkcitycoin-token-v2");
 })
 
@@ -89,6 +92,172 @@ describe("[NewYorkCityCoin Auth v2]", () => {
 
         const result = token.getTokenUri().result;
         result.expectOk().expectSome().expectUtf8(newUri);
+      });
+    });
+    describe("update-coinbase-thresholds()", () => {
+      it("fails with ERR_UNAUTHORIZED when called by someone who is not city wallet", () => {
+        // arrange
+        const sender = accounts.get("wallet_2")!;
+        // act
+        const block = chain.mineBlock([
+          authV2.updateCoinbaseThresholds(
+            sender,
+            coreV2.address,
+            token.address,
+            100,
+            200,
+            300,
+            400,
+            500
+          ),
+        ]);
+        // assert
+        const receipt = block.receipts[0];
+
+        receipt.result
+          .expectErr()
+          .expectUint(NewYorkCityCoinAuthModelV2.ErrCode.ERR_UNAUTHORIZED);
+      });
+      it("fails with ERR_UNAUTHORIZED when called by someone who is not auth contract", () => {
+        // arrange
+        const sender = accounts.get("wallet_2")!;
+        // act
+        const block = chain.mineBlock([
+          token.updateCoinbaseThresholds(sender, 100, 200, 300, 400, 500)
+        ]);
+        // assert
+        const receipt = block.receipts[0];
+
+        receipt.result
+          .expectErr()
+          .expectUint(NewYorkCityCoinTokenModelV2.ErrCode.ERR_UNAUTHORIZED);
+      });
+      it("succeeds and sets new coinbase thresholds in token and core contract", () => {
+        // arrange
+        const sender = accounts.get("nyc_wallet")!;
+        const coinbaseThresholds = [100, 200, 300, 400, 500];
+
+        chain.mineBlock([
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(sender),
+        ]);
+        // act
+        const block = chain.mineBlock([
+          authV2.updateCoinbaseThresholds(
+            sender,
+            coreV2.address,
+            token.address,
+            coinbaseThresholds[0],
+            coinbaseThresholds[1],
+            coinbaseThresholds[2],
+            coinbaseThresholds[3],
+            coinbaseThresholds[4]
+          )
+        ]);
+        // assert
+        const receipt = block.receipts[0];
+        receipt.result.expectOk().expectBool(true);
+
+        const expectedResult = {
+          coinbaseThreshold1: types.uint(coinbaseThresholds[0]),
+          coinbaseThreshold2: types.uint(coinbaseThresholds[1]),
+          coinbaseThreshold3: types.uint(coinbaseThresholds[2]),
+          coinbaseThreshold4: types.uint(coinbaseThresholds[3]),
+          coinbaseThreshold5: types.uint(coinbaseThresholds[4])
+        }
+
+        const tokenResult = token.getCoinbaseThresholds().result;
+        assertEquals(tokenResult.expectOk().expectTuple(), expectedResult);
+
+        const coreResult = coreV2.getCoinbaseThresholds().result;
+        assertEquals(coreResult.expectOk().expectTuple(), expectedResult);
+      });
+    });
+    describe("update-coinbase-amounts()", () => {
+      it("fails with ERR_UNAUTHORIZED when called by someone who is not city wallet", () => {
+        // arrange
+        const sender = accounts.get("wallet_2")!;
+        // act
+        const block = chain.mineBlock([
+          authV2.updateCoinbaseAmounts(
+            sender,
+            coreV2.address,
+            token.address,
+            100,
+            200,
+            300,
+            400,
+            500,
+            600,
+            700
+          ),
+        ]);
+        // assert
+        const receipt = block.receipts[0];
+
+        receipt.result
+          .expectErr()
+          .expectUint(NewYorkCityCoinAuthModelV2.ErrCode.ERR_UNAUTHORIZED);
+      });
+      it("fails with ERR_UNAUTHORIZED when called by someone who is not auth contract", () => {
+        // arrange
+        const sender = accounts.get("wallet_2")!;
+        // act
+        const block = chain.mineBlock([
+          token.updateCoinbaseAmounts(sender, 100, 200, 300, 400, 500, 600, 700)
+        ]);
+        // assert
+        const receipt = block.receipts[0];
+
+        receipt.result
+          .expectErr()
+          .expectUint(NewYorkCityCoinTokenModelV2.ErrCode.ERR_UNAUTHORIZED);
+      });
+      it("succeeds and sets new coinbase amounts in token and core contract", () => {
+        // arrange
+        const sender = accounts.get("nyc_wallet")!;
+        const coinbaseAmounts = [250000, 100000, 50000, 25000, 12500, 6250, 3125];
+        
+        chain.mineBlock([
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(sender),
+        ]);
+        // act
+        const block = chain.mineBlock([
+          authV2.updateCoinbaseAmounts(
+            sender,
+            coreV2.address,
+            token.address,
+            coinbaseAmounts[0],
+            coinbaseAmounts[1],
+            coinbaseAmounts[2],
+            coinbaseAmounts[3],
+            coinbaseAmounts[4],
+            coinbaseAmounts[5],
+            coinbaseAmounts[6]
+          )
+        ]);
+        // assert
+        const receipt = block.receipts[0];
+        receipt.result.expectOk().expectBool(true);
+
+        const expectedResult = {
+          coinbaseAmount1: types.uint(coinbaseAmounts[1]),
+          coinbaseAmount2: types.uint(coinbaseAmounts[2]),
+          coinbaseAmount3: types.uint(coinbaseAmounts[3]),
+          coinbaseAmount4: types.uint(coinbaseAmounts[4]),
+          coinbaseAmount5: types.uint(coinbaseAmounts[5]),
+          coinbaseAmountBonus: types.uint(coinbaseAmounts[0]),
+          coinbaseAmountDefault: types.uint(coinbaseAmounts[6]),
+        }
+
+        const tokenResult = token.getCoinbaseAmounts().result;
+        assertEquals(tokenResult.expectOk().expectTuple(), expectedResult);
+
+        const coreResult = coreV2.getCoinbaseAmounts().result;
+        assertEquals(coreResult.expectOk().expectTuple(), expectedResult);
       });
     });
   });

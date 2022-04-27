@@ -228,6 +228,10 @@ export class NewYorkCityCoinCoreModelV2 extends Model {
     return this.callReadOnly("get-coinbase-thresholds");
   }
 
+  getCoinbaseAmounts(): ReadOnlyFn {
+    return this.callReadOnly("get-coinbase-amounts");
+  }
+
   //////////////////////////////////////////////////
   // UTILITIES
   //////////////////////////////////////////////////
