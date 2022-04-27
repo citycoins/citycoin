@@ -14,6 +14,7 @@
 (define-constant ERR_TOKEN_ALREADY_ACTIVATED (err u2002))
 (define-constant ERR_V1_BALANCE_NOT_FOUND (err u2003))
 (define-constant ERR_INVALID_COINBASE_THRESHOLD (err u2004))
+(define-constant ERR_INVALID_COINBASE_AMOUNT (err u2005))
 
 ;; SIP-010 DEFINITION
 
@@ -69,24 +70,7 @@
 (define-constant TOKEN_BONUS_PERIOD u10000)
 (define-constant TOKEN_EPOCH_LENGTH u25000)
 
-;; coinbase thresholds per halving, used to select coinbase rewards in core
-;; initially set by register-user in core contract
-(define-data-var coinbaseThreshold1 uint u0)
-(define-data-var coinbaseThreshold2 uint u0)
-(define-data-var coinbaseThreshold3 uint u0)
-(define-data-var coinbaseThreshold4 uint u0)
-(define-data-var coinbaseThreshold5 uint u0)
-
-;; coinbase rewards per threshold per CCIP-008
-(define-data-var coinbaseAmountBonus uint (* MICRO_CITYCOINS u250000))
-(define-data-var coinbaseAmount1 uint (* MICRO_CITYCOINS u100000))
-(define-data-var coinbaseAmount2 uint (* MICRO_CITYCOINS u50000))
-(define-data-var coinbaseAmount3 uint (* MICRO_CITYCOINS u25000))
-(define-data-var coinbaseAmount4 uint (* MICRO_CITYCOINS u12500))
-(define-data-var coinbaseAmount5 uint (* MICRO_CITYCOINS u6250))
-(define-data-var coinbaseAmountDefault uint (* MICRO_CITYCOINS u3125))
-
-;; once activated, thresholds cannot be updated again
+;; once activated, activation cannot happen again
 (define-data-var tokenActivated bool false)
 
 ;; core contract states
@@ -114,6 +98,14 @@
 )
 
 ;; COINBASE THRESHOLDS
+
+;; coinbase thresholds per halving, used to select coinbase rewards in core
+;; initially set by register-user in core contract per CCIP-008
+(define-data-var coinbaseThreshold1 uint u0)
+(define-data-var coinbaseThreshold2 uint u0)
+(define-data-var coinbaseThreshold3 uint u0)
+(define-data-var coinbaseThreshold4 uint u0)
+(define-data-var coinbaseThreshold5 uint u0)
 
 ;; return coinbase thresholds if token activated
 (define-read-only (get-coinbase-thresholds)
@@ -158,26 +150,69 @@
 (define-public (update-coinbase-thresholds (threshold1 uint) (threshold2 uint) (threshold3 uint) (threshold4 uint) (threshold5 uint))
   (begin
     (asserts! (is-authorized-auth) ERR_UNAUTHORIZED)
+    ;; TODO: activation guard needed?
     ;; (asserts! (var-get tokenActivated) ERR_TOKEN_NOT_ACTIVATED)
     (try! (set-coinbase-thresholds threshold1 threshold2 threshold3 threshold4 threshold5))
     (ok true)
   )
 )
 
-;; COINBASE REWARDS
+;; COINBASE AMOUNTS (REWARDS)
 
-(define-public (update-coinbase-amounts (amount1 uint) (amount2 uint) (amount3 uint) (amount4 uint) (amount5 uint))
+;; coinbase rewards per threshold per CCIP-008
+(define-data-var coinbaseAmountBonus uint (* MICRO_CITYCOINS u250000))
+(define-data-var coinbaseAmount1 uint (* MICRO_CITYCOINS u100000))
+(define-data-var coinbaseAmount2 uint (* MICRO_CITYCOINS u50000))
+(define-data-var coinbaseAmount3 uint (* MICRO_CITYCOINS u25000))
+(define-data-var coinbaseAmount4 uint (* MICRO_CITYCOINS u12500))
+(define-data-var coinbaseAmount5 uint (* MICRO_CITYCOINS u6250))
+(define-data-var coinbaseAmountDefault uint (* MICRO_CITYCOINS u3125))
+
+;; return coinbase thresholds if token activated
+(define-read-only (get-coinbase-amounts)
+  (ok {
+    coinbaseAmountBonus: (var-get coinbaseAmountBonus),
+    coinbaseAmount1: (var-get coinbaseAmount1),
+    coinbaseAmount2: (var-get coinbaseAmount2),
+    coinbaseAmount3: (var-get coinbaseAmount3),
+    coinbaseAmount4: (var-get coinbaseAmount4),
+    coinbaseAmount5: (var-get coinbaseAmount5),
+    coinbaseAmountDefault: (var-get coinbaseAmountDefault)
+  })
+)
+
+(define-private (set-coinbase-amounts (amountBonus uint) (amount1 uint) (amount2 uint) (amount3 uint) (amount4 uint) (amount5 uint) (amountDefault uint))
   (begin
-    (asserts! (is-authorized-auth) ERR_UNAUTHORIZED)
-    ;; (asserts! (var-get tokenActivated) ERR_TOKEN_NOT_ACTIVATED)
-    ;; (try! (set-coinbase-thresholds threshold1 threshold2 threshold3 threshold4 threshold5))
+    ;; check that all amounts are greater than zero
+    (asserts! (and (> amountBonus u0) (> amount1 u0) (> amount2 u0) (> amount3 u0) (> amount4 u0) (> amount5 u0) (> amountDefault u0)) ERR_INVALID_COINBASE_AMOUNT)
+    ;; set coinbase amounts in token contract
+    (var-set coinbaseAmountBonus amountBonus)
+    (var-set coinbaseAmount1 amount1)
+    (var-set coinbaseAmount2 amount2)
+    (var-set coinbaseAmount3 amount3)
+    (var-set coinbaseAmount4 amount4)
+    (var-set coinbaseAmount5 amount5)
+    (var-set coinbaseAmountDefault amountDefault)
+    ;; print coinbase amounts
     (print {
+      coinbaseAmountBonus: amountBonus,
       coinbaseAmount1: amount1,
       coinbaseAmount2: amount2,
       coinbaseAmount3: amount3,
       coinbaseAmount4: amount4,
-      coinbaseAmount5: amount5
+      coinbaseAmount5: amount5,
+      coinbaseAmountDefault: amountDefault
     })
+    (ok true)
+  )
+)
+
+;; only accessible by auth
+(define-public (update-coinbase-amounts (amountBonus uint) (amount1 uint) (amount2 uint) (amount3 uint) (amount4 uint) (amount5 uint) (amountDefault uint))
+  (begin
+    (asserts! (is-authorized-auth) ERR_UNAUTHORIZED)
+    ;; (asserts! (var-get tokenActivated) ERR_TOKEN_NOT_ACTIVATED)
+    (try! (set-coinbase-amounts amountBonus amount1 amount2 amount3 amount4 amount5 amountDefault))
     (ok true)
   )
 )

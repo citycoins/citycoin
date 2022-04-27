@@ -4,6 +4,7 @@
 ;; GENERAL CONFIGURATION
 
 (impl-trait .citycoin-core-trait.citycoin-core)
+(impl-trait .citycoin-core-v2-trait.citycoin-core-v2)
 (define-constant CONTRACT_OWNER tx-sender)
 
 ;; ERROR CODES
@@ -30,6 +31,7 @@
 (define-constant ERR_UNABLE_TO_FIND_CITY_WALLET (err u1019))
 (define-constant ERR_CLAIM_IN_WRONG_CONTRACT (err u1020))
 (define-constant ERR_BLOCK_HEIGHT_IN_PAST (err u1021))
+(define-constant ERR_COINBASE_AMOUNTS_NOT_FOUND (err u1022))
 
 ;; CITY WALLET MANAGEMENT
 
@@ -159,6 +161,7 @@
         (try! (contract-call? .newyorkcitycoin-auth-v2 activate-core-contract (as-contract tx-sender) activationBlockVal))
         (try! (contract-call? .newyorkcitycoin-token-v2 activate-token (as-contract tx-sender) activationBlockVal))
         (try! (set-coinbase-thresholds))
+        (try! (set-coinbase-amounts))
         (var-set activationReached true)
         (var-set activationBlock activationBlockVal)
         (ok true)
@@ -810,35 +813,12 @@
 ;; bonus period length for increased coinbase rewards
 (define-constant TOKEN_BONUS_PERIOD u10000)
 
-;; coinbase rewards per threshold per CCIP-008
-(define-data-var coinbaseAmountBonus uint (* MICRO_CITYCOINS u250000))
-(define-data-var coinbaseAmount1 uint (* MICRO_CITYCOINS u100000))
-(define-data-var coinbaseAmount2 uint (* MICRO_CITYCOINS u50000))
-(define-data-var coinbaseAmount3 uint (* MICRO_CITYCOINS u25000))
-(define-data-var coinbaseAmount4 uint (* MICRO_CITYCOINS u12500))
-(define-data-var coinbaseAmount5 uint (* MICRO_CITYCOINS u6250))
-(define-data-var coinbaseAmountDefault uint (* MICRO_CITYCOINS u3125))
-
-;; coinbase thresholds per halving, use to select coinbase rewards
+;; coinbase thresholds per halving, used to determine halvings
 (define-data-var coinbaseThreshold1 uint u0)
 (define-data-var coinbaseThreshold2 uint u0)
 (define-data-var coinbaseThreshold3 uint u0)
 (define-data-var coinbaseThreshold4 uint u0)
 (define-data-var coinbaseThreshold5 uint u0)
-
-(define-private (set-coinbase-thresholds)
-  (let
-    (
-      (coinbaseAmounts (try! (contract-call? .newyorkcitycoin-token-v2 get-coinbase-thresholds)))
-    )
-    (var-set coinbaseThreshold1 (get coinbaseThreshold1 coinbaseAmounts))
-    (var-set coinbaseThreshold2 (get coinbaseThreshold2 coinbaseAmounts))
-    (var-set coinbaseThreshold3 (get coinbaseThreshold3 coinbaseAmounts))
-    (var-set coinbaseThreshold4 (get coinbaseThreshold4 coinbaseAmounts))
-    (var-set coinbaseThreshold5 (get coinbaseThreshold5 coinbaseAmounts))
-    (ok true)
-  )
-)
 
 ;; return coinbase thresholds if contract activated
 (define-read-only (get-coinbase-thresholds)
@@ -847,7 +827,7 @@
       (activated (var-get activationReached))
     )
     (asserts! activated ERR_CONTRACT_NOT_ACTIVATED)
-    ;; could check that core/token are in sync
+    ;; TODO: could check that core/token are in sync
     (ok {
       coinbaseThreshold1: (var-get coinbaseThreshold1),
       coinbaseThreshold2: (var-get coinbaseThreshold2),
@@ -855,6 +835,102 @@
       coinbaseThreshold4: (var-get coinbaseThreshold4),
       coinbaseThreshold5: (var-get coinbaseThreshold5)
     })
+  )
+)
+
+;; set coinbase thresholds, used during activation
+(define-private (set-coinbase-thresholds)
+  (let
+    (
+      (coinbaseThresholds (try! (contract-call? .newyorkcitycoin-token-v2 get-coinbase-thresholds)))
+    )
+    (var-set coinbaseThreshold1 (get coinbaseThreshold1 coinbaseThresholds))
+    (var-set coinbaseThreshold2 (get coinbaseThreshold2 coinbaseThresholds))
+    (var-set coinbaseThreshold3 (get coinbaseThreshold3 coinbaseThresholds))
+    (var-set coinbaseThreshold4 (get coinbaseThreshold4 coinbaseThresholds))
+    (var-set coinbaseThreshold5 (get coinbaseThreshold5 coinbaseThresholds))
+    ;; print coinbase thresholds
+    (print {
+      coinbaseThreshold1: (var-get coinbaseThreshold1),
+      coinbaseThreshold2: (var-get coinbaseThreshold2),
+      coinbaseThreshold3: (var-get coinbaseThreshold3),
+      coinbaseThreshold4: (var-get coinbaseThreshold4),
+      coinbaseThreshold5: (var-get coinbaseThreshold5)
+    })
+    (ok true)
+  )
+)
+
+;; guarded function for auth to update coinbase thresholds
+(define-public (update-coinbase-thresholds)
+  (begin
+    (asserts! (is-authorized-auth) ERR_UNAUTHORIZED)
+    (try! (set-coinbase-thresholds))
+    (ok true)
+  )
+)
+
+;; coinbase rewards per threshold, used to determine rewards
+(define-data-var coinbaseAmountBonus uint u0)
+(define-data-var coinbaseAmount1 uint u0)
+(define-data-var coinbaseAmount2 uint u0)
+(define-data-var coinbaseAmount3 uint u0)
+(define-data-var coinbaseAmount4 uint u0)
+(define-data-var coinbaseAmount5 uint u0)
+(define-data-var coinbaseAmountDefault uint u0)
+
+;; return coinbase amounts if contract activated
+(define-read-only (get-coinbase-amounts)
+  (let
+    (
+      (activated (var-get activationReached))
+    )
+    (asserts! activated ERR_CONTRACT_NOT_ACTIVATED)
+    ;; TODO: could check that core/token are in sync
+    (ok {
+      coinbaseAmountBonus: (var-get coinbaseAmountBonus),
+      coinbaseAmount1: (var-get coinbaseAmount1),
+      coinbaseAmount2: (var-get coinbaseAmount2),
+      coinbaseAmount3: (var-get coinbaseAmount3),
+      coinbaseAmount4: (var-get coinbaseAmount4),
+      coinbaseAmount5: (var-get coinbaseAmount5),
+      coinbaseAmountDefault: (var-get coinbaseAmountDefault)
+    })
+  )
+)
+
+;; set coinbase amounts, used during activation
+(define-private (set-coinbase-amounts)
+  (let
+    (
+      (coinbaseAmounts (unwrap! (contract-call? .newyorkcitycoin-token-v2 get-coinbase-amounts) ERR_COINBASE_AMOUNTS_NOT_FOUND))
+    )
+    (var-set coinbaseAmountBonus (get coinbaseAmountBonus coinbaseAmounts))
+    (var-set coinbaseAmount1 (get coinbaseAmount1 coinbaseAmounts))
+    (var-set coinbaseAmount2 (get coinbaseAmount2 coinbaseAmounts))
+    (var-set coinbaseAmount3 (get coinbaseAmount3 coinbaseAmounts))
+    (var-set coinbaseAmount4 (get coinbaseAmount4 coinbaseAmounts))
+    (var-set coinbaseAmount5 (get coinbaseAmount5 coinbaseAmounts))
+    (var-set coinbaseAmountDefault (get coinbaseAmountDefault coinbaseAmounts))
+    ;; print coinbase amounts
+    (print {
+      coinbaseAmountBonus: (var-get coinbaseAmountBonus),
+      coinbaseAmount1: (var-get coinbaseAmount1),
+      coinbaseAmount2: (var-get coinbaseAmount2),
+      coinbaseAmount3: (var-get coinbaseAmount3),
+      coinbaseAmount4: (var-get coinbaseAmount4),
+      coinbaseAmount5: (var-get coinbaseAmount5),
+      coinbaseAmountDefault: (var-get coinbaseAmountDefault)
+    })
+    (ok true)
+  )
+)
+
+(define-public (update-coinbase-amounts)
+  (begin
+    (asserts! (is-authorized-auth) ERR_UNAUTHORIZED)
+    (try! (set-coinbase-amounts))
+    (ok true)
   )
 )
 
@@ -926,7 +1002,7 @@
   (is-eq DEPLOYED_AT u0)
 )
 
-(use-trait coreTrait .citycoin-core-trait.citycoin-core)
+(use-trait coreTraitV2 .citycoin-core-v2-trait.citycoin-core-v2)
 
 (define-public (test-set-city-wallet (newCityWallet principal))
   (begin
@@ -942,7 +1018,7 @@
   )
 )
 
-(define-public (test-initialize-core (coreContract <coreTrait>))
+(define-public (test-initialize-core (coreContract <coreTraitV2>))
   (begin
     (asserts! (is-test-env) ERR_UNAUTHORIZED)
     (var-set activationThreshold u1)

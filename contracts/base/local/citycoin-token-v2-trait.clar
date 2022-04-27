@@ -31,7 +31,7 @@
       (response bool uint)
     )
 
-    (update-coinbase-amounts (uint uint uint uint uint)
+    (update-coinbase-amounts (uint uint uint uint uint uint uint)
       (response bool uint)
     )
 

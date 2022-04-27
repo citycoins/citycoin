@@ -5,7 +5,7 @@
 
 ;; TRAIT DEFINITIONS
 
-(use-trait coreTrait .citycoin-core-trait.citycoin-core)
+(use-trait coreTraitV2 .citycoin-core-v2-trait.citycoin-core-v2)
 (use-trait tokenTraitV2 .citycoin-token-v2-trait.citycoin-token-v2)
 
 ;; ERRORS
@@ -376,7 +376,7 @@
 ;; - set initial map value for core contract v1
 ;; - set cityWallet in core contract
 ;; - set intialized true
-(define-public (initialize-contracts (coreContract <coreTrait>))
+(define-public (initialize-contracts (coreContract <coreTraitV2>))
   (let
     (
       (coreContractAddress (contract-of coreContract))
@@ -426,7 +426,7 @@
 )
 
 ;; protected function to update core contract
-(define-public (upgrade-core-contract (oldContract <coreTrait>) (newContract <coreTrait>))
+(define-public (upgrade-core-contract (oldContract <coreTraitV2>) (newContract <coreTraitV2>))
   (let
     (
       (oldContractAddress (contract-of oldContract))
@@ -457,7 +457,7 @@
   )
 )
 
-(define-public (execute-upgrade-core-contract-job (jobId uint) (oldContract <coreTrait>) (newContract <coreTrait>))
+(define-public (execute-upgrade-core-contract-job (jobId uint) (oldContract <coreTraitV2>) (newContract <coreTraitV2>))
   (let
     (
       (oldContractArg (unwrap! (get-principal-value-by-name jobId "oldContract") ERR_UNKNOWN_ARGUMENT))
@@ -504,7 +504,7 @@
 )
  
 ;; protected function to update city wallet variable
-(define-public (set-city-wallet (targetContract <coreTrait>) (newCityWallet principal))
+(define-public (set-city-wallet (targetContract <coreTraitV2>) (newCityWallet principal))
   (let
     (
       (coreContractAddress (contract-of targetContract))
@@ -518,7 +518,7 @@
   )
 )
 
-(define-public (execute-set-city-wallet-job (jobId uint) (targetContract <coreTrait>))
+(define-public (execute-set-city-wallet-job (jobId uint) (targetContract <coreTraitV2>))
   (let
     (
       (coreContractAddress (contract-of targetContract))
@@ -548,18 +548,24 @@
   )
 )
 
-(define-public (update-coinbase-thresholds (targetContract <tokenTraitV2>) (threshold1 uint) (threshold2 uint) (threshold3 uint) (threshold4 uint) (threshold5 uint))
+(define-public (update-coinbase-thresholds (targetCore <coreTraitV2>) (targetToken <tokenTraitV2>) (threshold1 uint) (threshold2 uint) (threshold3 uint) (threshold4 uint) (threshold5 uint))
   (begin
     (asserts! (is-authorized-city) ERR_UNAUTHORIZED)
-    (as-contract (try! (contract-call? targetContract update-coinbase-thresholds threshold1 threshold2 threshold3 threshold4 threshold5)))
+    ;; update in token contract
+    (as-contract (try! (contract-call? targetToken update-coinbase-thresholds threshold1 threshold2 threshold3 threshold4 threshold5)))
+    ;; update core contract based on token contract
+    (as-contract (try! (contract-call? targetCore update-coinbase-thresholds)))
     (ok true)
   )
 )
 
-(define-public (update-coinbase-amounts (targetContract <tokenTraitV2>) (amount1 uint) (amount2 uint) (amount3 uint) (amount4 uint) (amount5 uint))
+(define-public (update-coinbase-amounts (targetCore <coreTraitV2>) (targetToken <tokenTraitV2>) (amountBonus uint) (amount1 uint) (amount2 uint) (amount3 uint) (amount4 uint) (amount5 uint) (amountDefault uint))
   (begin
     (asserts! (is-authorized-city) ERR_UNAUTHORIZED)
-    (as-contract (try! (contract-call? targetContract update-coinbase-amounts amount1 amount2 amount3 amount4 amount5)))
+    ;; update in token contract
+    (as-contract (try! (contract-call? targetToken update-coinbase-amounts amountBonus amount1 amount2 amount3 amount4 amount5 amountDefault)))
+    ;; update core contract based on token contract
+    (as-contract (try! (contract-call? targetCore update-coinbase-amounts)))
     (ok true)
   )
 )
@@ -605,7 +611,7 @@
   (is-eq DEPLOYED_AT u0)
 )
 
-(define-public (test-initialize-contracts (coreContract <coreTrait>))
+(define-public (test-initialize-contracts (coreContract <coreTraitV2>))
   (let
     (
       (coreContractAddress (contract-of coreContract))
@@ -632,7 +638,7 @@
   )
 )
 
-(define-public (test-set-core-contract-state (coreContract <coreTrait>) (state uint))
+(define-public (test-set-core-contract-state (coreContract <coreTraitV2>) (state uint))
   (let
     (
       (coreContractAddress (contract-of coreContract))
