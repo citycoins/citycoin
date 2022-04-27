@@ -926,6 +926,7 @@
   )
 )
 
+;; guarded function for auth to update coinbase amounts
 (define-public (update-coinbase-amounts)
   (begin
     (asserts! (is-authorized-auth) ERR_UNAUTHORIZED)

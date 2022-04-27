@@ -190,61 +190,6 @@ describe("[MiamiCoin Token v2]", () => {
         result.expectOk().expectSome().expectUtf8(tokenUri);
       });
     });
-
-    describe("burn()", () => {
-      it("fails with ERR_UNAUTHORIZED when owner is different than transaction sender", () => {
-        // arrange
-        const owner = accounts.get("wallet_1")!;
-        const sender = accounts.get("wallet_2")!;
-        const amount = 500;
-
-        // act
-        const receipt = chain.mineBlock([tokenV2.burn(amount, owner, sender)])
-          .receipts[0];
-
-        // assert
-        receipt.result
-          .expectErr()
-          .expectUint(MiamiCoinTokenModelV2.ErrCode.ERR_UNAUTHORIZED);
-      });
-
-      it("fails with u1 when sender is trying to burn more tokens than they own", () => {
-        const owner = accounts.get("wallet_5")!;
-        const amount = 8888912313;
-
-        // act
-        const receipt = chain.mineBlock([
-          tokenV2.burn(amount, owner, owner),
-        ]).receipts[0];
-
-        receipt.result.expectErr().expectUint(1); // 1 is standard ft-burn error code
-      })
-
-      it("succeeds when called by token owner and burns correct amount of tokens", () => {
-        // arrange
-        const owner = accounts.get("wallet_1")!;
-        const amount = 300;
-        chain.mineBlock([
-          tokenV2.testMint(amount, owner)
-        ]);
-
-        // act
-        const receipt = chain.mineBlock([
-          tokenV2.burn(amount, owner, owner),
-        ]).receipts[0];
-
-        // assert
-        receipt.result.expectOk().expectBool(true);
-
-        assertEquals(receipt.events.length, 1);
-
-        receipt.events.expectFungibleTokenBurnEvent(
-          amount,
-          owner.address,
-          "miamicoin"
-        );
-      });
-    });
   });
 });
 

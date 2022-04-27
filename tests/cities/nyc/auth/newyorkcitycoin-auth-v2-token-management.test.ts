@@ -9,7 +9,7 @@ let chain: Chain;
 let accounts: Accounts;
 let authV2: NewYorkCityCoinAuthModelV2;
 let coreV2: NewYorkCityCoinCoreModelV2;
-let token: NewYorkCityCoinTokenModelV2;
+let tokenV2: NewYorkCityCoinTokenModelV2;
 
 beforeEach(() => {
   ctx = new Context();
@@ -17,7 +17,7 @@ beforeEach(() => {
   accounts = ctx.accounts;
   authV2 = ctx.models.get(NewYorkCityCoinAuthModelV2, "newyorkcitycoin-auth-v2");
   coreV2 = ctx.models.get(NewYorkCityCoinCoreModelV2, "newyorkcitycoin-core-v2");
-  token = ctx.models.get(NewYorkCityCoinTokenModelV2, "newyorkcitycoin-token-v2");
+  tokenV2 = ctx.models.get(NewYorkCityCoinTokenModelV2, "newyorkcitycoin-token-v2");
 })
 
 describe("[NewYorkCityCoin Auth v2]", () => {
@@ -33,7 +33,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
         const block = chain.mineBlock([
           authV2.setTokenUri(
             sender,
-            token.address,
+            tokenV2.address,
             "http://something-something.com"
           ),
         ]);
@@ -49,7 +49,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
         const sender = accounts.get("wallet_2")!;
         // act
         const block = chain.mineBlock([
-          token.setTokenUri(sender, "http://something-something.com"),
+          tokenV2.setTokenUri(sender, "http://something-something.com"),
         ]);
         // assert
         const receipt = block.receipts[0];
@@ -63,14 +63,14 @@ describe("[NewYorkCityCoin Auth v2]", () => {
         const sender = accounts.get("nyc_wallet")!;
         // act
         const block = chain.mineBlock([
-          authV2.setTokenUri(sender, token.address),
+          authV2.setTokenUri(sender, tokenV2.address),
         ]);
         // assert
         const receipt = block.receipts[0];
 
         receipt.result.expectOk().expectBool(true);
 
-        const result = token.getTokenUri().result;
+        const result = tokenV2.getTokenUri().result;
         result.expectOk().expectNone();
       });
       it("succeeds and updates token uri to new value if provided", () => {
@@ -81,7 +81,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
         const block = chain.mineBlock([
           authV2.setTokenUri(
             sender,
-            token.address,
+            tokenV2.address,
             newUri
           ),
         ]);
@@ -90,7 +90,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
 
         receipt.result.expectOk().expectBool(true);
 
-        const result = token.getTokenUri().result;
+        const result = tokenV2.getTokenUri().result;
         result.expectOk().expectSome().expectUtf8(newUri);
       });
     });
@@ -103,7 +103,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
           authV2.updateCoinbaseThresholds(
             sender,
             coreV2.address,
-            token.address,
+            tokenV2.address,
             100,
             200,
             300,
@@ -123,7 +123,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
         const sender = accounts.get("wallet_2")!;
         // act
         const block = chain.mineBlock([
-          token.updateCoinbaseThresholds(sender, 100, 200, 300, 400, 500)
+          tokenV2.updateCoinbaseThresholds(sender, 100, 200, 300, 400, 500)
         ]);
         // assert
         const receipt = block.receipts[0];
@@ -147,7 +147,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
           authV2.updateCoinbaseThresholds(
             sender,
             coreV2.address,
-            token.address,
+            tokenV2.address,
             coinbaseThresholds[0],
             coinbaseThresholds[1],
             coinbaseThresholds[2],
@@ -167,7 +167,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
           coinbaseThreshold5: types.uint(coinbaseThresholds[4])
         }
 
-        const tokenResult = token.getCoinbaseThresholds().result;
+        const tokenResult = tokenV2.getCoinbaseThresholds().result;
         assertEquals(tokenResult.expectOk().expectTuple(), expectedResult);
 
         const coreResult = coreV2.getCoinbaseThresholds().result;
@@ -183,7 +183,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
           authV2.updateCoinbaseAmounts(
             sender,
             coreV2.address,
-            token.address,
+            tokenV2.address,
             100,
             200,
             300,
@@ -205,7 +205,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
         const sender = accounts.get("wallet_2")!;
         // act
         const block = chain.mineBlock([
-          token.updateCoinbaseAmounts(sender, 100, 200, 300, 400, 500, 600, 700)
+          tokenV2.updateCoinbaseAmounts(sender, 100, 200, 300, 400, 500, 600, 700)
         ]);
         // assert
         const receipt = block.receipts[0];
@@ -218,7 +218,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
         // arrange
         const sender = accounts.get("nyc_wallet")!;
         const coinbaseAmounts = [250000, 100000, 50000, 25000, 12500, 6250, 3125];
-        
+
         chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
           coreV2.testSetActivationThreshold(1),
@@ -229,7 +229,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
           authV2.updateCoinbaseAmounts(
             sender,
             coreV2.address,
-            token.address,
+            tokenV2.address,
             coinbaseAmounts[0],
             coinbaseAmounts[1],
             coinbaseAmounts[2],
@@ -253,7 +253,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
           coinbaseAmountDefault: types.uint(coinbaseAmounts[6]),
         }
 
-        const tokenResult = token.getCoinbaseAmounts().result;
+        const tokenResult = tokenV2.getCoinbaseAmounts().result;
         assertEquals(tokenResult.expectOk().expectTuple(), expectedResult);
 
         const coreResult = coreV2.getCoinbaseAmounts().result;
