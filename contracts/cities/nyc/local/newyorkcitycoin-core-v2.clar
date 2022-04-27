@@ -803,7 +803,23 @@
 
 ;; TOKEN CONFIGURATION
 
-;; store block height at each halving, set by register-user in core contract
+;; decimals and multiplier for token
+(define-constant DECIMALS u6)
+(define-constant MICRO_CITYCOINS (pow u10 DECIMALS))
+
+;; bonus period length for increased coinbase rewards
+(define-constant TOKEN_BONUS_PERIOD u10000)
+
+;; coinbase rewards per threshold per CCIP-008
+(define-data-var coinbaseAmountBonus uint (* MICRO_CITYCOINS u250000))
+(define-data-var coinbaseAmount1 uint (* MICRO_CITYCOINS u100000))
+(define-data-var coinbaseAmount2 uint (* MICRO_CITYCOINS u50000))
+(define-data-var coinbaseAmount3 uint (* MICRO_CITYCOINS u25000))
+(define-data-var coinbaseAmount4 uint (* MICRO_CITYCOINS u12500))
+(define-data-var coinbaseAmount5 uint (* MICRO_CITYCOINS u6250))
+(define-data-var coinbaseAmountDefault uint (* MICRO_CITYCOINS u3125))
+
+;; coinbase thresholds per halving, use to select coinbase rewards
 (define-data-var coinbaseThreshold1 uint u0)
 (define-data-var coinbaseThreshold2 uint u0)
 (define-data-var coinbaseThreshold3 uint u0)
@@ -831,6 +847,7 @@
       (activated (var-get activationReached))
     )
     (asserts! activated ERR_CONTRACT_NOT_ACTIVATED)
+    ;; could check that core/token are in sync
     (ok {
       coinbaseThreshold1: (var-get coinbaseThreshold1),
       coinbaseThreshold2: (var-get coinbaseThreshold2),
@@ -846,24 +863,23 @@
   (begin
     ;; if contract is not active, return 0
     (asserts! (>= minerBlockHeight (var-get activationBlock)) u0)
-    ;; if contract is active, return based on issuance schedule
-    ;; halvings occur every 210,000 blocks for 1,050,000 Stacks blocks
-    ;; then mining continues indefinitely with 3,125 tokens as the reward
+    ;; if contract is active, return based on emissions schedule
+    ;; defined in CCIP-008 https://github.com/citycoins/governance
     (asserts! (> minerBlockHeight (var-get coinbaseThreshold1))
-      (if (<= (- minerBlockHeight (var-get activationBlock)) u10000)
-        ;; bonus reward first 10,000 blocks
-        u250000
-        ;; standard reward remaining 200,000 blocks until 1st halving
-        u100000
+      (if (<= (- minerBlockHeight (var-get activationBlock)) TOKEN_BONUS_PERIOD)
+        ;; bonus reward for initial miners
+        (var-get coinbaseAmountBonus)
+        ;; standard reward until 1st halving
+        (var-get coinbaseAmount1)
       )
     )
     ;; computations based on each halving threshold
-    (asserts! (> minerBlockHeight (var-get coinbaseThreshold2)) u50000)
-    (asserts! (> minerBlockHeight (var-get coinbaseThreshold3)) u25000)
-    (asserts! (> minerBlockHeight (var-get coinbaseThreshold4)) u12500)
-    (asserts! (> minerBlockHeight (var-get coinbaseThreshold5)) u6250)
+    (asserts! (> minerBlockHeight (var-get coinbaseThreshold2)) (var-get coinbaseAmount2))
+    (asserts! (> minerBlockHeight (var-get coinbaseThreshold3)) (var-get coinbaseAmount3))
+    (asserts! (> minerBlockHeight (var-get coinbaseThreshold4)) (var-get coinbaseAmount4))
+    (asserts! (> minerBlockHeight (var-get coinbaseThreshold5)) (var-get coinbaseAmount5))
     ;; default value after 5th halving
-    u3125
+    (var-get coinbaseAmountDefault)
   )
 )
 
