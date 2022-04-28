@@ -124,6 +124,10 @@ depends_on = ["newyorkcitycoin-auth", "newyorkcitycoin-token", "citycoin-vrf", "
 path = "contracts/cities/nyc/local/newyorkcitycoin-core-v1.clar"
 depends_on = ["newyorkcitycoin-auth", "newyorkcitycoin-token", "citycoin-vrf", "citycoin-core-trait"]
 
+[contracts.newyorkcitycoin-core-v1-patch]
+path = "contracts/cities/nyc/local/newyorkcitycoin-core-v1-patch.clar"
+depends_on = ["newyorkcitycoin-auth", "newyorkcitycoin-core-v1", "newyorkcitycoin-token", "citycoin-vrf", "citycoin-core-trait"]
+
 [contracts.newyorkcitycoin-token]
 path = "contracts/cities/nyc/local/newyorkcitycoin-token.clar"
 depends_on = ["newyorkcitycoin-auth", "citycoin-token-trait", "sip-010-trait-ft-standard"]
