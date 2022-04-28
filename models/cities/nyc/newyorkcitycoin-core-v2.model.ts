@@ -37,6 +37,7 @@ export class NewYorkCityCoinCoreModelV2 extends Model {
   static readonly SPLIT_CITY_PCT = 0.3;
   static readonly TOKEN_REWARD_MATURITY = 100;
   static readonly BONUS_PERIOD_LENGTH = 10000;
+  static readonly MICRO_CITYCOINS = 1000000;
 
   //////////////////////////////////////////////////
   // CITY WALLET MANAGEMENT
@@ -225,6 +226,10 @@ export class NewYorkCityCoinCoreModelV2 extends Model {
 
   getCoinbaseThresholds(): ReadOnlyFn {
     return this.callReadOnly("get-coinbase-thresholds");
+  }
+
+  getCoinbaseAmounts(): ReadOnlyFn {
+    return this.callReadOnly("get-coinbase-amounts");
   }
 
   //////////////////////////////////////////////////

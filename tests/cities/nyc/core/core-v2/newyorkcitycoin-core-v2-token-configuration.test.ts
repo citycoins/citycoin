@@ -50,6 +50,39 @@ describe("[NewYorkCityCoin Core v2]", () => {
         assertEquals(result.expectOk().expectTuple(), expectedResult);
       });
     });
+    describe("get-coinbase-amounts()", () => {
+      it("fails with ERR_CONTRACT_NOT_ACTIVATED if called before activation", () => {
+        // act
+        const result = coreV2.getCoinbaseAmounts().result;
+        // assert
+        result.expectErr().expectUint(NewYorkCityCoinCoreModelV2.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
+      });
+      it("succeeds and returns coinbase amounts", () => {
+        // arrange
+        const user = accounts.get("wallet_1")!;
+        const block = chain.mineBlock([
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(user)
+        ]);
+        const activationBlockHeight =
+          block.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+        chain.mineEmptyBlockUntil(activationBlockHeight);
+        // act
+        const result = coreV2.getCoinbaseAmounts().result;
+        // assert
+        const expectedResult = {
+          coinbaseAmount1: types.uint(100000 * NewYorkCityCoinCoreModelV2.MICRO_CITYCOINS),
+          coinbaseAmount2: types.uint(50000 * NewYorkCityCoinCoreModelV2.MICRO_CITYCOINS),
+          coinbaseAmount3: types.uint(25000 * NewYorkCityCoinCoreModelV2.MICRO_CITYCOINS),
+          coinbaseAmount4: types.uint(12500 * NewYorkCityCoinCoreModelV2.MICRO_CITYCOINS),
+          coinbaseAmount5: types.uint(6250 * NewYorkCityCoinCoreModelV2.MICRO_CITYCOINS),
+          coinbaseAmountBonus: types.uint(250000 * NewYorkCityCoinCoreModelV2.MICRO_CITYCOINS),
+          coinbaseAmountDefault: types.uint(3125 * NewYorkCityCoinCoreModelV2.MICRO_CITYCOINS),
+        };
+        assertEquals(result.expectOk().expectTuple(), expectedResult);
+      });
+    });
   });
 });
 
