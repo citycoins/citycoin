@@ -256,6 +256,19 @@ export class NewYorkCityCoinAuthModelV2 extends Model {
     );
   }
 
+  executeUpdateCoinbaseThresholdsJob(
+    jobId: number,
+    targetCore: string,
+    targetToken: string,
+    sender: Account
+  ): Tx {
+    return this.callPublic(
+      "execute-update-coinbase-thresholds-job",
+      [types.uint(jobId), types.principal(targetCore), types.principal(targetToken)],
+      sender.address
+    );
+  }
+
   updateCoinbaseAmounts(sender: Account, coreContract: string, targetContract: string, amountBonus: number, amount1: number, amount2: number, amount3: number, amount4: number, amount5: number, amountDefault: number): Tx {
     return this.callPublic(
       "update-coinbase-amounts",
@@ -270,6 +283,19 @@ export class NewYorkCityCoinAuthModelV2 extends Model {
         types.uint(amount5),
         types.uint(amountDefault),
       ],
+      sender.address
+    );
+  }
+
+  executeUpdateCoinbaseAmountsJob(
+    jobId: number,
+    targetCore: string,
+    targetToken: string,
+    sender: Account
+  ): Tx {
+    return this.callPublic(
+      "execute-update-coinbase-amounts-job",
+      [types.uint(jobId), types.principal(targetCore), types.principal(targetToken)],
       sender.address
     );
   }
