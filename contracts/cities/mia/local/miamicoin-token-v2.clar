@@ -227,8 +227,7 @@
     ;; verify positive balance
     (asserts! (> balanceV1 u0) ERR_V1_BALANCE_NOT_FOUND)
     ;; burn old
-    ;; TODO: MIA will need to call from core contract
-    ;; (try! (contract-call? .miamicoin-token burn balanceV1 tx-sender))
+    (try! (contract-call? .miamicoin-core-v1-patch burn-mia-v1 balanceV1 tx-sender))
     (print {
       burnedV1: balanceV1,
       mintedV2: (* balanceV1 MICRO_CITYCOINS),

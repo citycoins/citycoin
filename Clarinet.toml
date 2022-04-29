@@ -80,6 +80,10 @@ depends_on = ["miamicoin-auth", "miamicoin-token", "citycoin-vrf", "citycoin-cor
 path = "contracts/cities/mia/local/miamicoin-core-v1.clar"
 depends_on = ["miamicoin-auth", "miamicoin-token", "citycoin-vrf", "citycoin-core-trait"]
 
+[contracts.miamicoin-core-v1-patch]
+path = "contracts/cities/mia/local/miamicoin-core-v1-patch.clar"
+depends_on = ["miamicoin-auth", "miamicoin-core-v1", "miamicoin-token", "citycoin-vrf", "citycoin-core-trait"]
+
 [contracts.miamicoin-token]
 path = "contracts/cities/mia/local/miamicoin-token.clar"
 depends_on = ["miamicoin-auth", "citycoin-token-trait", "sip-010-trait-ft-standard"]

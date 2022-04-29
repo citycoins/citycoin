@@ -3,8 +3,13 @@
 
 (impl-trait .citycoin-core-trait.citycoin-core)
 
+
+;; uses same and skips errors already defined in miamicoin-core-v1
+(define-constant ERR_UNAUTHORIZED (err u1001))
 ;; generic error used to disable all functions below
-(define-constant ERR_CONTRACT_DISABLED (err u1000))
+(define-constant ERR_CONTRACT_DISABLED (err u1021))
+
+;; DISABLED FUNCTIONS
 
 (define-public (register-user (memo (optional (string-utf8 50))))
   ERR_CONTRACT_DISABLED
@@ -34,4 +39,13 @@
   ERR_CONTRACT_DISABLED
 )
 
-;; TODO: add burn pass-through function
+;; V1 TO V2 CONVERSION
+
+;; pass-through function to allow burning MIA v1
+(define-public (burn-mia-v1 (amount uint) (owner principal))
+  (begin
+    (asserts! (is-eq tx-sender owner) ERR_UNAUTHORIZED)
+    (as-contract (try! (contract-call? .miamicoin-token burn amount owner)))
+    (ok true)
+  )
+)
