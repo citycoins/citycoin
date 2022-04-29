@@ -251,15 +251,6 @@
   )
 )
 
-;; set token emissions schedule to new values, only accessible by Auth
-(define-public (set-token-emissions (newEmissions (list 5 uint)))
-  (begin
-    (asserts! (is-authorized-auth) ERR_UNAUTHORIZED)
-    (print newEmissions)
-    (ok true)
-  )
-)
-
 ;; mint new tokens, only accessible by a Core contract
 (define-public (mint (amount uint) (recipient principal))
   (let
