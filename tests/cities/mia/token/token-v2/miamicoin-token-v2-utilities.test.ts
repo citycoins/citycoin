@@ -1,12 +1,14 @@
-import { describe, run, Chain, it, beforeEach, assertEquals} from "../../../../../deps.ts";
+import { describe, run, Chain, it, beforeEach, types, assertEquals} from "../../../../../deps.ts";
 import { Accounts, Context } from "../../../../../src/context.ts";
 import { MiamiCoinCoreModelV2 } from "../../../../../models/cities/mia/miamicoin-core-v2.model.ts";
+import { MiamiCoinTokenModel } from "../../../../../models/cities/mia/miamicoin-token.model.ts";
 import { MiamiCoinTokenModelV2 } from "../../../../../models/cities/mia/miamicoin-token-v2.model.ts";
 
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
 let coreV2: MiamiCoinCoreModelV2;
+let token: MiamiCoinTokenModel;
 let tokenV2: MiamiCoinTokenModelV2;
 
 beforeEach(() => {
@@ -14,6 +16,7 @@ beforeEach(() => {
   chain = ctx.chain;
   accounts = ctx.accounts;
   coreV2 = ctx.models.get(MiamiCoinCoreModelV2, "miamicoin-core-v2");
+  token = ctx.models.get(MiamiCoinTokenModel, "miamicoin-token");
   tokenV2 = ctx.models.get(MiamiCoinTokenModelV2, "miamicoin-token-v2");
 })
 
@@ -124,7 +127,7 @@ describe("[MiamiCoin Token v2]", () => {
       });
     });
     describe("convert-to-v2()", () => {
-      it("fails with ERR_V1_BALANCE_NOT_FOUND if no v1 balance is found for the user", () => {
+      it("fails with ERR_V1_BALANCE_NOT_FOUND if v1 balance is not found for the user", () => {
         // arrange
         const wallet_1 = accounts.get("wallet_1")!;
         // act
@@ -137,8 +140,53 @@ describe("[MiamiCoin Token v2]", () => {
           .expectErr()
           .expectUint(MiamiCoinTokenModelV2.ErrCode.ERR_V1_BALANCE_NOT_FOUND);
       });
-      // it("fails with ERR_V1_BALANCE_NOT_FOUND if v1 balance is found but is zero", () => {});
-      // it("succeeds and burns V1 tokens then mints V2 tokens * 6 decimal places", () => {});
+      it("fails with ERR_V1_BALANCE_NOT_FOUND if v1 balance is found but is zero", () => {
+        // arrange
+        const wallet_1 = accounts.get("wallet_1")!;
+        const amount = 500;
+        chain.mineBlock([
+          tokenV2.testMint(amount, wallet_1)
+        ]);
+        chain.mineBlock([
+          tokenV2.burn(amount, wallet_1, wallet_1)
+        ]);
+        // act
+        const block = chain.mineBlock([
+          tokenV2.convertToV2(wallet_1)
+        ]);
+        // assert
+        const receipt = block.receipts[0];
+        receipt.result
+          .expectErr()
+          .expectUint(MiamiCoinTokenModelV2.ErrCode.ERR_V1_BALANCE_NOT_FOUND);
+      });
+      it("succeeds and burns V1 tokens then mints V2 tokens * MICRO_CITYCOINS", () => {
+        // arrange
+        const wallet_1 = accounts.get("wallet_1")!;
+        const amount = 500;
+        chain.mineBlock([
+          token.testMint(amount, wallet_1)
+        ]);
+        // act
+        const block = chain.mineBlock([
+          tokenV2.convertToV2(wallet_1)
+        ]);
+        // assert
+        const receipt = block.receipts[0];
+        receipt.result.expectOk().expectBool(true);
+        receipt.events.expectFungibleTokenBurnEvent(
+          amount,
+          wallet_1.address,
+          "miamicoin"
+        );
+        receipt.events.expectFungibleTokenMintEvent(
+          amount * MiamiCoinTokenModelV2.MICRO_CITYCOINS,
+          wallet_1.address,
+          "miamicoin"
+        );
+        const expectedPrintMsg = `{burnedV1: ${types.uint(amount)}, contract-caller: ${wallet_1.address}, mintedV2: ${types.uint(amount *MiamiCoinTokenModelV2.MICRO_CITYCOINS)}, tx-sender: ${wallet_1.address}}`;
+        receipt.events.expectPrintEvent(tokenV2.address, expectedPrintMsg);
+      });
     });
   });
 });

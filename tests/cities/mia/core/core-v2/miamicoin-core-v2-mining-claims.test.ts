@@ -173,7 +173,7 @@ describe("[MiamiCoin Core v2]", () => {
           .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_MINER_DID_NOT_WIN);
       });
 
-      it("succeeds and mints 250000 tokens in 1st issuance cycle, during bonus period", () => {
+      it("succeeds and mints 250,000,000,000 tokens in 1st issuance cycle, during bonus period", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
@@ -201,13 +201,13 @@ describe("[MiamiCoin Core v2]", () => {
         assertEquals(receipt.events.length, 1);
 
         receipt.events.expectFungibleTokenMintEvent(
-          250000,
+          250000 * MiamiCoinCoreModelV2.MICRO_CITYCOINS,
           miner.address,
           "miamicoin"
         );
       });
 
-      it("succeeds and mints 100000 tokens in 1st issuance cycle, after bonus period", () => {
+      it("succeeds and mints 100,000,000,000 tokens in 1st issuance cycle, after bonus period", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
@@ -237,13 +237,13 @@ describe("[MiamiCoin Core v2]", () => {
         assertEquals(receipt.events.length, 1);
 
         receipt.events.expectFungibleTokenMintEvent(
-          100000,
+          100000 * MiamiCoinCoreModelV2.MICRO_CITYCOINS,
           miner.address,
           "miamicoin"
         );
       });
 
-      it("succeeds and mints 50000 tokens in 2nd issuance cycle", () => {
+      it("succeeds and mints 50,000,000,000 tokens in 2nd issuance cycle", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
@@ -273,13 +273,13 @@ describe("[MiamiCoin Core v2]", () => {
         assertEquals(receipt.events.length, 1);
 
         receipt.events.expectFungibleTokenMintEvent(
-          50000,
+          50000 * MiamiCoinCoreModelV2.MICRO_CITYCOINS,
           miner.address,
           "miamicoin"
         );
       });
 
-      it("succeeds and mints 25000 tokens in 3rd issuance cycle", () => {
+      it("succeeds and mints 25,000,000,000 tokens in 3rd issuance cycle", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
@@ -309,13 +309,13 @@ describe("[MiamiCoin Core v2]", () => {
         assertEquals(receipt.events.length, 1);
 
         receipt.events.expectFungibleTokenMintEvent(
-          25000,
+          25000 * MiamiCoinCoreModelV2.MICRO_CITYCOINS,
           miner.address,
           "miamicoin"
         );
       });
 
-      it("succeeds and mints 12500 tokens in 4th issuance cycle", () => {
+      it("succeeds and mints 12,500,000,000 tokens in 4th issuance cycle", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
@@ -345,13 +345,13 @@ describe("[MiamiCoin Core v2]", () => {
         assertEquals(receipt.events.length, 1);
 
         receipt.events.expectFungibleTokenMintEvent(
-          12500,
+          12500 * MiamiCoinCoreModelV2.MICRO_CITYCOINS,
           miner.address,
           "miamicoin"
         );
       });
 
-      it("succeeds and mints 6250 tokens in 5th issuance cycle", () => {
+      it("succeeds and mints 6,250,000,000 tokens in 5th issuance cycle", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
@@ -381,13 +381,13 @@ describe("[MiamiCoin Core v2]", () => {
         assertEquals(receipt.events.length, 1);
 
         receipt.events.expectFungibleTokenMintEvent(
-          6250,
+          6250 * MiamiCoinCoreModelV2.MICRO_CITYCOINS,
           miner.address,
           "miamicoin"
         );
       });
 
-      it("succeeds and mints 3125 tokens in final issuance cycle", () => {
+      it("succeeds and mints 3,125,000,000 tokens in final issuance cycle", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
@@ -417,7 +417,7 @@ describe("[MiamiCoin Core v2]", () => {
         assertEquals(receipt.events.length, 1);
 
         receipt.events.expectFungibleTokenMintEvent(
-          3125,
+          3125 * MiamiCoinCoreModelV2.MICRO_CITYCOINS,
           miner.address,
           "miamicoin"
         );
