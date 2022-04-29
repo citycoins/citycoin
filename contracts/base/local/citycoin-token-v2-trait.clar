@@ -23,10 +23,6 @@
       (response bool uint)
     )
 
-    (set-token-emissions ((list 5 uint))
-      (response bool uint)
-    )
-
     (update-coinbase-thresholds (uint uint uint uint uint)
       (response bool uint)
     )
