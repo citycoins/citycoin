@@ -1,5 +1,8 @@
 import { describe, run, Chain, it, beforeEach, types, assertEquals} from "../../../../../deps.ts";
 import { Accounts, Context } from "../../../../../src/context.ts";
+import { MiamiCoinAuthModel } from "../../../../../models/cities/mia/miamicoin-auth.model.ts";
+import { MiamiCoinCoreModel } from "../../../../../models/cities/mia/miamicoin-core.model.ts";
+import { MiamiCoinCoreModelPatch } from "../../../../../models/cities/mia/miamicoin-core-v1-patch.model.ts";
 import { MiamiCoinCoreModelV2 } from "../../../../../models/cities/mia/miamicoin-core-v2.model.ts";
 import { MiamiCoinTokenModel } from "../../../../../models/cities/mia/miamicoin-token.model.ts";
 import { MiamiCoinTokenModelV2 } from "../../../../../models/cities/mia/miamicoin-token-v2.model.ts";
@@ -7,6 +10,9 @@ import { MiamiCoinTokenModelV2 } from "../../../../../models/cities/mia/miamicoi
 let ctx: Context;
 let chain: Chain;
 let accounts: Accounts;
+let auth: MiamiCoinAuthModel;
+let core: MiamiCoinCoreModel;
+let coreV1Patch: MiamiCoinCoreModelPatch;
 let coreV2: MiamiCoinCoreModelV2;
 let token: MiamiCoinTokenModel;
 let tokenV2: MiamiCoinTokenModelV2;
@@ -15,6 +21,9 @@ beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
+  auth = ctx.models.get(MiamiCoinAuthModel, "miamicoin-auth");
+  core = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v1");
+  coreV1Patch = ctx.models.get(MiamiCoinCoreModelPatch, "miamicoin-core-v1-patch");
   coreV2 = ctx.models.get(MiamiCoinCoreModelV2, "miamicoin-core-v2");
   token = ctx.models.get(MiamiCoinTokenModel, "miamicoin-token");
   tokenV2 = ctx.models.get(MiamiCoinTokenModelV2, "miamicoin-token-v2");
@@ -162,29 +171,41 @@ describe("[MiamiCoin Token v2]", () => {
       });
       it("succeeds and burns V1 tokens then mints V2 tokens * MICRO_CITYCOINS", () => {
         // arrange
-        const wallet_1 = accounts.get("wallet_1")!;
+        // setup accounts
+        const owner = accounts.get("wallet_1")!;
+        const cityWallet = accounts.get("mia_wallet")!;
+        const oldContract = core.address;
+        const newContract = coreV1Patch.address;
         const amount = 500;
+        // mint amount and activate core contract
         chain.mineBlock([
-          token.testMint(amount, wallet_1)
+          token.testMint(amount, owner),
+          core.testInitializeCore(core.address),
+          core.testSetActivationThreshold(1),
+          core.registerUser(owner)
+        ]);
+        // upgrade core contract to v1 patch
+        chain.mineBlock([
+          auth.upgradeCoreContract(oldContract, newContract, cityWallet),
         ]);
         // act
         const block = chain.mineBlock([
-          tokenV2.convertToV2(wallet_1)
+          tokenV2.convertToV2(owner)
         ]);
         // assert
         const receipt = block.receipts[0];
         receipt.result.expectOk().expectBool(true);
         receipt.events.expectFungibleTokenBurnEvent(
           amount,
-          wallet_1.address,
+          owner.address,
           "miamicoin"
         );
         receipt.events.expectFungibleTokenMintEvent(
           amount * MiamiCoinTokenModelV2.MICRO_CITYCOINS,
-          wallet_1.address,
+          owner.address,
           "miamicoin"
         );
-        const expectedPrintMsg = `{burnedV1: ${types.uint(amount)}, contract-caller: ${wallet_1.address}, mintedV2: ${types.uint(amount *MiamiCoinTokenModelV2.MICRO_CITYCOINS)}, tx-sender: ${wallet_1.address}}`;
+        const expectedPrintMsg = `{burnedV1: ${types.uint(amount)}, contract-caller: ${owner.address}, mintedV2: ${types.uint(amount *MiamiCoinTokenModelV2.MICRO_CITYCOINS)}, tx-sender: ${owner.address}}`;
         receipt.events.expectPrintEvent(tokenV2.address, expectedPrintMsg);
       });
     });

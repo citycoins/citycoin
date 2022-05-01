@@ -315,8 +315,9 @@ describe("[NewYorkCityCoin Core v2]", () => {
         const amounts = [1, 2, 3, 4];
 
         // act
-        const receipt = chain.mineBlock([coreV2.mineMany(amounts, miner)])
-          .receipts[0];
+        const receipt = chain.mineBlock([
+          coreV2.mineMany(amounts, miner)
+        ]).receipts[0];
 
         // assert
         receipt.result

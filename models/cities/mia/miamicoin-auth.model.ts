@@ -257,4 +257,12 @@ export class MiamiCoinAuthModel extends Model {
       sender.address
     );
   }
+
+  testSetCityWalletPatch(coreContract: string, sender: Account) {
+    return this.callPublic(
+      "test-set-city-wallet-patch",
+      [types.principal(coreContract)],
+      sender.address
+    );
+  }
 }
