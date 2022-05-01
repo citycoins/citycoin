@@ -331,6 +331,58 @@ describe("[NewYorkCityCoin Auth]", () => {
           .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNAUTHORIZED);
       });
 
+      it("fails with ERR_UNAUTHORIZED if old and new contract are the same", () => {
+        // arrange
+        const jobId = 1;
+        const sender = accounts.get("wallet_1")!;
+        const approver1 = accounts.get("wallet_2")!;
+        const approver2 = accounts.get("wallet_3")!;
+        const approver3 = accounts.get("wallet_4")!;
+        const oldContract = core.address;
+
+        chain.mineBlock([
+          core.testInitializeCore(oldContract),
+          core.testSetActivationThreshold(1),
+          core.registerUser(sender),
+          auth.createJob(
+            "upgrade core",
+            auth.address,
+            sender
+          ),
+          auth.addPrincipalArgument(
+            jobId,
+            "oldContract",
+            oldContract,
+            sender
+          ),
+          auth.addPrincipalArgument(
+            jobId,
+            "newContract",
+            oldContract,
+            sender
+          ),
+          auth.activateJob(jobId, sender),
+          auth.approveJob(jobId, approver1),
+          auth.approveJob(jobId, approver2),
+          auth.approveJob(jobId, approver3),
+        ]);
+
+        // act
+        const blockUpgrade = chain.mineBlock([
+          auth.executeUpgradeCoreContractJob(
+            jobId,
+            oldContract,
+            oldContract,
+            sender
+          ),
+        ]);
+
+        // assert
+        blockUpgrade.receipts[0].result
+          .expectErr()
+          .expectUint(NewYorkCityCoinAuthModel.ErrCode.ERR_UNAUTHORIZED);
+      });
+
       it("succeeds and updates core contract map and active variable", () => {
         // arrange
         const jobId = 1;
