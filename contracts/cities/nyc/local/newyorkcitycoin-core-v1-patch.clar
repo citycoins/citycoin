@@ -3,8 +3,10 @@
 
 (impl-trait .citycoin-core-trait.citycoin-core)
 
+;; uses same and skips errors already defined in newyorkcitycoin-core-v1
+(define-constant ERR_UNAUTHORIZED (err u1001))
 ;; generic error used to disable all functions below
-(define-constant ERR_CONTRACT_DISABLED (err u1000))
+(define-constant ERR_CONTRACT_DISABLED (err u1021))
 
 (define-public (register-user (memo (optional (string-utf8 50))))
   ERR_CONTRACT_DISABLED
@@ -26,10 +28,27 @@
   ERR_CONTRACT_DISABLED
 )
 
-(define-public (set-city-wallet (newCityWallet principal))
+(define-public (shutdown-contract (stacksHeight uint))
   ERR_CONTRACT_DISABLED
 )
 
-(define-public (shutdown-contract (stacksHeight uint))
-  ERR_CONTRACT_DISABLED
+;; need to allow function to succeed one time in order to be updated
+;; as the new V1 core contract, then will fail after that
+(define-data-var upgraded bool false)
+
+(define-public (set-city-wallet (newCityWallet principal))
+  (begin
+    (asserts! (is-authorized-auth) ERR_UNAUTHORIZED)
+    (if (var-get upgraded)
+      ;; if true
+      ERR_CONTRACT_DISABLED
+      ;; if false
+      (ok (var-set upgraded true))
+    )
+  )
+)
+
+;; checks if caller is auth contract
+(define-private (is-authorized-auth)
+  (is-eq contract-caller .newyorkcitycoin-auth)
 )
