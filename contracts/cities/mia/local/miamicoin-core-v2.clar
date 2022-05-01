@@ -827,7 +827,6 @@
       (activated (var-get activationReached))
     )
     (asserts! activated ERR_CONTRACT_NOT_ACTIVATED)
-    ;; TODO: could check that core/token are in sync
     (ok {
       coinbaseThreshold1: (var-get coinbaseThreshold1),
       coinbaseThreshold2: (var-get coinbaseThreshold2),
@@ -886,7 +885,6 @@
       (activated (var-get activationReached))
     )
     (asserts! activated ERR_CONTRACT_NOT_ACTIVATED)
-    ;; TODO: could check that core/token are in sync
     (ok {
       coinbaseAmountBonus: (var-get coinbaseAmountBonus),
       coinbaseAmount1: (var-get coinbaseAmount1),

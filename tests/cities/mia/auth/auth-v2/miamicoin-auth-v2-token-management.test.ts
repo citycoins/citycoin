@@ -248,8 +248,6 @@ describe("[MiamiCoin Auth v2]", () => {
           .expectErr()
           .expectUint(MiamiCoinAuthModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
-      // TODO: feels like the test below should be replicated, will revisit
-      // it("fails with ERR_UNAUTHORIZED if submitted trait principal does not match job principal", () => {});
       it("succeeds and sets new coinbase thresholds in token and core contract", () => {
         // arrange
         const jobId = 1;
@@ -503,8 +501,6 @@ describe("[MiamiCoin Auth v2]", () => {
           .expectErr()
           .expectUint(MiamiCoinAuthModelV2.ErrCode.ERR_UNAUTHORIZED);
       });
-      // TODO: feels like the test below should be replicated, will revisit
-      // it("fails with ERR_UNAUTHORIZED if submitted trait principal does not match job principal", () => {});
       it("succeeds and sets new coinbase thresholds in token and core contract", () => {
         // arrange
         const jobId = 1;

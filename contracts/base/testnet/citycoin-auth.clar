@@ -382,7 +382,6 @@
     )
     (asserts! (not (is-eq oldContractAddress newContractAddress)) (err ERR_UNAUTHORIZED))
     (asserts! (is-authorized-city) (err ERR_UNAUTHORIZED))
-    ;; TODO: allow call via approved job
     (map-set CityCoinCoreContracts
       oldContractAddress
       {
