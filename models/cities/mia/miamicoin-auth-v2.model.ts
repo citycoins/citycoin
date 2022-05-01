@@ -211,6 +211,18 @@ export class MiamiCoinAuthModelV2 extends Model {
     );
   }
 
+  executeSetCityWalletJob(
+    jobId: number,
+    targetContract: string,
+    sender: Account
+  ): Tx {
+    return this.callPublic(
+      "execute-set-city-wallet-job",
+      [types.uint(jobId), types.principal(targetContract)],
+      sender.address
+    );
+  }
+
   setTokenUri(
     sender: Account,
     target: string,
@@ -228,14 +240,62 @@ export class MiamiCoinAuthModelV2 extends Model {
     );
   }
 
-  executeSetCityWalletJob(
+  updateCoinbaseThresholds(sender: Account, coreContract: string, targetContract: string, threshold1: number, threshold2: number, threshold3: number, threshold4: number, threshold5: number): Tx {
+    return this.callPublic(
+      "update-coinbase-thresholds",
+      [
+        types.principal(coreContract),
+        types.principal(targetContract),
+        types.uint(threshold1),
+        types.uint(threshold2),
+        types.uint(threshold3),
+        types.uint(threshold4),
+        types.uint(threshold5),
+      ],
+      sender.address
+    );
+  }
+
+  executeUpdateCoinbaseThresholdsJob(
     jobId: number,
-    targetContract: string,
+    targetCore: string,
+    targetToken: string,
     sender: Account
   ): Tx {
     return this.callPublic(
-      "execute-set-city-wallet-job",
-      [types.uint(jobId), types.principal(targetContract)],
+      "execute-update-coinbase-thresholds-job",
+      [types.uint(jobId), types.principal(targetCore), types.principal(targetToken)],
+      sender.address
+    );
+  }
+
+  updateCoinbaseAmounts(sender: Account, coreContract: string, targetContract: string, amountBonus: number, amount1: number, amount2: number, amount3: number, amount4: number, amount5: number, amountDefault: number): Tx {
+    return this.callPublic(
+      "update-coinbase-amounts",
+      [
+        types.principal(coreContract),
+        types.principal(targetContract),
+        types.uint(amountBonus),
+        types.uint(amount1),
+        types.uint(amount2),
+        types.uint(amount3),
+        types.uint(amount4),
+        types.uint(amount5),
+        types.uint(amountDefault),
+      ],
+      sender.address
+    );
+  }
+
+  executeUpdateCoinbaseAmountsJob(
+    jobId: number,
+    targetCore: string,
+    targetToken: string,
+    sender: Account
+  ): Tx {
+    return this.callPublic(
+      "execute-update-coinbase-amounts-job",
+      [types.uint(jobId), types.principal(targetCore), types.principal(targetToken)],
       sender.address
     );
   }

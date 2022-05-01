@@ -222,7 +222,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           .expectUint(NewYorkCityCoinCoreModelV2.ErrCode.ERR_FT_INSUFFICIENT_BALANCE);
       });
 
-      it("succeeds and emits one ft_transfer event to coreV2 contract", () => {
+      it("succeeds and emits one ft_transfer event to core contract", () => {
         // arrange
         const stacker = accounts.get("wallet_2")!;
         const amountTokens = 20;

@@ -11,6 +11,10 @@
       (response bool uint)
     )
 
+    (mine-many ((list 200 uint))
+      (response bool uint)
+    )
+
     (claim-mining-reward (uint)
       (response bool uint)
     )

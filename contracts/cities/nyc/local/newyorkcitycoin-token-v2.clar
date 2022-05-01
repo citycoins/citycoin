@@ -150,8 +150,7 @@
 (define-public (update-coinbase-thresholds (threshold1 uint) (threshold2 uint) (threshold3 uint) (threshold4 uint) (threshold5 uint))
   (begin
     (asserts! (is-authorized-auth) ERR_UNAUTHORIZED)
-    ;; TODO: activation guard needed?
-    ;; (asserts! (var-get tokenActivated) ERR_TOKEN_NOT_ACTIVATED)
+    (asserts! (var-get tokenActivated) ERR_TOKEN_NOT_ACTIVATED)
     (try! (set-coinbase-thresholds threshold1 threshold2 threshold3 threshold4 threshold5))
     (ok true)
   )
@@ -248,15 +247,6 @@
   (begin
     (asserts! (is-authorized-auth) ERR_UNAUTHORIZED)
     (ok (var-set tokenUri newUri))
-  )
-)
-
-;; set token emissions schedule to new values, only accessible by Auth
-(define-public (set-token-emissions (newEmissions (list 5 uint)))
-  (begin
-    (asserts! (is-authorized-auth) ERR_UNAUTHORIZED)
-    (print newEmissions)
-    (ok true)
   )
 )
 

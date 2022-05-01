@@ -12,6 +12,7 @@ enum ErrCode {
 export class MiamiCoinTokenModelV2 extends Model {
   name = "miamicoin-token-v2";
   static readonly ErrCode = ErrCode;
+  static readonly MICRO_CITYCOINS = 1000000;
 
   //////////////////////////////////////////////////
   // SIP-010 FUNCTIONS
@@ -118,6 +119,44 @@ export class MiamiCoinTokenModelV2 extends Model {
 
   convertToV2(sender: Account): Tx {
     return this.callPublic("convert-to-v2", [], sender.address);
+  }
+
+  getCoinbaseThresholds(): ReadOnlyFn {
+    return this.callReadOnly("get-coinbase-thresholds");
+  }
+
+  updateCoinbaseThresholds(sender: Account, threshold1: number, threshold2: number, threshold3: number, threshold4: number, threshold5: number): Tx {
+    return this.callPublic(
+      "update-coinbase-thresholds",
+      [
+        types.uint(threshold1),
+        types.uint(threshold2),
+        types.uint(threshold3),
+        types.uint(threshold4),
+        types.uint(threshold5),
+      ],
+      sender.address
+    );
+  }
+
+  getCoinbaseAmounts(): ReadOnlyFn {
+    return this.callReadOnly("get-coinbase-amounts");
+  }
+
+  updateCoinbaseAmounts(sender: Account, amountBonus: number, amount1: number, amount2: number, amount3: number, amount4: number, amount5: number, amountDefault: number): Tx {
+    return this.callPublic(
+      "update-coinbase-amounts",
+      [
+        types.uint(amountBonus),
+        types.uint(amount1),
+        types.uint(amount2),
+        types.uint(amount3),
+        types.uint(amount4),
+        types.uint(amount5),
+        types.uint(amountDefault),
+      ],
+      sender.address
+    );
   }
 
   //////////////////////////////////////////////////

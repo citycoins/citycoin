@@ -226,7 +226,6 @@ describe("[NewYorkCityCoin Auth v2]", () => {
 
         activeContract.expectOk().expectPrincipal(newContract);
 
-        // TODO: why the +1 and -1 here ??
         const expectedOldContractData = {
           state: types.uint(NewYorkCityCoinAuthModelV2.CoreContractState.STATE_INACTIVE),
           startHeight: types.uint(NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY + 1),
@@ -501,7 +500,6 @@ describe("[NewYorkCityCoin Auth v2]", () => {
 
         activeContract.expectOk().expectPrincipal(newContract);
 
-        // TODO: why the +1 and -1 here ??
         const expectedOldContractData = {
           state: types.uint(NewYorkCityCoinAuthModelV2.CoreContractState.STATE_INACTIVE),
           startHeight: types.uint(NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY + 1),

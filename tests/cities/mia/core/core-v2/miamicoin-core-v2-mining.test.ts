@@ -475,9 +475,8 @@ describe("[MiamiCoin Core v2]", () => {
         );
 
         // act
-        const receipt = chain.mineBlock([
-          coreV2.mineMany(amounts, miner)
-        ]).receipts[0];
+        const receipt = chain.mineBlock([coreV2.mineMany(amounts, miner)])
+          .receipts[0];
 
         // assert
         receipt.result.expectOk().expectBool(true);

@@ -43,6 +43,13 @@ jobs:
       - name: "Rename MIA core v1 coverage file"
         run: |
           mv coverage.lcov mia-core-v1-coverage.lcov
+      - name: "Execute MIA core v1 patch tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/cities/mia/core/core-v1-patch
+      - name: "Rename MIA core v1 patch coverage file"
+        run: |
+          mv coverage.lcov mia-core-v1-patch-coverage.lcov
       - name: "Execute MIA token v1 tests"
         uses: docker://hirosystems/clarinet:latest
         with:
@@ -87,6 +94,13 @@ jobs:
       - name: "Rename NYC core v1 coverage file"
         run: |
           mv coverage.lcov nyc-core-v1-coverage.lcov
+      - name: "Execute NYC core v1 patch tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/cities/nyc/core/core-v1-patch
+      - name: "Rename NYC core v1 patch coverage file"
+        run: |
+          mv coverage.lcov nyc-core-v1-patch-coverage.lcov
       - name: "Execute NYC token v1 tests"
         uses: docker://hirosystems/clarinet:latest
         with:

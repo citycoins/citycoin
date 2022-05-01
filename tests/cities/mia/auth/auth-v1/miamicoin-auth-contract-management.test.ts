@@ -203,7 +203,6 @@ describe("[MiamiCoin Auth]", () => {
 
         activeContract.expectOk().expectPrincipal(newContract);
 
-        // TODO: why the +1 and -1 here ??
         const expectedOldContractData = {
           state: types.uint(MiamiCoinAuthModel.CoreContractState.STATE_INACTIVE),
           startHeight: types.uint(MiamiCoinCoreModel.ACTIVATION_DELAY + 1),
@@ -442,7 +441,6 @@ describe("[MiamiCoin Auth]", () => {
 
         activeContract.expectOk().expectPrincipal(newContract);
 
-        // TODO: why the +1 and -1 here ??
         const expectedOldContractData = {
           state: types.uint(MiamiCoinAuthModel.CoreContractState.STATE_INACTIVE),
           startHeight: types.uint(MiamiCoinCoreModel.ACTIVATION_DELAY + 1),

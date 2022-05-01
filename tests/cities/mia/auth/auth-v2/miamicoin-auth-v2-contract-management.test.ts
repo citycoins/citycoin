@@ -152,7 +152,7 @@ describe("[MiamiCoin Auth v2]", () => {
           .expectErr()
           .expectUint(MiamiCoinAuthModelV2.ErrCode.ERR_CONTRACT_ALREADY_EXISTS);
       });
-      it("fails with ERR_CONTRACT_ALREADY_EXISTS if called with a target contract already in coreV2 contracts map", () => {
+      it("fails with ERR_CONTRACT_ALREADY_EXISTS if called with a target contract already in core contracts map", () => {
         // arrange
         const sender = accounts.get("mia_wallet")!;
         const oldContract = coreV2.address;
@@ -226,7 +226,6 @@ describe("[MiamiCoin Auth v2]", () => {
 
         activeContract.expectOk().expectPrincipal(newContract);
 
-        // TODO: why the +1 and -1 here ??
         const expectedOldContractData = {
           state: types.uint(MiamiCoinAuthModelV2.CoreContractState.STATE_INACTIVE),
           startHeight: types.uint(MiamiCoinCoreModelV2.ACTIVATION_DELAY + 1),
@@ -501,7 +500,6 @@ describe("[MiamiCoin Auth v2]", () => {
 
         activeContract.expectOk().expectPrincipal(newContract);
 
-        // TODO: why the +1 and -1 here ??
         const expectedOldContractData = {
           state: types.uint(MiamiCoinAuthModelV2.CoreContractState.STATE_INACTIVE),
           startHeight: types.uint(MiamiCoinCoreModelV2.ACTIVATION_DELAY + 1),

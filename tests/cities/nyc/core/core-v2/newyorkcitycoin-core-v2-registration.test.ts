@@ -11,7 +11,7 @@ beforeEach(() => {
   ctx = new Context();
   chain = ctx.chain;
   accounts = ctx.accounts;
-  coreV2 = ctx.models.get(NewYorkCityCoinCoreModelV2);
+  coreV2 = ctx.models.get(NewYorkCityCoinCoreModelV2, "newyorkcitycoin-core-v2");
 });
 
 describe("[NewYorkCityCoin Core v2]", () => {
