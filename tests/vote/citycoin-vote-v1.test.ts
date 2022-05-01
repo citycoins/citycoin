@@ -725,7 +725,6 @@ describe("[CityCoin Vote]", () => {
       it("succeeds and returns base proposal record with no voters", () => {
         // arrange
         const result = vote.getProposalVotes().result;
-        // TODO: refine like SendManyRecord in token model
         const expected = {
           noCount: 0,
           noMia: 0,
