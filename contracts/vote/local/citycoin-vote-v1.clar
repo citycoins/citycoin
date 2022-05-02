@@ -243,7 +243,6 @@
 (define-private (get-mia-vote-amount (user principal) (voterId uint))
   (let
     (
-      ;; TODO: update to mainnet block heights
       (userCycle12 (try! (contract-call? .citycoin-tardis-v2 get-historical-stacker-stats-or-default u4500 user)))
       (stackedCycle12 (get amountStacked userCycle12))
       (userCycle13 (try! (contract-call? .citycoin-tardis-v2 get-historical-stacker-stats-or-default u6600 user)))
@@ -263,7 +262,6 @@
 (define-private (get-nyc-vote-amount (user principal) (voterId uint))
   (let
     (
-      ;; TODO: update to mainnet block heights
       (userCycle6 (try! (contract-call? .citycoin-tardis-v2 get-historical-stacker-stats-or-default u4500 user)))
       (stackedCycle6 (get amountStacked userCycle6))
       (userCycle7 (try! (contract-call? .citycoin-tardis-v2 get-historical-stacker-stats-or-default u6600 user)))

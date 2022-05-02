@@ -15,6 +15,9 @@ on:
   # allow running manually
   workflow_dispatch:
 
+env:
+  CLARINET_DISABLE_HINTS: 1
+
 jobs:
   test-contracts:
     runs-on: ubuntu-latest
@@ -25,27 +28,131 @@ jobs:
         uses: docker://hirosystems/clarinet:latest
         with:
           args: check
-      - name: "Execute MIA tests"
+      # MIA V1 tests
+      - name: "Execute MIA auth v1 tests"
         uses: docker://hirosystems/clarinet:latest
         with:
-          args: test --coverage tests/cities/mia/
-      - name: "Rename MIA coverage file"
+          args: test --coverage tests/cities/mia/auth/auth-v1
+      - name: "Rename MIA auth v1 coverage file"
         run: |
-          mv coverage.lcov mia-coverage.lcov
-      - name: "Execute NYC tests"
+          mv coverage.lcov mia-auth-v1-coverage.lcov
+      - name: "Execute MIA core v1 tests"
         uses: docker://hirosystems/clarinet:latest
         with:
-          args: test --coverage tests/cities/nyc/
-      - name: "Rename NYC coverage file"
+          args: test --coverage tests/cities/mia/core/core-v1
+      - name: "Rename MIA core v1 coverage file"
         run: |
-          mv coverage.lcov nyc-coverage.lcov
-      - name: "Execute core tests"
+          mv coverage.lcov mia-core-v1-coverage.lcov
+      - name: "Execute MIA core v1 patch tests"
         uses: docker://hirosystems/clarinet:latest
         with:
-          args: test --coverage tests/core/
+          args: test --coverage tests/cities/mia/core/core-v1-patch
+      - name: "Rename MIA core v1 patch coverage file"
+        run: |
+          mv coverage.lcov mia-core-v1-patch-coverage.lcov
+      - name: "Execute MIA token v1 tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/cities/mia/token/token-v1
+      - name: "Rename MIA token v1 coverage file"
+        run: |
+          mv coverage.lcov mia-token-v1-coverage.lcov
+      # MIA V2 tests
+      - name: "Execute MIA auth v2 tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/cities/mia/auth/auth-v2
+      - name: "Rename MIA auth v2 coverage file"
+        run: |
+          mv coverage.lcov mia-auth-v2-coverage.lcov
+      - name: "Execute MIA core v2 tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/cities/mia/core/core-v2
+      - name: "Rename MIA core v2 coverage file"
+        run: |
+          mv coverage.lcov mia-core-v2-coverage.lcov
+      - name: "Execute MIA token v2 tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/cities/mia/token/token-v2
+      - name: "Rename MIA token v2 coverage file"
+        run: |
+          mv coverage.lcov mia-token-v2-coverage.lcov
+      # NYC V1 tests
+      - name: "Execute NYC auth v1 tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/cities/nyc/auth/auth-v1
+      - name: "Rename NYC auth v1 coverage file"
+        run: |
+          mv coverage.lcov nyc-auth-v1-coverage.lcov
+      - name: "Execute NYC core v1 tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/cities/nyc/core/core-v1
+      - name: "Rename NYC core v1 coverage file"
+        run: |
+          mv coverage.lcov nyc-core-v1-coverage.lcov
+      - name: "Execute NYC core v1 patch tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/cities/nyc/core/core-v1-patch
+      - name: "Rename NYC core v1 patch coverage file"
+        run: |
+          mv coverage.lcov nyc-core-v1-patch-coverage.lcov
+      - name: "Execute NYC token v1 tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/cities/nyc/token/token-v1
+      - name: "Rename NYC token v1 coverage file"
+        run: |
+          mv coverage.lcov nyc-token-v1-coverage.lcov
+      # NYC V2 tests
+      - name: "Execute NYC auth v2 tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/cities/nyc/auth/auth-v2
+      - name: "Rename NYC auth v2 coverage file"
+        run: |
+          mv coverage.lcov nyc-auth-v2-coverage.lcov
+      - name: "Execute NYC core v2 tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/cities/nyc/core/core-v2
+      - name: "Rename NYC core v2 coverage file"
+        run: |
+          mv coverage.lcov nyc-core-v2-coverage.lcov
+      - name: "Execute NYC token v2 tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/cities/nyc/token/token-v2
+      - name: "Rename NYC token v2 coverage file"
+        run: |
+          mv coverage.lcov nyc-token-v2-coverage.lcov
+      # Base tests
+      - name: "Execute base auth tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/base/auth
+      - name: "Rename base auth coverage file"
+        run: |
+          mv coverage.lcov base-auth-coverage.lcov
+      - name: "Execute base core tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/base/core
       - name: "Rename core coverage file"
         run: |
-          mv coverage.lcov core-coverage.lcov
+          mv coverage.lcov base-core-coverage.lcov
+      - name: "Execute base token tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/base/token
+      - name: "Rename base token coverage file"
+        run: |
+          mv coverage.lcov base-token-coverage.lcov
+      # Misc tests
       - name: "Execute tardis tests"
         uses: docker://hirosystems/clarinet:latest
         with:
@@ -67,6 +174,13 @@ jobs:
       - name: "Rename vote coverage file"
         run: |
           mv coverage.lcov vote-coverage.lcov
+      - name: "Execute vrf tests"
+        uses: docker://hirosystems/clarinet:latest
+        with:
+          args: test --coverage tests/vrf/
+      - name: "Rename vrf coverage file"
+        run: |
+          mv coverage.lcov vrf-coverage.lcov
       - name: "Combine code coverage files"
         run: |
           ls -Rlh *.lcov

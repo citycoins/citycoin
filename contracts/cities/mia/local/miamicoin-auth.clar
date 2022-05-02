@@ -577,6 +577,7 @@
 ;; DELETE BEFORE DEPLOYING TO MAINNET
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
 (define-constant DEPLOYED_AT block-height)
 
 (define-private (is-test-env)
@@ -607,5 +608,13 @@
   (begin
     (asserts! (is-test-env) (err ERR_UNAUTHORIZED))
     (ok (var-set activeCoreContract .miamicoin-core-v1))
+  )
+)
+
+(define-public (test-set-city-wallet-patch (coreContract <coreTrait>))
+  (begin
+    (asserts! (is-test-env) (err ERR_UNAUTHORIZED))
+    (as-contract (try! (contract-call? coreContract set-city-wallet (var-get cityWallet))))
+    (ok true)
   )
 )
