@@ -12,6 +12,7 @@ beforeEach(() => {
   chain = ctx.chain;
   accounts = ctx.accounts;
   coreV2 = ctx.models.get(MiamiCoinCoreModelV2, "miamicoin-core-v2");
+  chain.mineEmptyBlock(59000);
 });
 
 describe("[MiamiCoin Core v2]", () => {
@@ -41,11 +42,11 @@ describe("[MiamiCoin Core v2]", () => {
         const result = coreV2.getCoinbaseThresholds().result;
         // assert
         const expectedResult = {
-          coinbaseThreshold1: types.uint(activationBlockHeight + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH),     // 210151
-          coinbaseThreshold2: types.uint(activationBlockHeight + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 2), // 420151
-          coinbaseThreshold3: types.uint(activationBlockHeight + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 3), // 630151
-          coinbaseThreshold4: types.uint(activationBlockHeight + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 4), // 840151
-          coinbaseThreshold5: types.uint(activationBlockHeight + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 5)  // 1050151
+          coinbaseThreshold1: types.uint(MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH),     // 210151
+          coinbaseThreshold2: types.uint(MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 2), // 420151
+          coinbaseThreshold3: types.uint(MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 3), // 630151
+          coinbaseThreshold4: types.uint(MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 4), // 840151
+          coinbaseThreshold5: types.uint(MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 5)  // 1050151
         };
         assertEquals(result.expectOk().expectTuple(), expectedResult);
       });

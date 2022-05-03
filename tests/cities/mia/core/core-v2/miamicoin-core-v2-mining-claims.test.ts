@@ -12,6 +12,7 @@ beforeEach(() => {
   chain = ctx.chain;
   accounts = ctx.accounts;
   coreV2 = ctx.models.get(MiamiCoinCoreModelV2, "miamicoin-core-v2");
+  chain.mineEmptyBlock(59000);
 });
 
 describe("[MiamiCoin Core v2]", () => {
@@ -173,7 +174,9 @@ describe("[MiamiCoin Core v2]", () => {
           .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_MINER_DID_NOT_WIN);
       });
 
-      it("succeeds and mints 250,000,000,000 tokens in 1st issuance cycle, during bonus period", () => {
+      // skipped because contract will be activated based on the
+      // original block height and 250,000 bonus period is over
+      it.skip("succeeds and mints 250,000,000,000 tokens in 1st issuance cycle, during bonus period", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
@@ -216,12 +219,10 @@ describe("[MiamiCoin Core v2]", () => {
           coreV2.testSetActivationThreshold(1),
           coreV2.registerUser(miner),
         ]);
+
         const activationBlockHeight =
           setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
-
-        chain.mineEmptyBlockUntil(
-          activationBlockHeight + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + 1
-        );
+        chain.mineEmptyBlockUntil(activationBlockHeight);
 
         const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
         chain.mineEmptyBlock(MiamiCoinCoreModelV2.TOKEN_REWARD_MATURITY);
@@ -247,17 +248,16 @@ describe("[MiamiCoin Core v2]", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
-        const setupBlock = chain.mineBlock([
+        chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
           coreV2.testSetActivationThreshold(1),
           coreV2.registerUser(miner),
         ]);
-        const activationBlockHeight =
-          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
-        chain.mineEmptyBlockUntil(
-          activationBlockHeight + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH + 1
-        );
+        const targetBlockHeight = MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + 
+          MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + 
+          MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH + 1;
+        chain.mineEmptyBlockUntil(targetBlockHeight);
 
         const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
         chain.mineEmptyBlock(MiamiCoinCoreModelV2.TOKEN_REWARD_MATURITY);
@@ -283,17 +283,16 @@ describe("[MiamiCoin Core v2]", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
-        const setupBlock = chain.mineBlock([
+        chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
           coreV2.testSetActivationThreshold(1),
           coreV2.registerUser(miner),
         ]);
-        const activationBlockHeight =
-          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
-        chain.mineEmptyBlockUntil(
-          activationBlockHeight + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 2 + 1
-        );
+        const targetBlockHeight = MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + 
+          MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + 
+          MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 2 + 1;
+        chain.mineEmptyBlockUntil(targetBlockHeight);
 
         const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
         chain.mineEmptyBlock(MiamiCoinCoreModelV2.TOKEN_REWARD_MATURITY);
@@ -319,17 +318,16 @@ describe("[MiamiCoin Core v2]", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
-        const setupBlock = chain.mineBlock([
+        chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
           coreV2.testSetActivationThreshold(1),
           coreV2.registerUser(miner),
         ]);
-        const activationBlockHeight =
-          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
-        chain.mineEmptyBlockUntil(
-          activationBlockHeight + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 3 + 1
-        );
+        const targetBlockHeight = MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + 
+          MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + 
+          MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 3 + 1;
+        chain.mineEmptyBlockUntil(targetBlockHeight);
 
         const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
         chain.mineEmptyBlock(MiamiCoinCoreModelV2.TOKEN_REWARD_MATURITY);
@@ -355,17 +353,16 @@ describe("[MiamiCoin Core v2]", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
-        const setupBlock = chain.mineBlock([
+        chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
           coreV2.testSetActivationThreshold(1),
           coreV2.registerUser(miner),
         ]);
-        const activationBlockHeight =
-          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
-        chain.mineEmptyBlockUntil(
-          activationBlockHeight + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 4 + 1
-        );
+        const targetBlockHeight = MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + 
+          MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + 
+          MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 4 + 1;
+        chain.mineEmptyBlockUntil(targetBlockHeight);
 
         const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
         chain.mineEmptyBlock(MiamiCoinCoreModelV2.TOKEN_REWARD_MATURITY);
@@ -391,17 +388,16 @@ describe("[MiamiCoin Core v2]", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
         const amount = 2;
-        const setupBlock = chain.mineBlock([
+        chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
           coreV2.testSetActivationThreshold(1),
           coreV2.registerUser(miner),
         ]);
-        const activationBlockHeight =
-          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
 
-        chain.mineEmptyBlockUntil(
-          activationBlockHeight + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 5 + 1
-        );
+        const targetBlockHeight = MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + 
+          MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + 
+          MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 5 + 1;
+        chain.mineEmptyBlockUntil(targetBlockHeight);
 
         const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
         chain.mineEmptyBlock(MiamiCoinCoreModelV2.TOKEN_REWARD_MATURITY);
