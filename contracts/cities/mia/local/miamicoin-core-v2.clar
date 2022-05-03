@@ -63,11 +63,8 @@
 
 ;; returns Stacks block height registration was activated at plus activationDelay
 (define-read-only (get-activation-block)
-  (let
-    (
-      (activated (var-get activationReached))
-    )
-    (asserts! activated ERR_CONTRACT_NOT_ACTIVATED)
+  (begin
+    (asserts! (get-activation-status) ERR_CONTRACT_NOT_ACTIVATED)
     (ok (var-get activationBlock))
   )
 )
