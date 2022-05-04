@@ -50,7 +50,7 @@ describe("[MiamiCoin Core v2]", () => {
         // arrange
         const stacker = accounts.get("wallet_2")!;
         const stackerId = 1;
-        const targetCycle = 1;
+        const targetCycle = MiamiCoinCoreModelV2.REWARD_CYCLE_OFFSET;
         const amountTokens = 200;
         const setupBlock = chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
@@ -312,7 +312,7 @@ describe("[MiamiCoin Core v2]", () => {
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
-        const stackingBlock = chain.mineBlock([
+        chain.mineBlock([
           coreV2.stackTokens(amountTokens, lockPeriod, stacker),
         ]);
 

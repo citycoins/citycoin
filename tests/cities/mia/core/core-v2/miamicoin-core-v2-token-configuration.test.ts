@@ -35,18 +35,21 @@ describe("[MiamiCoin Core v2]", () => {
           coreV2.testSetActivationThreshold(1),
           coreV2.registerUser(user)
         ]);
-        const activationBlockHeight =
+        const activationBlock = MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT;
+        const bonusPeriod = MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH;
+        const epochLength = MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH;
+        const targetBlock =
           block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
-        chain.mineEmptyBlockUntil(activationBlockHeight);
+        chain.mineEmptyBlockUntil(targetBlock);
         // act
         const result = coreV2.getCoinbaseThresholds().result;
         // assert
         const expectedResult = {
-          coinbaseThreshold1: types.uint(MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH),     // 210151
-          coinbaseThreshold2: types.uint(MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 2), // 420151
-          coinbaseThreshold3: types.uint(MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 3), // 630151
-          coinbaseThreshold4: types.uint(MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 4), // 840151
-          coinbaseThreshold5: types.uint(MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 5)  // 1050151
+          coinbaseThreshold1: types.uint(activationBlock + bonusPeriod + epochLength),     // 210151
+          coinbaseThreshold2: types.uint(activationBlock + bonusPeriod + epochLength * 2), // 420151
+          coinbaseThreshold3: types.uint(activationBlock + bonusPeriod + epochLength * 3), // 630151
+          coinbaseThreshold4: types.uint(activationBlock + bonusPeriod + epochLength * 4), // 840151
+          coinbaseThreshold5: types.uint(activationBlock + bonusPeriod + epochLength * 5)  // 1050151
         };
         assertEquals(result.expectOk().expectTuple(), expectedResult);
       });
@@ -61,6 +64,7 @@ describe("[MiamiCoin Core v2]", () => {
       it("succeeds and returns coinbase amounts", () => {
         // arrange
         const user = accounts.get("wallet_1")!;
+        const microCitycoins = MiamiCoinCoreModelV2.MICRO_CITYCOINS;
         const block = chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
           coreV2.testSetActivationThreshold(1),
@@ -73,13 +77,13 @@ describe("[MiamiCoin Core v2]", () => {
         const result = coreV2.getCoinbaseAmounts().result;
         // assert
         const expectedResult = {
-          coinbaseAmount1: types.uint(100000 * MiamiCoinCoreModelV2.MICRO_CITYCOINS),
-          coinbaseAmount2: types.uint(50000 * MiamiCoinCoreModelV2.MICRO_CITYCOINS),
-          coinbaseAmount3: types.uint(25000 * MiamiCoinCoreModelV2.MICRO_CITYCOINS),
-          coinbaseAmount4: types.uint(12500 * MiamiCoinCoreModelV2.MICRO_CITYCOINS),
-          coinbaseAmount5: types.uint(6250 * MiamiCoinCoreModelV2.MICRO_CITYCOINS),
-          coinbaseAmountBonus: types.uint(250000 * MiamiCoinCoreModelV2.MICRO_CITYCOINS),
-          coinbaseAmountDefault: types.uint(3125 * MiamiCoinCoreModelV2.MICRO_CITYCOINS),
+          coinbaseAmount1: types.uint(100000 * microCitycoins),
+          coinbaseAmount2: types.uint(50000 * microCitycoins),
+          coinbaseAmount3: types.uint(25000 * microCitycoins),
+          coinbaseAmount4: types.uint(12500 * microCitycoins),
+          coinbaseAmount5: types.uint(6250 * microCitycoins),
+          coinbaseAmountBonus: types.uint(250000 * microCitycoins),
+          coinbaseAmountDefault: types.uint(3125 * microCitycoins),
         };
         assertEquals(result.expectOk().expectTuple(), expectedResult);
       });

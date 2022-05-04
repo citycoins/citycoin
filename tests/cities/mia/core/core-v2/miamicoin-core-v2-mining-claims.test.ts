@@ -219,7 +219,6 @@ describe("[MiamiCoin Core v2]", () => {
           coreV2.testSetActivationThreshold(1),
           coreV2.registerUser(miner),
         ]);
-
         const activationBlockHeight =
           setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
         chain.mineEmptyBlockUntil(activationBlockHeight);
@@ -255,7 +254,7 @@ describe("[MiamiCoin Core v2]", () => {
         ]);
 
         const targetBlockHeight = MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + 
-          MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + 
+          MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH +
           MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH + 1;
         chain.mineEmptyBlockUntil(targetBlockHeight);
 
@@ -290,7 +289,7 @@ describe("[MiamiCoin Core v2]", () => {
         ]);
 
         const targetBlockHeight = MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + 
-          MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + 
+          MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH +
           MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 2 + 1;
         chain.mineEmptyBlockUntil(targetBlockHeight);
 
@@ -325,7 +324,7 @@ describe("[MiamiCoin Core v2]", () => {
         ]);
 
         const targetBlockHeight = MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + 
-          MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + 
+          MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH +
           MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 3 + 1;
         chain.mineEmptyBlockUntil(targetBlockHeight);
 
@@ -360,7 +359,7 @@ describe("[MiamiCoin Core v2]", () => {
         ]);
 
         const targetBlockHeight = MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + 
-          MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + 
+          MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH +
           MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 4 + 1;
         chain.mineEmptyBlockUntil(targetBlockHeight);
 
@@ -395,7 +394,7 @@ describe("[MiamiCoin Core v2]", () => {
         ]);
 
         const targetBlockHeight = MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + 
-          MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH + 
+          MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH +
           MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 5 + 1;
         chain.mineEmptyBlockUntil(targetBlockHeight);
 
