@@ -12,6 +12,7 @@ beforeEach(() => {
   chain = ctx.chain;
   accounts = ctx.accounts;
   coreV2 = ctx.models.get(NewYorkCityCoinCoreModelV2, "newyorkcitycoin-core-v2");
+  chain.mineEmptyBlock(59000);
 });
 
 describe("[NewYorkCityCoin Core v2]", () => {

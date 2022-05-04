@@ -15,6 +15,7 @@ beforeEach(() => {
   accounts = ctx.accounts;
   coreV2 = ctx.models.get(NewYorkCityCoinCoreModelV2, "newyorkcitycoin-core-v2");
   tokenV2 = ctx.models.get(NewYorkCityCoinTokenModelV2, "newyorkcitycoin-token-v2");
+  chain.mineEmptyBlock(59000);
 });
 
 describe("[NewYorkCityCoin Core v2]", () => {
@@ -89,10 +90,15 @@ describe("[NewYorkCityCoin Core v2]", () => {
   //////////////////////////////////////////////////
   describe("MINING ACTIONS", () => {
     describe("mine-tokens()", () => {
-      it("fails with ERR_CONTRACT_NOT_ACTIVATED while trying to mine before reaching activation threshold", () => {
+      it("fails with ERR_CONTRACT_NOT_ACTIVATED while trying to mine before the activation target is reached", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
         const amountUstx = 200;
+        chain.mineBlock([
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(miner),
+        ]);
 
         // act
         const receipt = chain.mineBlock([
@@ -109,11 +115,14 @@ describe("[NewYorkCityCoin Core v2]", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
         const amountUstx = 0;
-        chain.mineBlock([
+        const block = chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
           coreV2.testSetActivationThreshold(1),
           coreV2.registerUser(miner),
         ]);
+        const activationBlockHeight =
+          block.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+        chain.mineEmptyBlock(activationBlockHeight);
 
         // act
         const receipt = chain.mineBlock([
@@ -130,11 +139,14 @@ describe("[NewYorkCityCoin Core v2]", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
         const amountUstx = miner.balance + 1;
-        chain.mineBlock([
+        const block = chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
           coreV2.testSetActivationThreshold(1),
           coreV2.registerUser(miner),
         ]);
+        const activationBlockHeight =
+          block.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+        chain.mineEmptyBlock(activationBlockHeight);
 
         // act
         const receipt = chain.mineBlock([
@@ -145,27 +157,6 @@ describe("[NewYorkCityCoin Core v2]", () => {
         receipt.result
           .expectErr()
           .expectUint(NewYorkCityCoinCoreModelV2.ErrCode.ERR_INSUFFICIENT_BALANCE);
-      });
-
-      it("fails with ERR_STACKING_NOT_VAILABLE while trying to mine before the activation period ends", () => {
-        // arrange
-        const miner = accounts.get("wallet_2")!;
-        const amountUstx = 200;
-        chain.mineBlock([
-          coreV2.testInitializeCore(coreV2.address),
-          coreV2.testSetActivationThreshold(1),
-          coreV2.registerUser(miner),
-        ]);
-
-        // act
-        const receipt = chain.mineBlock([
-          coreV2.mineTokens(amountUstx, miner),
-        ]).receipts[0];
-
-        //assert
-        receipt.result
-          .expectErr()
-          .expectUint(NewYorkCityCoinCoreModelV2.ErrCode.ERR_STACKING_NOT_AVAILABLE);
       });
 
       it("succeeds and emits one stx_transfer event to city wallet during first cycle", () => {
@@ -309,31 +300,10 @@ describe("[NewYorkCityCoin Core v2]", () => {
     });
 
     describe("mine-many()", () => {
-      it("fails with ERR_CONTRACT_NOT_ACTIVATED while trying to mine before reaching activation threshold", () => {
+      it("fails with ERR_CONTRACT_NOT_ACTIVATED while trying to mine before the activation target is reached", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
         const amounts = [1, 2, 3, 4];
-
-        // act
-        const receipt = chain.mineBlock([
-          coreV2.mineMany(amounts, miner)
-        ]).receipts[0];
-
-        // assert
-        receipt.result
-          .expectErr()
-          .expectUint(NewYorkCityCoinCoreModelV2.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
-      });
-
-      it("fails with ERR_STACKING_NOT_AVAILABLE while trying to mine before activation period ends", () => {
-        // arrange
-        const miner = accounts.get("wallet_1")!;
-        const amounts = [1, 2, 3, 4];
-        chain.mineBlock([
-          coreV2.testInitializeCore(coreV2.address),
-          coreV2.testSetActivationThreshold(1),
-          coreV2.registerUser(miner),
-        ]);
 
         // act
         const receipt = chain.mineBlock([coreV2.mineMany(amounts, miner)])
@@ -342,7 +312,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
         // assert
         receipt.result
           .expectErr()
-          .expectUint(NewYorkCityCoinCoreModelV2.ErrCode.ERR_STACKING_NOT_AVAILABLE);
+          .expectUint(NewYorkCityCoinCoreModelV2.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
       });
 
       it("fails with ERR_INSUFFICIENT_COMMITMENT while providing empty list of amounts", () => {
@@ -506,8 +476,9 @@ describe("[NewYorkCityCoin Core v2]", () => {
         );
 
         // act
-        const receipt = chain.mineBlock([coreV2.mineMany(amounts, miner)])
-          .receipts[0];
+        const receipt = chain.mineBlock([
+          coreV2.mineMany(amounts, miner)
+        ]).receipts[0];
 
         // assert
         receipt.result.expectOk().expectBool(true);
