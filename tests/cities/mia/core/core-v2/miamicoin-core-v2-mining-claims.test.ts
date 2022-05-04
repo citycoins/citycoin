@@ -290,7 +290,7 @@ describe("[MiamiCoin Core v2]", () => {
 
         const targetBlockHeight = MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + 
           MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH +
-          MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 2 + 1;
+          MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 3 + 1;
         chain.mineEmptyBlockUntil(targetBlockHeight);
 
         const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
@@ -325,7 +325,7 @@ describe("[MiamiCoin Core v2]", () => {
 
         const targetBlockHeight = MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + 
           MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH +
-          MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 3 + 1;
+          MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 7 + 1;
         chain.mineEmptyBlockUntil(targetBlockHeight);
 
         const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
@@ -360,7 +360,7 @@ describe("[MiamiCoin Core v2]", () => {
 
         const targetBlockHeight = MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + 
           MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH +
-          MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 4 + 1;
+          MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 15 + 1;
         chain.mineEmptyBlockUntil(targetBlockHeight);
 
         const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
@@ -395,7 +395,7 @@ describe("[MiamiCoin Core v2]", () => {
 
         const targetBlockHeight = MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + 
           MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH +
-          MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 5 + 1;
+          MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 31 + 1;
         chain.mineEmptyBlockUntil(targetBlockHeight);
 
         const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);

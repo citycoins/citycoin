@@ -290,7 +290,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
 
         const targetBlockHeight = NewYorkCityCoinCoreModelV2.NEWYORKCITYCOIN_ACTIVATION_HEIGHT +
           NewYorkCityCoinCoreModelV2.BONUS_PERIOD_LENGTH +
-          NewYorkCityCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 2 + 1;
+          NewYorkCityCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 3 + 1;
         chain.mineEmptyBlockUntil(targetBlockHeight);
 
         const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
@@ -325,7 +325,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
 
         const targetBlockHeight = NewYorkCityCoinCoreModelV2.NEWYORKCITYCOIN_ACTIVATION_HEIGHT +
           NewYorkCityCoinCoreModelV2.BONUS_PERIOD_LENGTH +
-          NewYorkCityCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 3 + 1;
+          NewYorkCityCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 7 + 1;
         chain.mineEmptyBlockUntil(targetBlockHeight);
 
         const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
@@ -360,7 +360,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
 
         const targetBlockHeight = NewYorkCityCoinCoreModelV2.NEWYORKCITYCOIN_ACTIVATION_HEIGHT +
           NewYorkCityCoinCoreModelV2.BONUS_PERIOD_LENGTH +
-          NewYorkCityCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 4 + 1;
+          NewYorkCityCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 15 + 1;
         chain.mineEmptyBlockUntil(targetBlockHeight);
 
         const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
@@ -395,7 +395,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
 
         const targetBlockHeight = NewYorkCityCoinCoreModelV2.NEWYORKCITYCOIN_ACTIVATION_HEIGHT +
           NewYorkCityCoinCoreModelV2.BONUS_PERIOD_LENGTH +
-          NewYorkCityCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 5 + 1;
+          NewYorkCityCoinCoreModelV2.TOKEN_EPOCH_LENGTH * 31 + 1;
         chain.mineEmptyBlockUntil(targetBlockHeight);
 
         const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);

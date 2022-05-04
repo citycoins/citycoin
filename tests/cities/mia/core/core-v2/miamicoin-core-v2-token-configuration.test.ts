@@ -45,11 +45,11 @@ describe("[MiamiCoin Core v2]", () => {
         const result = coreV2.getCoinbaseThresholds().result;
         // assert
         const expectedResult = {
-          coinbaseThreshold1: types.uint(activationBlock + bonusPeriod + epochLength),     // 210151
-          coinbaseThreshold2: types.uint(activationBlock + bonusPeriod + epochLength * 2), // 420151
-          coinbaseThreshold3: types.uint(activationBlock + bonusPeriod + epochLength * 3), // 630151
-          coinbaseThreshold4: types.uint(activationBlock + bonusPeriod + epochLength * 4), // 840151
-          coinbaseThreshold5: types.uint(activationBlock + bonusPeriod + epochLength * 5)  // 1050151
+          coinbaseThreshold1: types.uint(activationBlock + bonusPeriod + epochLength),
+          coinbaseThreshold2: types.uint(activationBlock + bonusPeriod + epochLength * 3),
+          coinbaseThreshold3: types.uint(activationBlock + bonusPeriod + epochLength * 7),
+          coinbaseThreshold4: types.uint(activationBlock + bonusPeriod + epochLength * 15),
+          coinbaseThreshold5: types.uint(activationBlock + bonusPeriod + epochLength * 31)
         };
         assertEquals(result.expectOk().expectTuple(), expectedResult);
       });
