@@ -117,7 +117,7 @@ describe("[NewYorkCityCoin Upgrade v1-v2]", () => {
 
     // fast-forward to just before the upgrade
     // and mine past the shutdown height
-    chain.mineEmptyBlockUntil(58850);
+    chain.mineEmptyBlockUntil(upgradeTarget - 50);
     const minerCommits = new Array(100).fill(minerCommit * 100);
     chain.mineBlock([
       core.mineMany(minerCommits, user1),
