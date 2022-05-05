@@ -29,10 +29,11 @@ beforeEach(() => {
   tokenV2 = ctx.models.get(MiamiCoinTokenModelV2, "miamicoin-token-v2");
 });
 
-describe("[MiamiCoin Core Upgrade v1-v2]", () => {
+describe("[MiamiCoin Upgrade v1-v2]", () => {
   const jobId = 1;
   const minerCommit = 10;
   const mintAmount = 1000000;
+  const upgradeTarget = 58905;
   let sender: Account;
   let approver1: Account;
   let approver2: Account;
@@ -67,22 +68,21 @@ describe("[MiamiCoin Core Upgrade v1-v2]", () => {
     chain.mineEmptyBlockUntil(activationBlock);
 
     // mine tokens for claim in past
-    // console.log("---------- Mining")
-    // console.log(`block: 24646, user1`)
+    // block: 24646, user1
     chain.mineBlock([
       core.mineTokens(minerCommit * 1000, user1),
       core.mineTokens(minerCommit, user2),
       core.mineTokens(minerCommit, user3),
     ]);
     chain.mineEmptyBlock(100);
-    // console.log(`block: 24747, user2`)
+    // block: 24747, user2
     chain.mineBlock([
       core.mineTokens(minerCommit, user1),
       core.mineTokens(minerCommit * 1000, user2),
       core.mineTokens(minerCommit, user3),
     ]);
     chain.mineEmptyBlock(100);
-    // console.log(`block: 24848, user3`)
+    // block: 24848, user3
     chain.mineBlock([
       core.mineTokens(minerCommit, user1),
       core.mineTokens(minerCommit, user2),
@@ -93,8 +93,6 @@ describe("[MiamiCoin Core Upgrade v1-v2]", () => {
     // stack tokens for testing claims
     // before during and after shutdown
     chain.mineEmptyBlockUntil(46000);
-    // console.log("---------- Stacking")
-    // console.log(`block: 46,000`)
     chain.mineBlock([
       core.stackTokens(1000, 3, user1),  // cycles 11 - 13
       core.stackTokens(1000, 6, user2),  // cycles 11 - 16
@@ -119,17 +117,13 @@ describe("[MiamiCoin Core Upgrade v1-v2]", () => {
 
     // fast-forward to just before the upgrade
     // and mine past the shutdown height
-    chain.mineEmptyBlockUntil(58949);
-    // console.log("---------- Mining past shutdown")
-    // console.log(`block: 58,950`)
+    chain.mineEmptyBlockUntil(58850);
     const minerCommits = new Array(100).fill(minerCommit * 100);
     chain.mineBlock([
       core.mineMany(minerCommits, user1),
     ]);
 
     // setup upgrade job
-    // console.log("---------- Upgrade prep")
-    // console.log(`block: 58,951`)
     chain.mineBlock([
       auth.createJob(
         "upgrade core",
@@ -157,12 +151,10 @@ describe("[MiamiCoin Core Upgrade v1-v2]", () => {
     // fast-forward to proposed shutdown height
     // and setup upgrade using approvers job
     // citycoin-core-v1 -> citycoin-core-v1-patch
-    chain.mineEmptyBlockUntil(59000);
+    chain.mineEmptyBlockUntil(upgradeTarget);
     
-    // perform contract upgrade and activate
-    // new core-v2 contract for mining/stacking
-    // console.log("---------- Contract upgrade")
-    // console.log(`block: 59,000`)
+    // perform contract upgrade to v1-patch and
+    // activate the new core-v2 contract
     const upgradeBlock = chain.mineBlock([
       auth.executeUpgradeCoreContractJob(
         jobId,
@@ -379,10 +371,10 @@ describe("[MiamiCoin Core Upgrade v1-v2]", () => {
     block.receipts[2].result.expectOk().expectBool(true);
   });
 
-  it("claim-mining-reward() succeeds in v1 with block prior to end of the upgrade", () => {
+  it("claim-mining-reward() succeeds in v1 with two blocks prior to end of the upgrade", () => {
     // arrange
-    const targetBlock1 = 58998;
-    const targetBlock2 = 58999;
+    const targetBlock1 = upgradeTarget - 2;
+    const targetBlock2 = upgradeTarget - 1;
     // act
     const block = chain.mineBlock([
       core.claimMiningReward(targetBlock1, user1),
