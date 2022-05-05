@@ -83,11 +83,11 @@
   (let
     (
       (coreContractMap (try! (contract-call? .miamicoin-auth-v2 get-core-contract-info coreContract)))
-      (threshold1 (+ stacksHeight TOKEN_BONUS_PERIOD TOKEN_EPOCH_LENGTH))        ;; 35,000 blocks
-      (threshold2 (+ stacksHeight TOKEN_BONUS_PERIOD (* u2 TOKEN_EPOCH_LENGTH))) ;; 85,000 blocks
-      (threshold3 (+ stacksHeight TOKEN_BONUS_PERIOD (* u3 TOKEN_EPOCH_LENGTH))) ;; 185,000 blocks
-      (threshold4 (+ stacksHeight TOKEN_BONUS_PERIOD (* u4 TOKEN_EPOCH_LENGTH))) ;; 385,000 blocks
-      (threshold5 (+ stacksHeight TOKEN_BONUS_PERIOD (* u5 TOKEN_EPOCH_LENGTH))) ;; 785,000 blocks
+      (threshold1 (+ stacksHeight TOKEN_BONUS_PERIOD TOKEN_EPOCH_LENGTH))         ;; 35,000 blocks
+      (threshold2 (+ stacksHeight TOKEN_BONUS_PERIOD (* u3 TOKEN_EPOCH_LENGTH)))  ;; 85,000 blocks
+      (threshold3 (+ stacksHeight TOKEN_BONUS_PERIOD (* u7 TOKEN_EPOCH_LENGTH)))  ;; 185,000 blocks
+      (threshold4 (+ stacksHeight TOKEN_BONUS_PERIOD (* u15 TOKEN_EPOCH_LENGTH))) ;; 385,000 blocks
+      (threshold5 (+ stacksHeight TOKEN_BONUS_PERIOD (* u31 TOKEN_EPOCH_LENGTH))) ;; 785,000 blocks
     )
     (asserts! (is-eq (get state coreContractMap) STATE_ACTIVE) ERR_UNAUTHORIZED)
     (asserts! (not (var-get tokenActivated)) ERR_TOKEN_ALREADY_ACTIVATED)
