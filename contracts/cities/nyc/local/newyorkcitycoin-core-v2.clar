@@ -53,19 +53,18 @@
 
 ;; REGISTRATION
 
+(define-constant NEWYORKCITYCOIN_ACTIVATION_HEIGHT u37449)
 (define-data-var activationBlock uint u340282366920938463463374607431768211455)
 (define-data-var activationDelay uint u150)
 (define-data-var activationReached bool false)
+(define-data-var activationTarget uint u0)
 (define-data-var activationThreshold uint u20)
 (define-data-var usersNonce uint u0)
 
 ;; returns Stacks block height registration was activated at plus activationDelay
 (define-read-only (get-activation-block)
-  (let
-    (
-      (activated (var-get activationReached))
-    )
-    (asserts! activated ERR_CONTRACT_NOT_ACTIVATED)
+  (begin
+    (asserts! (get-activation-status) ERR_CONTRACT_NOT_ACTIVATED)
     (ok (var-get activationBlock))
   )
 )
@@ -78,6 +77,14 @@
 ;; returns activation status as boolean
 (define-read-only (get-activation-status)
   (var-get activationReached)
+)
+
+;; returns activation target
+(define-read-only (get-activation-target)
+  (begin
+    (asserts! (get-activation-status) ERR_CONTRACT_NOT_ACTIVATED)
+    (ok (var-get activationTarget))
+  )
 )
 
 ;; returns activation threshold
@@ -156,14 +163,15 @@
     (if (is-eq newId threshold)
       (let
         (
-          (activationBlockVal (+ block-height (var-get activationDelay)))
+          (activationTargetBlock (+ block-height (var-get activationDelay)))
         )
-        (try! (contract-call? .newyorkcitycoin-auth-v2 activate-core-contract (as-contract tx-sender) activationBlockVal))
-        (try! (contract-call? .newyorkcitycoin-token-v2 activate-token (as-contract tx-sender) activationBlockVal))
+        (try! (contract-call? .newyorkcitycoin-auth-v2 activate-core-contract (as-contract tx-sender) activationTargetBlock))
+        (try! (contract-call? .newyorkcitycoin-token-v2 activate-token (as-contract tx-sender) NEWYORKCITYCOIN_ACTIVATION_HEIGHT))
         (try! (set-coinbase-thresholds))
         (try! (set-coinbase-amounts))
         (var-set activationReached true)
-        (var-set activationBlock activationBlockVal)
+        (var-set activationBlock NEWYORKCITYCOIN_ACTIVATION_HEIGHT)
+        (var-set activationTarget activationTargetBlock)
         (ok true)
       )
       (ok true)
@@ -293,7 +301,7 @@
 
 (define-public (mine-many (amounts (list 200 uint)))
   (begin
-    (asserts! (get-activation-status) ERR_CONTRACT_NOT_ACTIVATED)
+    (asserts! (is-activated) ERR_CONTRACT_NOT_ACTIVATED)
     (asserts! (> (len amounts) u0) ERR_INSUFFICIENT_COMMITMENT)
     (match (fold mine-single amounts (ok { userId: (get-or-create-user-id tx-sender), toStackers: u0, toCity: u0, stacksHeight: block-height }))
       okReturn 
@@ -369,7 +377,7 @@
       )
       (toStackers (- amountUstx toCity))
     )
-    (asserts! (get-activation-status) ERR_CONTRACT_NOT_ACTIVATED)
+    (asserts! (is-activated) ERR_CONTRACT_NOT_ACTIVATED)
     (asserts! (not (has-mined-at-block stacksHeight userId)) ERR_USER_ALREADY_MINED)
     (asserts! (> amountUstx u0) ERR_INSUFFICIENT_COMMITMENT)
     (asserts! (>= (stx-get-balance tx-sender) amountUstx) ERR_INSUFFICIENT_BALANCE)
@@ -674,7 +682,7 @@
         last: (+ targetCycle lockPeriod)
       })
     )
-    (asserts! (get-activation-status) ERR_CONTRACT_NOT_ACTIVATED)
+    (asserts! (is-activated) ERR_CONTRACT_NOT_ACTIVATED)
     (asserts! (and (> lockPeriod u0) (<= lockPeriod MAX_REWARD_CYCLES))
       ERR_CANNOT_STACK)
     (asserts! (> amountTokens u0) ERR_CANNOT_STACK)
@@ -824,7 +832,7 @@
 (define-read-only (get-coinbase-thresholds)
   (let
     (
-      (activated (var-get activationReached))
+      (activated (get-activation-status))
     )
     (asserts! activated ERR_CONTRACT_NOT_ACTIVATED)
     (ok {
@@ -882,7 +890,7 @@
 (define-read-only (get-coinbase-amounts)
   (let
     (
-      (activated (var-get activationReached))
+      (activated (get-activation-status))
     )
     (asserts! activated ERR_CONTRACT_NOT_ACTIVATED)
     (ok {
@@ -988,6 +996,12 @@
 ;; checks if caller is Auth contract
 (define-private (is-authorized-auth)
   (is-eq contract-caller .newyorkcitycoin-auth-v2)
+)
+
+;; checks if contract is fully activated to
+;; enable mining and stacking functions
+(define-private (is-activated)
+  (and (get-activation-status) (>= block-height (var-get activationTarget)))
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

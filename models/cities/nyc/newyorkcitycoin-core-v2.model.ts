@@ -38,6 +38,10 @@ export class NewYorkCityCoinCoreModelV2 extends Model {
   static readonly TOKEN_REWARD_MATURITY = 100;
   static readonly BONUS_PERIOD_LENGTH = 10000;
   static readonly MICRO_CITYCOINS = 1000000;
+  static readonly NEWYORKCITYCOIN_ACTIVATION_HEIGHT = 37449;
+  // based on shutdown at 59,000
+  // and cycle 11 starting at 60,549
+  static readonly REWARD_CYCLE_OFFSET = 11;
 
   //////////////////////////////////////////////////
   // CITY WALLET MANAGEMENT
@@ -69,6 +73,10 @@ export class NewYorkCityCoinCoreModelV2 extends Model {
 
   getActivationStatus(): ReadOnlyFn {
     return this.callReadOnly("get-activation-status");
+  }
+
+  getActivationTarget(): ReadOnlyFn {
+    return this.callReadOnly("get-activation-target");
   }
 
   getActivationThreshold(): ReadOnlyFn {

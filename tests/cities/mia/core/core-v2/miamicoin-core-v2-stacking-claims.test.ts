@@ -15,6 +15,7 @@ beforeEach(() => {
   accounts = ctx.accounts;
   coreV2 = ctx.models.get(MiamiCoinCoreModelV2, "miamicoin-core-v2");
   tokenV2 = ctx.models.get(MiamiCoinTokenModelV2, "miamicoin-token-v2");
+  chain.mineEmptyBlock(59000);
 });
 
 describe("[MiamiCoin Core v2]", () => {
@@ -23,11 +24,19 @@ describe("[MiamiCoin Core v2]", () => {
   //////////////////////////////////////////////////
   describe("STACKING CLAIMS", () => {
     describe("claim-stacking-reward()", () => {
-      it("fails with ERR_STACKING_NOT_AVAILABLE when stacking is not yet available", () => {
+      // skipped because stacking will be available
+      // based on the activation height in the past
+      it.skip("fails with ERR_STACKING_NOT_AVAILABLE when stacking is not yet available", () => {
         // arrange
         const stacker = accounts.get("wallet_1")!;
+        const amount = 500;
+        chain.mineBlock([
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(stacker),
+          tokenV2.testMint(amount, stacker),
+        ]);
         const targetCycle = 1;
-
         // act
         const receipt = chain.mineBlock([
           coreV2.claimStackingReward(targetCycle, stacker),
@@ -67,7 +76,7 @@ describe("[MiamiCoin Core v2]", () => {
       it("fails with ERR_REWARD_CYCLE_NOT_COMPLETED when reward cycle is not completed", () => {
         // arrange
         const stacker = accounts.get("wallet_1")!;
-        const targetCycle = 1;
+        const targetCycle = MiamiCoinCoreModelV2.REWARD_CYCLE_OFFSET;
         const setupBlock = chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
           coreV2.testSetActivationThreshold(1),
@@ -91,7 +100,7 @@ describe("[MiamiCoin Core v2]", () => {
       it("fails with ERR_NOTHING_TO_REDEEM when stacker didn't stack at all", () => {
         // arrange
         const stacker = accounts.get("wallet_1")!;
-        const targetCycle = 1;
+        const targetCycle = MiamiCoinCoreModelV2.REWARD_CYCLE_OFFSET;
         const setupBlock = chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
           coreV2.testSetActivationThreshold(1),
@@ -118,7 +127,7 @@ describe("[MiamiCoin Core v2]", () => {
       it("fails with ERR_NOTHING_TO_REDEEM when stacker stacked in a cycle but miners did not mine", () => {
         // arrange
         const stacker = accounts.get("wallet_1")!;
-        const targetCycle = 1;
+        const targetCycle = MiamiCoinCoreModelV2.REWARD_CYCLE_OFFSET;
         const amount = 200;
         const setupBlock = chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
@@ -146,7 +155,7 @@ describe("[MiamiCoin Core v2]", () => {
       it("fails with ERR_NOTHING_TO_REDEEM while trying to claim reward 2nd time", () => {
         // arrange
         const stacker = accounts.get("wallet_1")!;
-        const targetCycle = 1;
+        const targetCycle = MiamiCoinCoreModelV2.REWARD_CYCLE_OFFSET;
         const amount = 200;
         const setupBlock = chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
@@ -177,7 +186,7 @@ describe("[MiamiCoin Core v2]", () => {
         const miner = accounts.get("wallet_1")!;
         const amountUstx = 1000;
         const stacker = accounts.get("wallet_2")!;
-        const targetCycle = 1;
+        const targetCycle = MiamiCoinCoreModelV2.REWARD_CYCLE_OFFSET;
         const amountTokens = 200;
         const setupBlock = chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
@@ -220,7 +229,7 @@ describe("[MiamiCoin Core v2]", () => {
         // arrange
         const stacker = accounts.get("wallet_1")!;
         const amountTokens = 20;
-        const targetCycle = 1;
+        const targetCycle = MiamiCoinCoreModelV2.REWARD_CYCLE_OFFSET;
         const setupBlock = chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
           coreV2.testSetActivationThreshold(1),
@@ -254,7 +263,7 @@ describe("[MiamiCoin Core v2]", () => {
       it("succeeds and returns tokens only for last cycle in locked period", () => {
         // arrange
         const stacker = accounts.get("wallet_2")!;
-        const userId = 1;
+        const cycleOffset = MiamiCoinCoreModelV2.REWARD_CYCLE_OFFSET;
         class StackingRecord {
           constructor(
             readonly stackInCycle: number,
@@ -288,15 +297,14 @@ describe("[MiamiCoin Core v2]", () => {
           coreV2.registerUser(stacker),
           tokenV2.testMint(totalAmountTokens, stacker),
         ]);
-        const activationBlockHeight =
+        const targetBlock =
           block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
-        chain.mineEmptyBlockUntil(activationBlockHeight);
+        chain.mineEmptyBlockUntil(targetBlock);
 
         stackingRecords.forEach((record) => {
           // move chain tip to the beginning of specific cycle
           chain.mineEmptyBlockUntil(
-            activationBlockHeight +
-              record.stackInCycle * MiamiCoinCoreModelV2.REWARD_CYCLE_LENGTH
+            targetBlock + record.stackInCycle * MiamiCoinCoreModelV2.REWARD_CYCLE_LENGTH
           );
 
           chain.mineBlock([
@@ -309,15 +317,15 @@ describe("[MiamiCoin Core v2]", () => {
         });
 
         chain.mineEmptyBlockUntil(
-          MiamiCoinCoreModelV2.REWARD_CYCLE_LENGTH * (maxCycle + 1)
+          targetBlock + MiamiCoinCoreModelV2.REWARD_CYCLE_LENGTH * (maxCycle + 1)
         );
 
         // act + assert
-        for (let rewardCycle = 0; rewardCycle <= maxCycle; rewardCycle++) {
+        for (let rewardCycle = cycleOffset; rewardCycle <= maxCycle; rewardCycle++) {
           let toReturn = 0;
 
           stackingRecords.forEach((record) => {
-            let lastCycle = record.stackInCycle + record.lockPeriod;
+            let lastCycle = cycleOffset + record.stackInCycle + record.lockPeriod - 1;
 
             if (rewardCycle == lastCycle) {
               toReturn += record.amountTokens;

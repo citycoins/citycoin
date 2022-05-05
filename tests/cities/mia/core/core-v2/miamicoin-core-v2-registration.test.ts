@@ -12,6 +12,7 @@ beforeEach(() => {
   chain = ctx.chain;
   accounts = ctx.accounts;
   coreV2 = ctx.models.get(MiamiCoinCoreModelV2, "miamicoin-core-v2");
+  chain.mineEmptyBlock(59000);
 });
 
 describe("[MiamiCoin Core v2]", () => {
@@ -32,17 +33,15 @@ describe("[MiamiCoin Core v2]", () => {
       it("succeeds and returns activation height", () => {
         // arrange
         const user = accounts.get("wallet_4")!;
-        const block = chain.mineBlock([
+        chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
           coreV2.testSetActivationThreshold(1),
           coreV2.registerUser(user),
         ]);
-        const activationBlockHeight =
-          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
         // act
         const result = coreV2.getActivationBlock().result;
         // assert
-        result.expectOk().expectUint(activationBlockHeight);
+        result.expectOk().expectUint(MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT);
       });
     });
     describe("get-activation-delay()", () => {
@@ -51,6 +50,32 @@ describe("[MiamiCoin Core v2]", () => {
         const result = coreV2.getActivationDelay().result;
         // assert
         result.expectUint(MiamiCoinCoreModelV2.ACTIVATION_DELAY);
+      });
+    });
+    describe("get-activation-target()", () => {
+      it("fails with ERR_CONTRACT_NOT_ACTIVATED if called before contract is activated", () => {
+        // act
+        const result = coreV2.getActivationTarget().result;
+        // assert
+        result
+          .expectErr()
+          .expectUint(MiamiCoinCoreModelV2.ErrCode.ERR_CONTRACT_NOT_ACTIVATED);
+      });
+      it("succeeds and returns activation target", () => {
+        // arrange
+        const user = accounts.get("wallet_4")!;
+        const block = chain.mineBlock([
+          coreV2.testInitializeCore(coreV2.address),
+          coreV2.testSetActivationThreshold(1),
+          coreV2.registerUser(user),
+        ]);
+        const activationBlockHeight =
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+        chain.mineEmptyBlock(activationBlockHeight);
+        // act
+        const result = coreV2.getActivationTarget().result;
+        // assert
+        result.expectOk().expectUint(activationBlockHeight);
       });
     });
     describe("get-activation-threshold()", () => {

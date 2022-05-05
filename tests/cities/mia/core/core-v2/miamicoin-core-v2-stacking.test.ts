@@ -15,6 +15,7 @@ beforeEach(() => {
   accounts = ctx.accounts;
   coreV2 = ctx.models.get(MiamiCoinCoreModelV2, "miamicoin-core-v2");
   tokenV2 = ctx.models.get(MiamiCoinTokenModelV2, "miamicoin-token-v2");
+  chain.mineEmptyBlock(59000);
 });
 
 describe("[MiamiCoin Core v2]", () => {
@@ -31,17 +32,17 @@ describe("[MiamiCoin Core v2]", () => {
           coreV2.testSetActivationThreshold(1),
           coreV2.registerUser(user),
         ]);
-        const activationBlockHeight =
+        const targetBlock =
           setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
-        chain.mineEmptyBlockUntil(activationBlockHeight);
+        chain.mineEmptyBlockUntil(targetBlock);
         // act
         const result1 = coreV2.getFirstStacksBlockInRewardCycle(0).result;
         const result2 = coreV2.getFirstStacksBlockInRewardCycle(1).result;
-        const result3 = coreV2.getFirstStacksBlockInRewardCycle(2).result;
+        const result3 = coreV2.getFirstStacksBlockInRewardCycle(25).result;
         // assert
-        result1.expectUint(activationBlockHeight);
-        result2.expectUint(activationBlockHeight + MiamiCoinCoreModelV2.REWARD_CYCLE_LENGTH);
-        result3.expectUint(activationBlockHeight + MiamiCoinCoreModelV2.REWARD_CYCLE_LENGTH * 2);
+        result1.expectUint(MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT);
+        result2.expectUint(MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + MiamiCoinCoreModelV2.REWARD_CYCLE_LENGTH);
+        result3.expectUint(MiamiCoinCoreModelV2.MIAMICOIN_ACTIVATION_HEIGHT + MiamiCoinCoreModelV2.REWARD_CYCLE_LENGTH * 25);
       });
     });
     describe("get-entitled-stacking-reward()", () => {
@@ -49,7 +50,7 @@ describe("[MiamiCoin Core v2]", () => {
         // arrange
         const stacker = accounts.get("wallet_2")!;
         const stackerId = 1;
-        const targetCycle = 1;
+        const targetCycle = MiamiCoinCoreModelV2.REWARD_CYCLE_OFFSET;
         const amountTokens = 200;
         const setupBlock = chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
@@ -72,7 +73,7 @@ describe("[MiamiCoin Core v2]", () => {
         const amountUstx = 1000;
         const stacker = accounts.get("wallet_2")!;
         const stackerId = 1;
-        const targetCycle = 1;
+        const targetCycle = MiamiCoinCoreModelV2.REWARD_CYCLE_OFFSET;
         const amountTokens = 200;
         const setupBlock = chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
@@ -83,7 +84,7 @@ describe("[MiamiCoin Core v2]", () => {
         chain.mineEmptyBlockUntil(
           setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY + 1
         );
-        chain.mineBlock([coreV2.stackTokens(amountTokens, 1, stacker)]);
+        chain.mineBlock([coreV2.stackTokens(amountTokens, targetCycle, stacker)]);
         chain.mineEmptyBlock(MiamiCoinCoreModelV2.REWARD_CYCLE_LENGTH);
         chain.mineBlock([coreV2.mineTokens(amountUstx, miner)]);
         chain.mineEmptyBlock(MiamiCoinCoreModelV2.REWARD_CYCLE_LENGTH);
@@ -316,7 +317,7 @@ describe("[MiamiCoin Core v2]", () => {
         ]);
 
         // assert
-        const rewardCycle = 1;
+        const rewardCycle = MiamiCoinCoreModelV2.REWARD_CYCLE_OFFSET;
         const userId = 1;
         const result = coreV2.getStackerAtCycleOrDefault(
           rewardCycle,
@@ -351,8 +352,7 @@ describe("[MiamiCoin Core v2]", () => {
 
         // assert
         const userId = 1;
-
-        for (let rewardCycle = 1; rewardCycle <= lockPeriod; rewardCycle++) {
+        for (let rewardCycle = MiamiCoinCoreModelV2.REWARD_CYCLE_OFFSET; rewardCycle <= lockPeriod; rewardCycle++) {
           const result = coreV2.getStackerAtCycleOrDefault(
             rewardCycle,
             userId
@@ -369,6 +369,7 @@ describe("[MiamiCoin Core v2]", () => {
         // arrange
         const stacker = accounts.get("wallet_2")!;
         const userId = 1;
+        const cycleOffset = MiamiCoinCoreModelV2.REWARD_CYCLE_OFFSET;
         class StackingRecord {
           constructor(
             readonly stackInCycle: number,
@@ -380,9 +381,9 @@ describe("[MiamiCoin Core v2]", () => {
         const stackingRecords: StackingRecord[] = [
           new StackingRecord(1, 4, 20),
           new StackingRecord(3, 8, 432),
-          new StackingRecord(7, 3, 10),
-          new StackingRecord(8, 2, 15),
-          new StackingRecord(9, 5, 123),
+          new StackingRecord(10, 3, 10),
+          new StackingRecord(25, 2, 15),
+          new StackingRecord(32, 5, 123),
         ];
 
         const totalAmountTokens = stackingRecords.reduce(
@@ -392,7 +393,7 @@ describe("[MiamiCoin Core v2]", () => {
         const maxCycle = Math.max.apply(
           Math,
           stackingRecords.map((record) => {
-            return record.stackInCycle + 1 + record.lockPeriod;
+            return record.stackInCycle + cycleOffset + record.lockPeriod;
           })
         );
 
@@ -402,16 +403,15 @@ describe("[MiamiCoin Core v2]", () => {
           coreV2.registerUser(stacker),
           tokenV2.testMint(totalAmountTokens, stacker),
         ]);
-        const activationBlockHeight =
+        const targetBlock =
           block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
-        chain.mineEmptyBlockUntil(activationBlockHeight);
+        chain.mineEmptyBlockUntil(targetBlock);
 
         // act
         stackingRecords.forEach((record) => {
           // move chain tip to the beginning of specific cycle
           chain.mineEmptyBlockUntil(
-            activationBlockHeight +
-              record.stackInCycle * MiamiCoinCoreModelV2.REWARD_CYCLE_LENGTH
+            targetBlock + record.stackInCycle * MiamiCoinCoreModelV2.REWARD_CYCLE_LENGTH
           );
 
           chain.mineBlock([
@@ -424,21 +424,21 @@ describe("[MiamiCoin Core v2]", () => {
         });
 
         // assert
-        for (let rewardCycle = 0; rewardCycle <= maxCycle; rewardCycle++) {
+        for (let rewardCycle = cycleOffset; rewardCycle <= maxCycle; rewardCycle++) {
           let expected = {
             amountStacked: 0,
             toReturn: 0,
           };
 
           stackingRecords.forEach((record) => {
-            let firstCycle = record.stackInCycle + 1;
-            let lastCycle = record.stackInCycle + record.lockPeriod;
+            let firstCycle = cycleOffset + record.stackInCycle;
+            let lastCycle = cycleOffset + record.stackInCycle + record.lockPeriod - 1;
 
             if (rewardCycle >= firstCycle && rewardCycle <= lastCycle) {
               expected.amountStacked += record.amountTokens;
             }
 
-            if (rewardCycle == lastCycle) {
+            if (rewardCycle === lastCycle) {
               expected.toReturn += record.amountTokens;
             }
           });
@@ -467,6 +467,7 @@ describe("[MiamiCoin Core v2]", () => {
         const amountTokens = 20;
         const lockPeriod = 1;
         const stackDuringCycle = 3;
+        const cycleOffset = MiamiCoinCoreModelV2.REWARD_CYCLE_OFFSET;
         const block = chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
           coreV2.testSetActivationThreshold(1),
@@ -480,7 +481,7 @@ describe("[MiamiCoin Core v2]", () => {
         const receipt = chain.mineBlock([coreV2.stackTokens(amountTokens, lockPeriod, stacker)]).receipts[0];
 
         // assert
-        const firstCycle = stackDuringCycle + 1;
+        const firstCycle = cycleOffset + stackDuringCycle;
         const lastCycle = firstCycle + (lockPeriod - 1);
         const expectedPrintMsg = `{firstCycle: ${types.uint(firstCycle)}, lastCycle: ${types.uint(lastCycle)}}`;
 
@@ -493,6 +494,7 @@ describe("[MiamiCoin Core v2]", () => {
         const amountTokens = 20;
         const lockPeriod = 9;
         const stackDuringCycle = 8;
+        const cycleOffset = MiamiCoinCoreModelV2.REWARD_CYCLE_OFFSET;
         const block = chain.mineBlock([
           coreV2.testInitializeCore(coreV2.address),
           coreV2.testSetActivationThreshold(1),
@@ -506,7 +508,7 @@ describe("[MiamiCoin Core v2]", () => {
         const receipt = chain.mineBlock([coreV2.stackTokens(amountTokens, lockPeriod, stacker)]).receipts[0];
 
         // assert
-        const firstCycle = stackDuringCycle + 1;
+        const firstCycle = stackDuringCycle + cycleOffset;
         const lastCycle = firstCycle + (lockPeriod - 1);
         const expectedPrintMsg = `{firstCycle: ${types.uint(firstCycle)}, lastCycle: ${types.uint(lastCycle)}}`;
 
