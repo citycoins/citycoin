@@ -31,7 +31,7 @@ beforeEach(() => {
 
 describe("[MiamiCoin Core Upgrade v1-v2]", () => {
   const jobId = 1;
-  const minerCommit = 1;
+  const minerCommit = 10;
   const mintAmount = 1000000;
   let sender: Account;
   let approver1: Account;
@@ -453,7 +453,7 @@ describe("[MiamiCoin Core Upgrade v1-v2]", () => {
       "miamicoin"
     );
     receipt.events.expectSTXTransferEvent(
-      3500,
+      35000,
       core.address,
       user2.address
     );
