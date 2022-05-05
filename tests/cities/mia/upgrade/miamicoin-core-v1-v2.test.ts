@@ -404,7 +404,7 @@ describe("[MiamiCoin Upgrade v1-v2]", () => {
     block.receipts[2].result.expectOk().expectBool(true);
   });
 
-  it("claim-stacking-reward() succeeds in v1 with current reward cycle after shutdown and returns CityCoins without returning STX", () => {
+  it.skip("claim-stacking-reward() succeeds in v1 with current reward cycle after shutdown and returns CityCoins without returning STX", () => {
     // this confirms a known bug in `get-entitled-stacking-reward`
     // arrange
     const targetCycle = 16;
@@ -421,6 +421,31 @@ describe("[MiamiCoin Upgrade v1-v2]", () => {
       core.address,
       user2.address,
       "miamicoin"
+    );
+  });
+
+  it("claim-stacking-reward() succeeds in v1 with current reward cycle after shutdown and returns CityCoins and STX", () => {
+    // this confirms a the bug fix for `get-entitled-stacking-reward`
+    // arrange
+    const targetCycle = 16;
+    // act
+    const block = chain.mineBlock([
+      core.claimStackingReward(targetCycle, user2)
+    ]);
+    const receipt = block.receipts[0];
+    // assert
+    receipt.result.expectOk().expectBool(true);
+    assertEquals(receipt.events.length, 2);
+    receipt.events.expectFungibleTokenTransferEvent(
+      1000,
+      core.address,
+      user2.address,
+      "miamicoin"
+    );
+    receipt.events.expectSTXTransferEvent(
+      35000,
+      core.address,
+      user2.address
     );
   });
 

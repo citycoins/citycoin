@@ -630,8 +630,11 @@
     )
     (match (get-reward-cycle stacksHeight)
       currentCycle
-      (if (or (<= currentCycle targetCycle) (is-eq u0 userStackedThisCycle))
-        ;; this cycle hasn't finished, or Stacker contributed nothing
+      (if (and (not (var-get isShutdown)) 
+        (or (<= currentCycle targetCycle) (is-eq u0 userStackedThisCycle)))
+        ;; the contract is not shut down and
+        ;; this cycle hasn't finished
+        ;; or stacker contributed nothing
         u0
         ;; (totalUstxThisCycle * userStackedThisCycle) / totalStackedThisCycle
         (/ (* totalUstxThisCycle userStackedThisCycle) totalStackedThisCycle)
