@@ -117,7 +117,7 @@ describe("[NewYorkCityCoin Upgrade v1-v2]", () => {
 
     // fast-forward to just before the upgrade
     // and mine past the shutdown height
-    chain.mineEmptyBlockUntil(58850);
+    chain.mineEmptyBlockUntil(upgradeTarget - 50);
     const minerCommits = new Array(100).fill(minerCommit * 100);
     chain.mineBlock([
       core.mineMany(minerCommits, user1),
@@ -427,7 +427,7 @@ describe("[NewYorkCityCoin Upgrade v1-v2]", () => {
   it("claim-stacking-reward() succeeds in v1 with current reward cycle after shutdown and returns CityCoins and STX", () => {
     // this confirms a the bug fix for `get-entitled-stacking-reward`
     // arrange
-    const targetCycle = 16;
+    const targetCycle = 10;
     // act
     const block = chain.mineBlock([
       core.claimStackingReward(targetCycle, user2)
