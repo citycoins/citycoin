@@ -59,7 +59,7 @@ describe("[MiamiCoin Core v2]", () => {
           coreV2.registerUser(otherUser),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1
+          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY
         );
 
         // act
@@ -83,7 +83,7 @@ describe("[MiamiCoin Core v2]", () => {
           coreV2.registerUser(stacker),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1
+          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY
         );
 
         // act
@@ -298,7 +298,7 @@ describe("[MiamiCoin Core v2]", () => {
           tokenV2.testMint(totalAmountTokens, stacker),
         ]);
         const targetBlock =
-          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY;
         chain.mineEmptyBlockUntil(targetBlock);
 
         stackingRecords.forEach((record) => {

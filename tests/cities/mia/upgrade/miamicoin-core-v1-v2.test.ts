@@ -64,7 +64,7 @@ describe("[MiamiCoin Upgrade v1-v2]", () => {
       core.testSetActivationThreshold(1),
       core.registerUser(sender),
     ]);
-    const activationBlock = setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+    const activationBlock = setupBlock.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1;
     chain.mineEmptyBlockUntil(activationBlock);
 
     // mine tokens for claim in past
@@ -166,7 +166,7 @@ describe("[MiamiCoin Upgrade v1-v2]", () => {
       coreV2.testSetActivationThreshold(1),
       coreV2.registerUser(sender),
     ]);
-    const activationBlockUpgrade = upgradeBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+    const activationBlockUpgrade = upgradeBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY;
     chain.mineEmptyBlockUntil(activationBlockUpgrade);
   });
 
@@ -209,7 +209,7 @@ describe("[MiamiCoin Upgrade v1-v2]", () => {
       coreV2.registerUser(user)
     ]);
     const activationBlockHeight =
-      block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+      block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY;
     chain.mineEmptyBlockUntil(activationBlockHeight);
     // act
     const result = coreV2.getCoinbaseAmounts().result;
@@ -375,6 +375,7 @@ describe("[MiamiCoin Upgrade v1-v2]", () => {
     // arrange
     const targetBlock1 = upgradeTarget - 2;
     const targetBlock2 = upgradeTarget - 1;
+    chain.mineEmptyBlock(MiamiCoinCoreModelV2.TOKEN_REWARD_MATURITY);
     // act
     const block = chain.mineBlock([
       core.claimMiningReward(targetBlock1, user1),

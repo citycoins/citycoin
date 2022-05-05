@@ -30,7 +30,7 @@ export class NewYorkCityCoinCoreModelV2 extends Model {
   name = "newyorkcitycoin-core-v2"
 
   static readonly ErrCode = ErrCode;
-  static readonly ACTIVATION_DELAY = 150;
+  static readonly ACTIVATION_DELAY = 0;
   static readonly ACTIVATION_THRESHOLD = 20;
   static readonly TOKEN_EPOCH_LENGTH = 25000;
   static readonly REWARD_CYCLE_LENGTH = 2100;
