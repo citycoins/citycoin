@@ -3,9 +3,9 @@
 
 ;; TRAIT DEFINITIONS
 
-(impl-trait .citycoin-token-trait.citycoin-token)
-(impl-trait .citycoin-token-v2-trait.citycoin-token-v2)
-(use-trait coreTrait .citycoin-core-trait.citycoin-core)
+(impl-trait 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.citycoin-token-trait.citycoin-token)
+(impl-trait 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.citycoin-token-v2-trait.citycoin-token-v2)
+(use-trait coreTrait 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.citycoin-core-trait.citycoin-core)
 
 ;; ERROR CODES
 
@@ -18,9 +18,7 @@
 
 ;; SIP-010 DEFINITION
 
-(impl-trait .sip-010-trait-ft-standard.sip-010-trait)
-;; MAINNET
-;; (impl-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
+(impl-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
 (define-fungible-token newyorkcitycoin)
 
@@ -82,7 +80,7 @@
 (define-public (activate-token (coreContract principal) (stacksHeight uint))
   (let
     (
-      (coreContractMap (try! (contract-call? .newyorkcitycoin-auth-v2 get-core-contract-info coreContract)))
+      (coreContractMap (try! (contract-call? 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.newyorkcitycoin-auth-v2 get-core-contract-info coreContract)))
       (threshold1 (+ stacksHeight TOKEN_BONUS_PERIOD TOKEN_EPOCH_LENGTH))         ;; 35,000 blocks
       (threshold2 (+ stacksHeight TOKEN_BONUS_PERIOD (* u3 TOKEN_EPOCH_LENGTH)))  ;; 85,000 blocks
       (threshold3 (+ stacksHeight TOKEN_BONUS_PERIOD (* u7 TOKEN_EPOCH_LENGTH)))  ;; 185,000 blocks
@@ -221,12 +219,12 @@
 (define-public (convert-to-v2)
   (let
     (
-      (balanceV1 (unwrap! (contract-call? .newyorkcitycoin-token get-balance tx-sender) ERR_V1_BALANCE_NOT_FOUND))
+      (balanceV1 (unwrap! (contract-call? 'SP2H8PY27SEZ03MWRKS5XABZYQN17ETGQS3527SA5.newyorkcitycoin-token get-balance tx-sender) ERR_V1_BALANCE_NOT_FOUND))
     )
     ;; verify positive balance
     (asserts! (> balanceV1 u0) ERR_V1_BALANCE_NOT_FOUND)
     ;; burn old
-    (try! (contract-call? .newyorkcitycoin-token burn balanceV1 tx-sender))
+    (try! (contract-call? 'SP2H8PY27SEZ03MWRKS5XABZYQN17ETGQS3527SA5.newyorkcitycoin-token burn balanceV1 tx-sender))
     (print {
       burnedV1: balanceV1,
       mintedV2: (* balanceV1 MICRO_CITYCOINS),
@@ -254,7 +252,7 @@
 (define-public (mint (amount uint) (recipient principal))
   (let
     (
-      (coreContract (try! (contract-call? .newyorkcitycoin-auth-v2 get-core-contract-info contract-caller)))
+      (coreContract (try! (contract-call? 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.newyorkcitycoin-auth-v2 get-core-contract-info contract-caller)))
     )
     (ft-mint? newyorkcitycoin amount recipient)
   )
@@ -270,7 +268,7 @@
 
 ;; checks if caller is Auth contract
 (define-private (is-authorized-auth)
-  (is-eq contract-caller .newyorkcitycoin-auth-v2)
+  (is-eq contract-caller 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.newyorkcitycoin-auth-v2)
 )
 
 ;; SEND-MANY
@@ -299,23 +297,5 @@
       (transferOk (try! (transfer amount tx-sender to memo)))
     )
     (ok transferOk)
-  )
-)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TESTING FUNCTIONS
-;; DELETE BEFORE DEPLOYING TO MAINNET
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(define-constant DEPLOYED_AT block-height)
-
-(define-private (is-test-env)
-  (is-eq DEPLOYED_AT u0)
-)
-
-(define-public (test-mint (amount uint) (recipient principal))
-  (begin
-    (asserts! (is-test-env) ERR_UNAUTHORIZED)
-    (ft-mint? newyorkcitycoin amount recipient)
   )
 )

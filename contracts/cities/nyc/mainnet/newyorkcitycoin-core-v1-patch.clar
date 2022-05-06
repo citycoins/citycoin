@@ -1,7 +1,7 @@
 ;; NEWYORKCITYCOIN CORE CONTRACT V1 PATCH
 ;; CityCoins Protocol Version 2.0.0
 
-(impl-trait .citycoin-core-trait.citycoin-core)
+(impl-trait 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.citycoin-core-trait.citycoin-core)
 
 ;; uses same and skips errors already defined in newyorkcitycoin-core-v1
 (define-constant ERR_UNAUTHORIZED (err u1001))
@@ -50,5 +50,5 @@
 
 ;; checks if caller is auth contract
 (define-private (is-authorized-auth)
-  (is-eq contract-caller .newyorkcitycoin-auth)
+  (is-eq contract-caller 'SP2H8PY27SEZ03MWRKS5XABZYQN17ETGQS3527SA5.newyorkcitycoin-auth)
 )

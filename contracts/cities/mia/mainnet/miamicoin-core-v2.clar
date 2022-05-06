@@ -3,8 +3,8 @@
 
 ;; GENERAL CONFIGURATION
 
-(impl-trait .citycoin-core-trait.citycoin-core)
-(impl-trait .citycoin-core-v2-trait.citycoin-core-v2)
+(impl-trait 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.citycoin-core-trait.citycoin-core)
+(impl-trait 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.citycoin-core-v2-trait.citycoin-core-v2)
 (define-constant CONTRACT_OWNER tx-sender)
 
 ;; ERROR CODES
@@ -36,7 +36,7 @@
 ;; CITY WALLET MANAGEMENT
 
 ;; initial value for city wallet, set to this contract until initialized
-(define-data-var cityWallet principal .miamicoin-core-v2)
+(define-data-var cityWallet principal 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-core-v2)
 
 ;; returns set city wallet principal
 (define-read-only (get-city-wallet)
@@ -142,7 +142,7 @@
     (
       (newId (+ u1 (var-get usersNonce)))
       (threshold (var-get activationThreshold))
-      (initialized (contract-call? .miamicoin-auth-v2 is-initialized))
+      (initialized (contract-call? 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-auth-v2 is-initialized))
     )
 
     (asserts! initialized ERR_UNAUTHORIZED)
@@ -165,8 +165,8 @@
         (
           (activationTargetBlock (+ block-height (var-get activationDelay)))
         )
-        (try! (contract-call? .miamicoin-auth-v2 activate-core-contract (as-contract tx-sender) activationTargetBlock))
-        (try! (contract-call? .miamicoin-token-v2 activate-token (as-contract tx-sender) MIAMICOIN_ACTIVATION_HEIGHT))
+        (try! (contract-call? 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-auth-v2 activate-core-contract (as-contract tx-sender) activationTargetBlock))
+        (try! (contract-call? 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-token-v2 activate-token (as-contract tx-sender) MIAMICOIN_ACTIVATION_HEIGHT))
         (try! (set-coinbase-thresholds))
         (try! (set-coinbase-amounts))
         (var-set activationReached true)
@@ -466,7 +466,7 @@
       (blockStats (unwrap! (get-mining-stats-at-block minerBlockHeight) ERR_NO_MINERS_AT_BLOCK))
       (minerStats (unwrap! (get-miner-at-block minerBlockHeight userId) ERR_USER_DID_NOT_MINE_IN_BLOCK))
       (isMature (asserts! (> stacksHeight maturityHeight) ERR_CLAIMED_BEFORE_MATURITY))
-      (vrfSample (unwrap! (contract-call? .citycoin-vrf-v2 get-save-rnd maturityHeight) ERR_NO_VRF_SEED_FOUND))
+      (vrfSample (unwrap! (contract-call? 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.citycoin-vrf-v2 get-save-rnd maturityHeight) ERR_NO_VRF_SEED_FOUND))
       (commitTotal (get-last-high-value-at-block minerBlockHeight))
       (winningValue (mod vrfSample commitTotal))
     )
@@ -531,7 +531,7 @@
       (blockStats (unwrap! (get-mining-stats-at-block minerBlockHeight) false))
       (minerStats (unwrap! (get-miner-at-block minerBlockHeight userId) false))
       (maturityHeight (+ (var-get tokenRewardMaturity) minerBlockHeight))
-      (vrfSample (unwrap! (contract-call? .citycoin-vrf-v2 get-rnd maturityHeight) false))
+      (vrfSample (unwrap! (contract-call? 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.citycoin-vrf-v2 get-rnd maturityHeight) false))
       (commitTotal (get-last-high-value-at-block minerBlockHeight))
       (winningValue (mod vrfSample commitTotal))
     )
@@ -689,7 +689,7 @@
     (asserts! (and (> lockPeriod u0) (<= lockPeriod MAX_REWARD_CYCLES))
       ERR_CANNOT_STACK)
     (asserts! (> amountTokens u0) ERR_CANNOT_STACK)
-    (try! (contract-call? .miamicoin-token-v2 transfer amountTokens tx-sender (as-contract tx-sender) none))
+    (try! (contract-call? 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-token-v2 transfer amountTokens tx-sender (as-contract tx-sender) none))
     (print {
       firstCycle: targetCycle, 
       lastCycle: (- (+ targetCycle lockPeriod) u1)
@@ -803,7 +803,7 @@
     )
     ;; send back tokens if user was eligible
     (if (> toReturn u0)
-      (try! (as-contract (contract-call? .miamicoin-token-v2 transfer toReturn tx-sender user none)))
+      (try! (as-contract (contract-call? 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-token-v2 transfer toReturn tx-sender user none)))
       true
     )
     ;; send back rewards if user was eligible
@@ -852,7 +852,7 @@
 (define-private (set-coinbase-thresholds)
   (let
     (
-      (coinbaseThresholds (try! (contract-call? .miamicoin-token-v2 get-coinbase-thresholds)))
+      (coinbaseThresholds (try! (contract-call? 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-token-v2 get-coinbase-thresholds)))
     )
     (var-set coinbaseThreshold1 (get coinbaseThreshold1 coinbaseThresholds))
     (var-set coinbaseThreshold2 (get coinbaseThreshold2 coinbaseThresholds))
@@ -912,7 +912,7 @@
 (define-private (set-coinbase-amounts)
   (let
     (
-      (coinbaseAmounts (unwrap! (contract-call? .miamicoin-token-v2 get-coinbase-amounts) ERR_COINBASE_AMOUNTS_NOT_FOUND))
+      (coinbaseAmounts (unwrap! (contract-call? 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-token-v2 get-coinbase-amounts) ERR_COINBASE_AMOUNTS_NOT_FOUND))
     )
     (var-set coinbaseAmountBonus (get coinbaseAmountBonus coinbaseAmounts))
     (var-set coinbaseAmount1 (get coinbaseAmount1 coinbaseAmounts))
@@ -971,7 +971,7 @@
 
 ;; mint new tokens for claimant who won at given Stacks block height
 (define-private (mint-coinbase (recipient principal) (stacksHeight uint))
-  (as-contract (contract-call? .miamicoin-token-v2 mint (get-coinbase-amount stacksHeight) recipient))
+  (as-contract (contract-call? 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-token-v2 mint (get-coinbase-amount stacksHeight) recipient))
 )
 
 ;; UTILITIES
@@ -998,7 +998,7 @@
 
 ;; checks if caller is Auth contract
 (define-private (is-authorized-auth)
-  (is-eq contract-caller .miamicoin-auth-v2)
+  (is-eq contract-caller 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-auth-v2)
 )
 
 ;; checks if contract is fully activated to
@@ -1006,40 +1006,3 @@
 (define-private (is-activated)
   (and (get-activation-status) (>= block-height (var-get activationTarget)))
 )
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TESTING FUNCTIONS
-;; DELETE BEFORE DEPLOYING TO MAINNET
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(define-constant DEPLOYED_AT block-height)
-
-(define-private (is-test-env)
-  (is-eq DEPLOYED_AT u0)
-)
-
-(use-trait coreTraitV2 .citycoin-core-v2-trait.citycoin-core-v2)
-
-(define-public (test-set-city-wallet (newCityWallet principal))
-  (begin
-    (asserts! (is-test-env) ERR_UNAUTHORIZED)
-    (ok (var-set cityWallet newCityWallet))
-  )
-)
-
-(define-public (test-set-activation-threshold (newThreshold uint))
-  (begin
-    (asserts! (is-test-env) ERR_UNAUTHORIZED)
-    (ok (var-set activationThreshold newThreshold))
-  )
-)
-
-(define-public (test-initialize-core (coreContract <coreTraitV2>))
-  (begin
-    (asserts! (is-test-env) ERR_UNAUTHORIZED)
-    (var-set activationThreshold u1)
-    (try! (contract-call? .miamicoin-auth-v2 test-initialize-contracts coreContract))
-    (ok true)
-  )
-)
-

@@ -5,8 +5,8 @@
 
 ;; TRAIT DEFINITIONS
 
-(use-trait coreTraitV2 .citycoin-core-v2-trait.citycoin-core-v2)
-(use-trait tokenTraitV2 .citycoin-token-v2-trait.citycoin-token-v2)
+(use-trait coreTraitV2 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.citycoin-core-v2-trait.citycoin-core-v2)
+(use-trait tokenTraitV2 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.citycoin-token-v2-trait.citycoin-token-v2)
 
 ;; ERRORS
 
@@ -625,72 +625,8 @@
 
 ;; CONTRACT INITIALIZATION
 
-(map-insert Approvers 'ST1J4G6RR643BCG8G8SR6M2D9Z9KXT2NJDRK3FBTK true)
-(map-insert Approvers 'ST20ATRN26N9P05V2F1RHFRV24X8C8M3W54E427B2 true)
-(map-insert Approvers 'ST21HMSJATHZ888PD0S0SSTWP4J61TCRJYEVQ0STB true)
-(map-insert Approvers 'ST2QXSK64YQX3CQPC530K79XWQ98XFAM9W3XKEH3N true)
-(map-insert Approvers 'ST3DG3R65C9TTEEW5BC5XTSY0M1JM7NBE7GVWKTVJ true)
-
-;; MAINNET
-;; (map-insert Approvers 'SP372JVX6EWE2M0XPA84MWZYRRG2M6CAC4VVC12V1 true)
-;; (map-insert Approvers 'SP2R0DQYR7XHD161SH2GK49QRP1YSV7HE9JSG7W6G true)
-;; (map-insert Approvers 'SPN4Y5QPGQA8882ZXW90ADC2DHYXMSTN8VAR8C3X true)
-;; (map-insert Approvers 'SP3YYGCGX1B62CYAH4QX7PQE63YXG7RDTXD8BQHJQ true)
-;; (map-insert Approvers 'SP7DGES13508FHRWS1FB0J3SZA326FP6QRMB6JDE true)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TESTING FUNCTIONS
-;; DELETE BEFORE DEPLOYING TO MAINNET
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(define-constant DEPLOYED_AT block-height)
-
-(define-private (is-test-env)
-  (is-eq DEPLOYED_AT u0)
-)
-
-(define-public (test-initialize-contracts (coreContract <coreTraitV2>))
-  (let
-    (
-      (coreContractAddress (contract-of coreContract))
-    )
-    (asserts! (is-test-env) ERR_UNAUTHORIZED)
-    (asserts! (not (var-get initialized)) ERR_UNAUTHORIZED)
-    (map-set CoreContracts
-      coreContractAddress
-      {
-        state: STATE_DEPLOYED,
-        startHeight: u0,
-        endHeight: u0
-      })
-    (try! (contract-call? coreContract set-city-wallet (var-get cityWallet)))
-    (var-set initialized true)
-    (ok true)
-  )
-)
-
-(define-public (test-set-active-core-contract)
-  (begin
-    (asserts! (is-test-env) ERR_UNAUTHORIZED)
-    (ok (var-set activeCoreContract .newyorkcitycoin-core-v2))
-  )
-)
-
-(define-public (test-set-core-contract-state (coreContract <coreTraitV2>) (state uint))
-  (let
-    (
-      (coreContractAddress (contract-of coreContract))
-    )
-    (asserts! (is-test-env) ERR_UNAUTHORIZED)
-    (asserts! (or (>= state STATE_DEPLOYED) (<= state STATE_INACTIVE)) ERR_UNAUTHORIZED)
-    (map-set CoreContracts
-      coreContractAddress
-      {
-        state: state,
-        startHeight: u0,
-        endHeight: u0
-      }
-    )
-    (ok true)
-  )
-)
+(map-insert Approvers 'SP372JVX6EWE2M0XPA84MWZYRRG2M6CAC4VVC12V1 true)
+(map-insert Approvers 'SP2R0DQYR7XHD161SH2GK49QRP1YSV7HE9JSG7W6G true)
+(map-insert Approvers 'SPN4Y5QPGQA8882ZXW90ADC2DHYXMSTN8VAR8C3X true)
+(map-insert Approvers 'SP3YYGCGX1B62CYAH4QX7PQE63YXG7RDTXD8BQHJQ true)
+(map-insert Approvers 'SP7DGES13508FHRWS1FB0J3SZA326FP6QRMB6JDE true)

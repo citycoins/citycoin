@@ -1,7 +1,7 @@
 ;; MIAMICOIN CORE CONTRACT V1 PATCH
 ;; CityCoins Protocol Version 2.0.0
 
-(impl-trait .citycoin-core-trait.citycoin-core)
+(impl-trait 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.citycoin-core-trait.citycoin-core)
 
 ;; uses same and skips errors already defined in miamicoin-core-v1
 (define-constant ERR_UNAUTHORIZED (err u1001))
@@ -52,7 +52,7 @@
 
 ;; checks if caller is auth contract
 (define-private (is-authorized-auth)
-  (is-eq contract-caller .miamicoin-auth)
+  (is-eq contract-caller 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.miamicoin-auth)
 )
 
 ;; V1 TO V2 CONVERSION
@@ -61,7 +61,7 @@
 (define-public (burn-mia-v1 (amount uint) (owner principal))
   (begin
     (asserts! (is-eq tx-sender owner) ERR_UNAUTHORIZED)
-    (as-contract (try! (contract-call? .miamicoin-token burn amount owner)))
+    (as-contract (try! (contract-call? 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.miamicoin-token burn amount owner)))
     (ok true)
   )
 )
