@@ -494,9 +494,7 @@
 ;; CITY WALLET MANAGEMENT
 
 ;; initial value for city wallet
-(define-data-var cityWallet principal 'STFCVYY1RJDNJHST7RRTPACYHVJQDJ7R1DWTQHQA)
-;; MAINNET
-;; (define-data-var cityWallet principal 'SM2MARAVW6BEJCD13YV2RHGYHQWT7TDDNMNRB1MVT)
+(define-data-var cityWallet principal 'SM2MARAVW6BEJCD13YV2RHGYHQWT7TDDNMNRB1MVT)
 
 ;; returns city wallet principal
 (define-read-only (get-city-wallet)
@@ -625,7 +623,6 @@
 
 ;; CONTRACT INITIALIZATION
 
-;; MAINNET
 (map-insert Approvers 'SP372JVX6EWE2M0XPA84MWZYRRG2M6CAC4VVC12V1 true)
 (map-insert Approvers 'SP2R0DQYR7XHD161SH2GK49QRP1YSV7HE9JSG7W6G true)
 (map-insert Approvers 'SPN4Y5QPGQA8882ZXW90ADC2DHYXMSTN8VAR8C3X true)
