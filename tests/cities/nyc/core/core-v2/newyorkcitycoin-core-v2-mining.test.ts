@@ -315,7 +315,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
     });
 
     describe("mine-many()", () => {
-      it("fails with ERR_CONTRACT_NOT_ACTIVATED while trying to mine the before the contract is initialized", () => {
+      it("fails with ERR_CONTRACT_NOT_ACTIVATED while trying to mine before the contract is initialized", () => {
         // arrange
         const miner = accounts.get("wallet_2")!;
         const amounts = [1, 2, 3, 4];
