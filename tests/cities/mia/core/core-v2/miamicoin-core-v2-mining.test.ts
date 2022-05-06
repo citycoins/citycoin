@@ -40,7 +40,6 @@ describe("[MiamiCoin Core v2]", () => {
           coreV2.mineTokens(amount, miner),
           coreV2.mineTokens(amount * 1000, miner2),
         ]);
-        console.log(`block: ${JSON.stringify(block)}`);
         chain.mineEmptyBlock(MiamiCoinCoreModelV2.TOKEN_REWARD_MATURITY);
 
         // act
