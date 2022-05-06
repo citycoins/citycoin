@@ -59,7 +59,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           coreV2.registerUser(otherUser),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY
         );
 
         // act
@@ -83,7 +83,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           coreV2.registerUser(stacker),
         ]);
         chain.mineEmptyBlockUntil(
-          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY
         );
 
         // act
@@ -298,7 +298,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           tokenV2.testMint(totalAmountTokens, stacker),
         ]);
         const targetBlock =
-          block.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          block.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY;
         chain.mineEmptyBlockUntil(targetBlock);
 
         stackingRecords.forEach((record) => {

@@ -39,7 +39,7 @@ describe("[MiamiCoin Core v2]", () => {
         const bonusPeriod = MiamiCoinCoreModelV2.BONUS_PERIOD_LENGTH;
         const epochLength = MiamiCoinCoreModelV2.TOKEN_EPOCH_LENGTH;
         const targetBlock =
-          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY;
         chain.mineEmptyBlockUntil(targetBlock);
         // act
         const result = coreV2.getCoinbaseThresholds().result;
@@ -71,7 +71,7 @@ describe("[MiamiCoin Core v2]", () => {
           coreV2.registerUser(user)
         ]);
         const activationBlockHeight =
-          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY;
         chain.mineEmptyBlockUntil(activationBlockHeight);
         // act
         const result = coreV2.getCoinbaseAmounts().result;

@@ -33,7 +33,7 @@ describe("[MiamiCoin Core v2]", () => {
           coreV2.registerUser(user),
         ]);
         const targetBlock =
-          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          setupBlock.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY;
         chain.mineEmptyBlockUntil(targetBlock);
         // act
         const result1 = coreV2.getFirstStacksBlockInRewardCycle(0).result;
@@ -131,7 +131,7 @@ describe("[MiamiCoin Core v2]", () => {
           tokenV2.testMint(amountTokens, stacker),
         ]);
         const activationBlockHeight =
-          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY;
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
@@ -157,7 +157,7 @@ describe("[MiamiCoin Core v2]", () => {
           tokenV2.testMint(amountTokens, stacker),
         ]);
         const activationBlockHeight =
-          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY;
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
@@ -183,7 +183,7 @@ describe("[MiamiCoin Core v2]", () => {
           tokenV2.testMint(amountTokens, stacker),
         ]);
         const activationBlockHeight =
-          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY;
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
@@ -209,7 +209,7 @@ describe("[MiamiCoin Core v2]", () => {
           tokenV2.testMint(amountTokens, stacker),
         ]);
         const activationBlockHeight =
-          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY;
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
@@ -235,7 +235,7 @@ describe("[MiamiCoin Core v2]", () => {
           tokenV2.testMint(amountTokens, stacker),
         ]);
         const activationBlockHeight =
-          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY;
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
@@ -267,7 +267,7 @@ describe("[MiamiCoin Core v2]", () => {
           tokenV2.testMint(amountTokens * 3, stacker),
         ]);
         const activationBlockHeight =
-          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY;
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
@@ -308,7 +308,7 @@ describe("[MiamiCoin Core v2]", () => {
           tokenV2.testMint(amountTokens, stacker),
         ]);
         const activationBlockHeight =
-          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY;
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
@@ -342,7 +342,7 @@ describe("[MiamiCoin Core v2]", () => {
           tokenV2.testMint(amountTokens, stacker),
         ]);
         const activationBlockHeight =
-          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY;
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         // act
@@ -404,7 +404,7 @@ describe("[MiamiCoin Core v2]", () => {
           tokenV2.testMint(totalAmountTokens, stacker),
         ]);
         const targetBlock =
-          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY;
         chain.mineEmptyBlockUntil(targetBlock);
 
         // act
@@ -474,7 +474,7 @@ describe("[MiamiCoin Core v2]", () => {
           coreV2.registerUser(stacker),
           tokenV2.testMint(amountTokens, stacker),
         ]);
-        const activationBlockHeight = block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+        const activationBlockHeight = block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY;
         chain.mineEmptyBlockUntil(activationBlockHeight + MiamiCoinCoreModelV2.REWARD_CYCLE_LENGTH * stackDuringCycle);
 
         // act
@@ -501,7 +501,7 @@ describe("[MiamiCoin Core v2]", () => {
           coreV2.registerUser(stacker),
           tokenV2.testMint(amountTokens, stacker),
         ]);
-        const activationBlockHeight = block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+        const activationBlockHeight = block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY;
         chain.mineEmptyBlockUntil(activationBlockHeight + MiamiCoinCoreModelV2.REWARD_CYCLE_LENGTH * stackDuringCycle);
 
         // act

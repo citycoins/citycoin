@@ -70,12 +70,12 @@ describe("[MiamiCoin Core v2]", () => {
           coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          block.height + MiamiCoinCoreModelV2.ACTIVATION_DELAY;
         chain.mineEmptyBlock(activationBlockHeight);
         // act
         const result = coreV2.getActivationTarget().result;
         // assert
-        result.expectOk().expectUint(activationBlockHeight);
+        result.expectOk().expectUint(activationBlockHeight - 1);
       });
     });
     describe("get-activation-threshold()", () => {

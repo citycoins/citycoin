@@ -67,7 +67,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           coreV2.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -96,7 +96,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           coreV2.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -123,7 +123,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           coreV2.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -153,7 +153,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           coreV2.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -186,7 +186,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           coreV2.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -220,7 +220,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           coreV2.registerUser(miner),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY;
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
         const block = chain.mineBlock([coreV2.mineTokens(amount, miner)]);
@@ -465,7 +465,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -492,7 +492,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -520,7 +520,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -558,7 +558,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -629,7 +629,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -656,7 +656,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -684,7 +684,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -722,7 +722,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 
@@ -760,7 +760,7 @@ describe("[NewYorkCityCoin Core v2]", () => {
           coreV2.registerUser(user),
         ]);
         const activationBlockHeight =
-          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1;
+          setupBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY;
 
         chain.mineEmptyBlockUntil(activationBlockHeight);
 

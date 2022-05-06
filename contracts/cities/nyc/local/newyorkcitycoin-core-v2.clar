@@ -55,7 +55,7 @@
 
 (define-constant NEWYORKCITYCOIN_ACTIVATION_HEIGHT u37449)
 (define-data-var activationBlock uint u340282366920938463463374607431768211455)
-(define-data-var activationDelay uint u150)
+(define-data-var activationDelay uint u0)
 (define-data-var activationReached bool false)
 (define-data-var activationTarget uint u0)
 (define-data-var activationThreshold uint u20)
