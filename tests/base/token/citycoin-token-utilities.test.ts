@@ -1,4 +1,4 @@
-import { describe, run, Chain, it, beforeEach} from "../../../deps.ts";
+import { describe, run, Chain, it, beforeEach, afterEach} from "../../../deps.ts";
 import { Accounts, Context } from "../../../src/context.ts";
 import { CoreModel } from "../../../models/base/core.model.ts";
 import { TokenModel } from "../../../models/base/token.model.ts";
@@ -16,6 +16,10 @@ beforeEach(() => {
   token = ctx.models.get(TokenModel);
   core = ctx.models.get(CoreModel);
 })
+
+afterEach(() => {
+  ctx.terminate()
+});
 
 describe("[CityCoin Token]", () => {
   //////////////////////////////////////////////////

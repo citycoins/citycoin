@@ -1,4 +1,4 @@
-import { describe, run, Chain, it, beforeEach, types, assertEquals} from "../../../../../deps.ts";
+import { describe, run, Chain, it, beforeEach, types, assertEquals, afterEach} from "../../../../../deps.ts";
 import { Accounts, Context } from "../../../../../src/context.ts";
 import { MiamiCoinAuthModel } from "../../../../../models/cities/mia/miamicoin-auth.model.ts";
 import { MiamiCoinCoreModel } from "../../../../../models/cities/mia/miamicoin-core.model.ts";
@@ -28,6 +28,10 @@ beforeEach(() => {
   token = ctx.models.get(MiamiCoinTokenModel, "miamicoin-token");
   tokenV2 = ctx.models.get(MiamiCoinTokenModelV2, "miamicoin-token-v2");
 })
+
+afterEach(() => {
+  ctx.terminate()
+});
 
 describe("[MiamiCoin Token v2]", () => {
   //////////////////////////////////////////////////

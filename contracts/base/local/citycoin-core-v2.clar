@@ -916,7 +916,7 @@
 (define-constant DEPLOYED_AT block-height)
 
 (define-private (is-test-env)
-  (is-eq DEPLOYED_AT u0)
+  (<= DEPLOYED_AT u5)
 )
 
 (use-trait coreTrait .citycoin-core-trait.citycoin-core)

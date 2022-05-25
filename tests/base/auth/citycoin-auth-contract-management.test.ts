@@ -1,4 +1,4 @@
-import { assertEquals, describe, types, run, Chain, beforeEach, it} from "../../../deps.ts";
+import { assertEquals, describe, types, run, Chain, beforeEach, it, afterEach} from "../../../deps.ts";
 import { Accounts, Context } from "../../../src/context.ts";
 import { AuthModel } from "../../../models/base/auth.model.ts";
 import { CoreModel } from "../../../models/base/core.model.ts";
@@ -21,6 +21,10 @@ beforeEach(() => {
   core2 = ctx.models.get(CoreModel, "citycoin-core-v2");
   core3 = ctx.models.get(CoreModel, "citycoin-core-v3");
 })
+
+afterEach(() => {
+  ctx.terminate()
+});
 
 describe("[CityCoin Auth]", () => {
   //////////////////////////////////////////////////
@@ -240,7 +244,7 @@ describe("[CityCoin Auth]", () => {
         const oldContract = core.address;
         const newContract = core2.address;
 
-        chain.mineBlock([
+        let activationBlock = chain.mineBlock([
           core.testInitializeCore(oldContract),
           core.testSetActivationThreshold(1),
           core.registerUser(sender),
@@ -265,7 +269,7 @@ describe("[CityCoin Auth]", () => {
 
         const expectedOldContractData = {
           state: types.uint(AuthModel.ContractState.STATE_INACTIVE),
-          startHeight: types.uint(CoreModel.ACTIVATION_DELAY + 1),
+          startHeight: types.uint(activationBlock.height + CoreModel.ACTIVATION_DELAY - 1),
           endHeight: types.uint(blockUpgrade.height - 1),
         };
         const expectedNewContractData = {
@@ -506,7 +510,7 @@ describe("[CityCoin Auth]", () => {
         const oldContract = core.address;
         const newContract = core2.address;
 
-        chain.mineBlock([
+        let activationBlock = chain.mineBlock([
           core.testInitializeCore(oldContract),
           core.testSetActivationThreshold(1),
           core.registerUser(sender),
@@ -557,7 +561,7 @@ describe("[CityCoin Auth]", () => {
 
         const expectedOldContractData = {
           state: types.uint(AuthModel.ContractState.STATE_INACTIVE),
-          startHeight: types.uint(CoreModel.ACTIVATION_DELAY + 1),
+          startHeight: types.uint(activationBlock.height + CoreModel.ACTIVATION_DELAY - 1),
           endHeight: types.uint(blockUpgrade.height - 1),
         };
         const expectedNewContractData = {

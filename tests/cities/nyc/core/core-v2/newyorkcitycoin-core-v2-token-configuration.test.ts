@@ -1,4 +1,4 @@
-import { assertEquals, describe, types, run, Chain, beforeEach, it } from "../../../../../deps.ts";
+import { assertEquals, describe, types, run, Chain, beforeEach, it, afterEach } from "../../../../../deps.ts";
 import { Accounts, Context } from "../../../../../src/context.ts";
 import { NewYorkCityCoinCoreModelV2 } from "../../../../../models/cities/nyc/newyorkcitycoin-core-v2.model.ts";
 
@@ -13,6 +13,10 @@ beforeEach(() => {
   accounts = ctx.accounts;
   coreV2 = ctx.models.get(NewYorkCityCoinCoreModelV2, "newyorkcitycoin-core-v2");
   chain.mineEmptyBlock(59000);
+});
+
+afterEach(() => {
+  ctx.terminate()
 });
 
 describe("[NewYorkCityCoin Core v2]", () => {

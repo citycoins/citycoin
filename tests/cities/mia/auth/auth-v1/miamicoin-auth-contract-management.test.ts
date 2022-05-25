@@ -1,4 +1,4 @@
-import { assertEquals, describe, types, run, Chain, beforeEach, it} from "../../../../../deps.ts";
+import { assertEquals, describe, types, run, Chain, beforeEach, it, afterEach} from "../../../../../deps.ts";
 import { Accounts, Context } from "../../../../../src/context.ts";
 import { MiamiCoinAuthModel } from "../../../../../models/cities/mia/miamicoin-auth.model.ts";
 import { MiamiCoinCoreModel } from "../../../../../models/cities/mia/miamicoin-core.model.ts";
@@ -20,6 +20,10 @@ beforeEach(() => {
   core2 = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v1-1");
   core3 = ctx.models.get(MiamiCoinCoreModel, "miamicoin-core-v1-2");
 })
+
+afterEach(() => {
+  ctx.terminate()
+});
 
 describe("[MiamiCoin Auth]", () => {
   //////////////////////////////////////////////////
@@ -180,7 +184,7 @@ describe("[MiamiCoin Auth]", () => {
         const oldContract = core.address;
         const newContract = core2.address;
 
-        chain.mineBlock([
+        let activationBlock = chain.mineBlock([
           core.testInitializeCore(oldContract),
           core.testSetActivationThreshold(1),
           core.registerUser(sender),
@@ -205,7 +209,7 @@ describe("[MiamiCoin Auth]", () => {
 
         const expectedOldContractData = {
           state: types.uint(MiamiCoinAuthModel.CoreContractState.STATE_INACTIVE),
-          startHeight: types.uint(MiamiCoinCoreModel.ACTIVATION_DELAY + 1),
+          startHeight: types.uint(activationBlock.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1),
           endHeight: types.uint(blockUpgrade.height - 1),
         };
         const expectedNewContractData = {
@@ -392,7 +396,7 @@ describe("[MiamiCoin Auth]", () => {
         const oldContract = core.address;
         const newContract = core2.address;
 
-        chain.mineBlock([
+        let activationBlock = chain.mineBlock([
           core.testInitializeCore(oldContract),
           core.testSetActivationThreshold(1),
           core.registerUser(sender),
@@ -443,7 +447,7 @@ describe("[MiamiCoin Auth]", () => {
 
         const expectedOldContractData = {
           state: types.uint(MiamiCoinAuthModel.CoreContractState.STATE_INACTIVE),
-          startHeight: types.uint(MiamiCoinCoreModel.ACTIVATION_DELAY + 1),
+          startHeight: types.uint(activationBlock.height + MiamiCoinCoreModel.ACTIVATION_DELAY - 1),
           endHeight: types.uint(blockUpgrade.height - 1),
         };
         const expectedNewContractData = {

@@ -1,4 +1,4 @@
-import { assertEquals, describe, run, Chain, beforeEach, it, Account, types } from "../../../../deps.ts";
+import { assertEquals, describe, run, Chain, beforeEach, it, Account, types, afterEach, Block } from "../../../../deps.ts";
 import { Accounts, Context } from "../../../../src/context.ts";
 import { NewYorkCityCoinAuthModel } from "../../../../models/cities/nyc/newyorkcitycoin-auth.model.ts";
 import { NewYorkCityCoinCoreModel } from "../../../../models/cities/nyc/newyorkcitycoin-core.model.ts";
@@ -29,6 +29,10 @@ beforeEach(() => {
   tokenV2 = ctx.models.get(NewYorkCityCoinTokenModelV2, "newyorkcitycoin-token-v2");
 });
 
+afterEach(() => {
+  ctx.terminate()
+});
+
 describe("[NewYorkCityCoin Upgrade v1-v2]", () => {
   const jobId = 1;
   const minerCommit = 10;
@@ -42,6 +46,9 @@ describe("[NewYorkCityCoin Upgrade v1-v2]", () => {
   let user2: Account;
   let user3: Account;
   let cityWallet: Account;
+  let block1: Block;
+  let block2: Block;
+  let block3: Block;
 
   beforeEach(() => {
     // setup accounts
@@ -69,21 +76,21 @@ describe("[NewYorkCityCoin Upgrade v1-v2]", () => {
 
     // mine tokens for claim in past
     // block: 37599, user1
-    chain.mineBlock([
+    block1 = chain.mineBlock([
       core.mineTokens(minerCommit * 1000, user1),
       core.mineTokens(minerCommit, user2),
       core.mineTokens(minerCommit, user3),
     ]);
     chain.mineEmptyBlock(100);
     // block: 37700, user2
-    chain.mineBlock([
+    block2 = chain.mineBlock([
       core.mineTokens(minerCommit, user1),
       core.mineTokens(minerCommit * 1000, user2),
       core.mineTokens(minerCommit, user3),
     ]);
     chain.mineEmptyBlock(100);
     // block: 37801, user3
-    chain.mineBlock([
+    block3 = chain.mineBlock([
       core.mineTokens(minerCommit, user1),
       core.mineTokens(minerCommit, user2),
       core.mineTokens(minerCommit * 1000, user3),
@@ -356,9 +363,9 @@ describe("[NewYorkCityCoin Upgrade v1-v2]", () => {
 
   it("claim-mining-reward() succeeds in v1 with block height in the past", () => {
     // arrange
-    const targetBlock1 = 37598;
-    const targetBlock2 = 37699;
-    const targetBlock3 = 37800;
+    const targetBlock1 = block1.height - 1;
+    const targetBlock2 = block2.height - 1;
+    const targetBlock3 = block3.height - 1;
     // act
     const block = chain.mineBlock([
       core.claimMiningReward(targetBlock1, user1),

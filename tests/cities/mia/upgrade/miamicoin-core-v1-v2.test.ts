@@ -1,4 +1,4 @@
-import { assertEquals, describe, run, Chain, beforeEach, it, Account, types } from "../../../../deps.ts";
+import { assertEquals, describe, run, Chain, beforeEach, it, Account, types, afterEach, Block } from "../../../../deps.ts";
 import { Accounts, Context } from "../../../../src/context.ts";
 import { MiamiCoinAuthModel } from "../../../../models/cities/mia/miamicoin-auth.model.ts";
 import { MiamiCoinCoreModel } from "../../../../models/cities/mia/miamicoin-core.model.ts";
@@ -29,6 +29,10 @@ beforeEach(() => {
   tokenV2 = ctx.models.get(MiamiCoinTokenModelV2, "miamicoin-token-v2");
 });
 
+afterEach(() => {
+  ctx.terminate()
+});
+
 describe("[MiamiCoin Upgrade v1-v2]", () => {
   const jobId = 1;
   const minerCommit = 10;
@@ -42,6 +46,9 @@ describe("[MiamiCoin Upgrade v1-v2]", () => {
   let user2: Account;
   let user3: Account;
   let cityWallet: Account;
+  let block1: Block;
+  let block2: Block;
+  let block3: Block;
 
   beforeEach(() => {
     // setup accounts
@@ -69,21 +76,21 @@ describe("[MiamiCoin Upgrade v1-v2]", () => {
 
     // mine tokens for claim in past
     // block: 24646, user1
-    chain.mineBlock([
+    block1 = chain.mineBlock([
       core.mineTokens(minerCommit * 1000, user1),
       core.mineTokens(minerCommit, user2),
       core.mineTokens(minerCommit, user3),
     ]);
     chain.mineEmptyBlock(100);
     // block: 24747, user2
-    chain.mineBlock([
+    block2 = chain.mineBlock([
       core.mineTokens(minerCommit, user1),
       core.mineTokens(minerCommit * 1000, user2),
       core.mineTokens(minerCommit, user3),
     ]);
     chain.mineEmptyBlock(100);
     // block: 24848, user3
-    chain.mineBlock([
+    block3 = chain.mineBlock([
       core.mineTokens(minerCommit, user1),
       core.mineTokens(minerCommit, user2),
       core.mineTokens(minerCommit * 1000, user3),
@@ -356,9 +363,9 @@ describe("[MiamiCoin Upgrade v1-v2]", () => {
 
   it("claim-mining-reward() succeeds in v1 with block height in the past", () => {
     // arrange
-    const targetBlock1 = 24646;
-    const targetBlock2 = 24747;
-    const targetBlock3 = 24848;
+    const targetBlock1 = block1.height - 1;
+    const targetBlock2 = block2.height - 1;
+    const targetBlock3 = block3.height - 1;
     // act
     const block = chain.mineBlock([
       core.claimMiningReward(targetBlock1, user1),

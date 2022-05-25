@@ -1,4 +1,4 @@
-import { assertEquals, describe, TxReceipt, types, run, Chain, beforeEach, it } from "../../../../../deps.ts";
+import { assertEquals, describe, TxReceipt, types, run, Chain, beforeEach, it, afterEach } from "../../../../../deps.ts";
 import { Accounts, Context } from "../../../../../src/context.ts";
 import { MiamiCoinCoreModelV2 } from "../../../../../models/cities/mia/miamicoin-core-v2.model.ts";
 import { MiamiCoinTokenModelV2 } from "../../../../../models/cities/mia/miamicoin-token-v2.model.ts";
@@ -16,6 +16,10 @@ beforeEach(() => {
   coreV2 = ctx.models.get(MiamiCoinCoreModelV2, "miamicoin-core-v2");
   tokenV2 = ctx.models.get(MiamiCoinTokenModelV2, "miamicoin-token-v2");
   chain.mineEmptyBlock(59000);
+});
+
+afterEach(() => {
+  ctx.terminate()
 });
 
 describe("[MiamiCoin Core v2]", () => {

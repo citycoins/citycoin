@@ -1,4 +1,4 @@
-import { describe, run, Chain, beforeEach, it } from "../../../../../deps.ts";
+import { describe, run, Chain, beforeEach, it, afterEach } from "../../../../../deps.ts";
 import { Accounts, Context } from "../../../../../src/context.ts";
 import { MiamiCoinCoreModelV2 } from "../../../../../models/cities/mia/miamicoin-core-v2.model.ts";
 
@@ -13,6 +13,10 @@ beforeEach(() => {
   accounts = ctx.accounts;
   coreV2 = ctx.models.get(MiamiCoinCoreModelV2, "miamicoin-core-v2");
   chain.mineEmptyBlock(59000);
+});
+
+afterEach(() => {
+  ctx.terminate()
 });
 
 describe("[MiamiCoin Core v2]", () => {

@@ -1,4 +1,4 @@
-import { describe, assertEquals, run, Chain, it, beforeEach} from "../../deps.ts";
+import { describe, assertEquals, run, Chain, it, beforeEach, afterEach} from "../../deps.ts";
 import { Accounts, Context } from "../../src/context.ts";
 import { VrfModel } from "../../models/vrf/vrf.model.ts";
 import { VrfModelV2 } from "../../models/vrf/vrf-v2.model.ts";
@@ -15,6 +15,10 @@ beforeEach(() => {
   accounts = ctx.accounts;
   vrf = ctx.models.get(VrfModel);
   vrfV2 = ctx.models.get(VrfModelV2);
+});
+
+afterEach(() => {
+  ctx.terminate()
 });
 
 describe("[CityCoin VRF]", () => {
