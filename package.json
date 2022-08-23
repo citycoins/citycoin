@@ -1,7 +1,7 @@
 {
   "name": "citycoin",
-  "version": "1.1.0",
-  "description": "A smart contract implementation of the Proof of Transfer consensus mechanism, allowing for the mining and Stacking of a new fungible token on the Stacks blockchain with a portion of miner rewards going to a custodied account for a city to claim the protocol contribution.",
+  "version": "2.0.0",
+  "description": "CityCoins give communities the power to improve and program their cities.",
   "scripts": {
     "console": "clarinet console",
     "test": "npm run test:cities && npm run test:base && npm run test:misc",
