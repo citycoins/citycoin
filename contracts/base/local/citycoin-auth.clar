@@ -576,7 +576,7 @@
 (define-constant DEPLOYED_AT block-height)
 
 (define-private (is-test-env)
-  (is-eq DEPLOYED_AT u0)
+  (<= DEPLOYED_AT u5)
 )
 
 (define-public (test-initialize-contracts (coreContract <coreTrait>))

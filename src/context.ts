@@ -13,15 +13,11 @@ export class Context {
   constructor(preSetupTx?: Array<Tx>) {
     (Deno as any).core.ops();
 
-    var transactions: Array<Tx> = [];
-    if (preSetupTx) {
-      transactions = preSetupTx!;
-    }
-
     let result = JSON.parse(
-      (Deno as any).core.opSync("setup_chain", {
+      (Deno as any).core.opSync("api/v1/new_session", {
         name: "test",
-        transactions: transactions,
+        loadDeployment: true,
+        deploymentPath: null,
       })
     );
     this.chain = new Chain(result["session_id"]);
@@ -37,5 +33,13 @@ export class Context {
     this.deployer = this.accounts.get("deployer")!;
 
     this.models = new Models(this.chain, this.deployer);
+  }
+
+  terminate() {
+    JSON.parse(
+      (Deno as any).core.opSync("api/v1/terminate_session", {
+        sessionId: this.chain.sessionId,
+      })
+    );
   }
 }

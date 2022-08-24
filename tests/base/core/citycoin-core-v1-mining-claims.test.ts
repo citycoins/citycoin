@@ -1,4 +1,4 @@
-import { assertEquals, describe, run, Chain, beforeEach, it } from "../../../deps.ts";
+import { assertEquals, describe, run, Chain, beforeEach, it, afterEach } from "../../../deps.ts";
 import { Accounts, Context } from "../../../src/context.ts";
 import { CoreModel } from "../../../models/base/core.model.ts";
 
@@ -12,6 +12,10 @@ beforeEach(() => {
   chain = ctx.chain;
   accounts = ctx.accounts;
   core = ctx.models.get(CoreModel);
+});
+
+afterEach(() => {
+  ctx.terminate()
 });
 
 describe("[CityCoin Core]", () => {

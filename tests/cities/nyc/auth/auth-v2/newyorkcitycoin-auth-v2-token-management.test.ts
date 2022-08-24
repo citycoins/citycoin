@@ -1,4 +1,4 @@
-import { describe, run, Chain, beforeEach, it, assertEquals, types} from "../../../../../deps.ts";
+import { describe, run, Chain, beforeEach, it, assertEquals, types, afterEach} from "../../../../../deps.ts";
 import { Accounts, Context } from "../../../../../src/context.ts";
 import { NewYorkCityCoinAuthModelV2 } from "../../../../../models/cities/nyc/newyorkcitycoin-auth-v2.model.ts";
 import { NewYorkCityCoinCoreModelV2 } from "../../../../../models/cities/nyc/newyorkcitycoin-core-v2.model.ts";
@@ -21,6 +21,10 @@ beforeEach(() => {
   coreV2_2 = ctx.models.get(NewYorkCityCoinCoreModelV2, "newyorkcitycoin-core-v2-1");
   tokenV2 = ctx.models.get(NewYorkCityCoinTokenModelV2, "newyorkcitycoin-token-v2");
 })
+
+afterEach(() => {
+  ctx.terminate()
+});
 
 describe("[NewYorkCityCoin Auth v2]", () => {
   //////////////////////////////////////////////////

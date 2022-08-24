@@ -1,4 +1,4 @@
-import { assertEquals, describe, types, run, Chain, beforeEach, it} from "../../../../../deps.ts";
+import { assertEquals, describe, types, run, Chain, beforeEach, it, afterEach} from "../../../../../deps.ts";
 import { Accounts, Context } from "../../../../../src/context.ts";
 import { NewYorkCityCoinAuthModelV2 } from "../../../../../models/cities/nyc/newyorkcitycoin-auth-v2.model.ts";
 import { NewYorkCityCoinCoreModelV2 } from "../../../../../models/cities/nyc/newyorkcitycoin-core-v2.model.ts";
@@ -20,6 +20,10 @@ beforeEach(() => {
   coreV2_2 = ctx.models.get(NewYorkCityCoinCoreModelV2, "newyorkcitycoin-core-v2-1");
   coreV2_3 = ctx.models.get(NewYorkCityCoinCoreModelV2, "newyorkcitycoin-core-v2-2");
 })
+
+afterEach(() => {
+  ctx.terminate()
+});
 
 describe("[NewYorkCityCoin Auth v2]", () => {
   //////////////////////////////////////////////////
@@ -203,7 +207,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
         const oldContract = coreV2.address;
         const newContract = coreV2_2.address;
 
-        chain.mineBlock([
+        let activationBlock = chain.mineBlock([
           coreV2.testInitializeCore(oldContract),
           coreV2.testSetActivationThreshold(1),
           coreV2.registerUser(sender),
@@ -228,7 +232,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
 
         const expectedOldContractData = {
           state: types.uint(NewYorkCityCoinAuthModelV2.CoreContractState.STATE_INACTIVE),
-          startHeight: types.uint(NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY + 1),
+          startHeight: types.uint(activationBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1),
           endHeight: types.uint(blockUpgrade.height - 1),
         };
         const expectedNewContractData = {
@@ -451,7 +455,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
         const oldContract = coreV2.address;
         const newContract = coreV2_2.address;
 
-        chain.mineBlock([
+        let activationBlock = chain.mineBlock([
           coreV2.testInitializeCore(oldContract),
           coreV2.testSetActivationThreshold(1),
           coreV2.registerUser(sender),
@@ -502,7 +506,7 @@ describe("[NewYorkCityCoin Auth v2]", () => {
 
         const expectedOldContractData = {
           state: types.uint(NewYorkCityCoinAuthModelV2.CoreContractState.STATE_INACTIVE),
-          startHeight: types.uint(NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY + 1),
+          startHeight: types.uint(activationBlock.height + NewYorkCityCoinCoreModelV2.ACTIVATION_DELAY - 1),
           endHeight: types.uint(blockUpgrade.height - 1),
         };
         const expectedNewContractData = {

@@ -1,4 +1,4 @@
-import { describe, assertEquals, types, Account, run, Chain, it, beforeEach} from "../../../../../deps.ts";
+import { describe, assertEquals, types, Account, run, Chain, it, beforeEach, afterEach} from "../../../../../deps.ts";
 import { Accounts, Context } from "../../../../../src/context.ts";
 import { NewYorkCityCoinTokenModelV2, SendManyRecord } from "../../../../../models/cities/nyc/newyorkcitycoin-token-v2.model.ts";
 
@@ -13,6 +13,10 @@ beforeEach(() => {
   accounts = ctx.accounts;
   tokenV2 = ctx.models.get(NewYorkCityCoinTokenModelV2, "newyorkcitycoin-token-v2");
 })
+
+afterEach(() => {
+  ctx.terminate()
+});
 
 describe("[NewYorkCityCoin Token v2]", () => {
   //////////////////////////////////////////////////

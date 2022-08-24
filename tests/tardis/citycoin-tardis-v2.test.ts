@@ -1,4 +1,4 @@
-import { describe, assertEquals, types, Account, run, Chain, it, beforeEach} from "../../deps.ts";
+import { describe, assertEquals, types, Account, run, Chain, it, beforeEach, afterEach} from "../../deps.ts";
 import { Accounts, Context } from "../../src/context.ts";
 import { CoreModel } from "../../models/base/core.model.ts";
 import { TokenModel } from "../../models/base/token.model.ts";
@@ -20,6 +20,10 @@ beforeEach(() => {
   tardis = ctx.models.get(TardisModel);
 })
 
+afterEach(() => {
+  ctx.terminate()
+});
+
 describe("[CityCoin Tardis]", () => {
   describe("HISTORICAL ACTIONS", () => {
     describe("get-historical-balance()", () => {
@@ -29,7 +33,7 @@ describe("[CityCoin Tardis]", () => {
         const mintAmount = 100;
 
         chain.mineEmptyBlock(100);
-        chain.mineBlock([
+        let block = chain.mineBlock([
           token.testMint(mintAmount, wallet_1)
         ]);
         chain.mineEmptyBlock(100);
@@ -39,7 +43,7 @@ describe("[CityCoin Tardis]", () => {
 
         // act
         const result1 = tardis.getHistoricalBalance(1, wallet_1).result;
-        const result2 = tardis.getHistoricalBalance(101, wallet_1).result;
+        const result2 = tardis.getHistoricalBalance(block.height, wallet_1).result;
         const result3 = token.getBalance(wallet_1).result;
 
         // assert
@@ -56,7 +60,7 @@ describe("[CityCoin Tardis]", () => {
         const mintAmount = 100;
 
         chain.mineEmptyBlock(100);
-        chain.mineBlock([
+        let block = chain.mineBlock([
           token.testMint(mintAmount, wallet_1)
         ]);
         chain.mineEmptyBlock(100);
@@ -66,7 +70,7 @@ describe("[CityCoin Tardis]", () => {
         
         // act
         const result1 = tardis.getHistoricalSupply(1).result;
-        const result2 = tardis.getHistoricalSupply(101).result;
+        const result2 = tardis.getHistoricalSupply(block.height).result;
         const result3 = token.getTotalSupply().result;
 
         // assert
