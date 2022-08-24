@@ -70,9 +70,6 @@ depends_on = []
 [contracts.citycoin-vote-v1-mainnet]
 path = "contracts/vote/mainnet/citycoins-vote-v1.clar"
 depends_on = []
-[contracts.citycoin-vote-v2-mainnet]
-path = "contracts/vote/mainnet/citycoins-vote-v2.clar"
-depends_on = []
 
 # all contracts below are used with the testing suite
 
@@ -236,6 +233,10 @@ depends_on = ["citycoin-core-v1"]
 
 [contracts.citycoin-vote-v1]
 path = "contracts/vote/local/citycoin-vote-v1.clar"
+depends_on = ["citycoin-core-v1"]
+
+[contracts.citycoin-vote-v2]
+path = "contracts/vote/local/citycoins-vote-v2.clar"
 depends_on = ["citycoin-core-v1"]
 
 # vrf
