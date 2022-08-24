@@ -49,12 +49,8 @@
   uint ;; proposalId
   {
     yesCount: uint,
-    yesMia: uint,
-    yesNyc: uint,
     yesTotal: uint,
     noCount: uint,
-    noMia: uint,
-    noNyc: uint,
     noTotal: uint
   }
 )
@@ -62,12 +58,8 @@
 ;; intialize ProposalVotes
 (map-insert ProposalVotes VOTE_PROPOSAL_ID {
   yesCount: u0,
-  yesMia: u0,
-  yesNyc: u0,
   yesTotal: u0,
   noCount: u0,
-  noMia: u0,
-  noNyc: u0,
   noTotal: u0
 })
 
@@ -89,8 +81,6 @@
   uint ;; voter ID
   {
     vote: bool,
-    mia: uint,
-    nyc: uint,
     total: uint
   }
 )
@@ -161,28 +151,19 @@
           (map-set ProposalVotes VOTE_PROPOSAL_ID
             (merge proposalRecord {
               yesCount: (+ (get yesCount proposalRecord) u1),
-              yesMia: (+ (get yesMia proposalRecord) (get mia record)),
-              yesNyc: (+ (get yesNyc proposalRecord) (get nyc record)),
               yesTotal: (+ (get yesTotal proposalRecord) (get total record)),
               noCount: (- (get noCount proposalRecord) u1),
-              noMia: (- (get noMia proposalRecord) (get mia record)),
-              noNyc: (- (get noNyc proposalRecord) (get nyc record)),
               noTotal: (- (get noTotal proposalRecord) (get total record))
             })
           )
           (map-set ProposalVotes VOTE_PROPOSAL_ID
             (merge proposalRecord {
               yesCount: (- (get yesCount proposalRecord) u1),
-              yesMia: (- (get yesMia proposalRecord) (get mia record)),
-              yesNyc: (- (get yesNyc proposalRecord) (get nyc record)),
               yesTotal: (- (get yesTotal proposalRecord) (get total record)),
               noCount: (+ (get noCount proposalRecord) u1),
-              noMia: (+ (get noMia proposalRecord) (get mia record)),
-              noNyc: (+ (get noNyc proposalRecord) (get nyc record)),
               noTotal: (+ (get noTotal proposalRecord) (get total record))
             })
           )
-          
         )
       )
       ;; vote record doesn't exist
@@ -200,8 +181,6 @@
         ;; update the voter record
         (map-insert Votes voterId {
           vote: vote,
-          mia: voteMia,
-          nyc: voteNyc,
           total: voteTotal
         })
         ;; update the proposal record
@@ -209,16 +188,12 @@
           (map-set ProposalVotes VOTE_PROPOSAL_ID
             (merge proposalRecord {
               yesCount: (+ (get yesCount proposalRecord) u1),
-              yesMia: (+ (get yesMia proposalRecord) voteMia),
-              yesNyc: (+ (get yesNyc proposalRecord) voteNyc),
               yesTotal: (+ (get yesTotal proposalRecord) voteTotal),
             })
           )
           (map-set ProposalVotes VOTE_PROPOSAL_ID
             (merge proposalRecord {
               noCount: (+ (get noCount proposalRecord) u1),
-              noMia: (+ (get noMia proposalRecord) voteMia),
-              noNyc: (+ (get noNyc proposalRecord) voteNyc),
               noTotal: (+ (get noTotal proposalRecord) voteTotal)
             })
           )
@@ -231,7 +206,7 @@
   )
 )
 
-;; MIA HELPER
+;; MIA HELPER - TODO: make read-only version?
 ;; returns (some uint) or (none)
 (define-private (get-mia-vote-amount (user principal) (voterId uint))
   (let
@@ -257,7 +232,7 @@
   )
 )
 
-;; NYC HELPER
+;; NYC HELPER - TODO: make read-only version?
 ;; returns (some uint) or (none)
 (define-private (get-nyc-vote-amount (user principal) (voterId uint))
   (let
