@@ -1,7 +1,7 @@
 ;; CityCoins Vote V2
 ;; A voting mechanism inspired by SIP-012 for Stacks,
 ;; defined in CCIP-011 and used to vote on ratifying
-;; CCIP-012 and CCIP-013.
+;; CCIP-012.
 ;;
 ;; External Link: https://github.com/citycoins/governance
 
@@ -35,12 +35,6 @@
 
 (define-constant CCIP_012 {
   name: "Stabilize Emissions and Treasuries",
-  link: "TODO",
-  hash: "TODO"
-})
-
-(define-constant CCIP_013 {
-  name: "Stabilize Protocol and Simplify Contracts",
   link: "TODO",
   hash: "TODO"
 })
@@ -215,12 +209,14 @@
       ;; MIA Cycle 21
       ;; first block: 68,597
       ;; target block: 68,600
-      (userCycle21 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v3 get-stacker-stats-mia u68600 user)))
+      ;; mainnet: 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v3
+      (userCycle21 (try! (contract-call? .citycoin-tardis-v3 get-stacker-stats-mia u4500 user)))
       (stackedCycle21 (get amountStacked userCycle21))
       ;; MIA Cycle 22
       ;; first block: 70,697
       ;; target block: 70,700
-      (userCycle22 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v3 get-stacker-stats-mia u70700 user)))
+      ;; mainnet: 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v3
+      (userCycle22 (try! (contract-call? .citycoin-tardis-v3 get-stacker-stats-mia u6600 user)))
       (stackedCycle22 (get amountStacked userCycle22))
       ;; MIA vote calculation
       (avgStackedMia (/ (+ (scale-up stackedCycle21) (scale-up stackedCycle22)) u2))
@@ -245,12 +241,14 @@
       ;; NYC Cycle 15
       ;; first block: 68,949
       ;; target block: 69,000
-      (userCycle15 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v3 get-stacker-stats-nyc u69000 user)))
+      ;; mainnet: 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v3
+      (userCycle15 (try! (contract-call? .citycoin-tardis-v3 get-stacker-stats-nyc u4500 user)))
       (stackedCycle15 (get amountStacked userCycle15))
       ;; NYC Cycle 16
       ;; first block: 71,049
       ;; target block: 71,100
-      (userCycle16 (try! (contract-call? 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v3 get-stacker-stats-nyc u71100 user)))
+      ;; mainnet: 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v3
+      (userCycle16 (try! (contract-call? .citycoin-tardis-v3 get-stacker-stats-nyc u6600 user)))
       (stackedCycle16 (get amountStacked userCycle16))
       ;; NYC vote calculation
       (nycVote (/ (+ (scale-up stackedCycle15) (scale-up stackedCycle16)) u2))
@@ -274,10 +272,7 @@
 
 ;; returns the list of proposals being voted on
 (define-read-only (get-proposals)
-  (ok {
-    CCIP_012: CCIP_012,
-    CCIP_013: CCIP_013,
-  })
+  (ok CCIP_012)
 )
 
 ;; returns the start/end block heights, if set

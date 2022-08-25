@@ -219,6 +219,10 @@ depends_on = ["citycoin-core-v1"]
 path = "contracts/tardis/local/citycoin-tardis-v2.clar"
 depends_on = ["citycoin-core-v1"]
 
+[contracts.citycoin-tardis-v3]
+path = "contracts/tardis/local/citycoin-tardis-v3.clar"
+depends_on = ["citycoin-core-v1"]
+
 # utilities
 
 [contracts.sip-010-trait-ft-standard]
