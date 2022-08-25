@@ -47,8 +47,8 @@ describe("[CityCoin Tardis]", () => {
         chain.mineBlock([token.testMint(mintAmount, wallet_1)]);
 
         // act
-        const result1 = tardis.getBalanceMia(1, wallet_1).result;
-        const result2 = tardis.getBalanceMia(block.height, wallet_1).result;
+        const result1 = tardis.getBalance(1, wallet_1).result;
+        const result2 = tardis.getBalance(block.height, wallet_1).result;
         const result3 = token.getBalance(wallet_1).result;
 
         // assert
@@ -70,8 +70,8 @@ describe("[CityCoin Tardis]", () => {
         chain.mineBlock([token.testMint(mintAmount, wallet_1)]);
 
         // act
-        const result1 = tardis.getSupplyMia(1).result;
-        const result2 = tardis.getSupplyMia(block.height).result;
+        const result1 = tardis.getSupply(1).result;
+        const result2 = tardis.getSupply(block.height).result;
         const result3 = token.getTotalSupply().result;
 
         // assert
@@ -98,7 +98,7 @@ describe("[CityCoin Tardis]", () => {
         chain.mineEmptyBlock(CoreModel.REWARD_CYCLE_LENGTH * 2);
 
         // act
-        const result = tardis.getStackingStatsMia(blockHeight).result;
+        const result = tardis.getStackingStats(blockHeight).result;
 
         const expectedStats = {
           amountToken: types.uint(0),
@@ -135,10 +135,10 @@ describe("[CityCoin Tardis]", () => {
         chain.mineEmptyBlock(CoreModel.REWARD_CYCLE_LENGTH * 2);
 
         // act
-        const result1 = tardis.getStackingStatsMia(
+        const result1 = tardis.getStackingStats(
           cycle1.height + CoreModel.REWARD_CYCLE_LENGTH + 1
         ).result;
-        const result2 = tardis.getStackingStatsMia(
+        const result2 = tardis.getStackingStats(
           cycle2.height + CoreModel.REWARD_CYCLE_LENGTH + 1
         ).result;
 
@@ -173,7 +173,7 @@ describe("[CityCoin Tardis]", () => {
         chain.mineEmptyBlock(CoreModel.REWARD_CYCLE_LENGTH * 2);
 
         // act
-        const result = tardis.getStackerStatsMia(blockHeight, wallet_1).result;
+        const result = tardis.getStackerStats(blockHeight, wallet_1).result;
 
         const expectedStats = {
           amountStacked: types.uint(0),
@@ -210,11 +210,11 @@ describe("[CityCoin Tardis]", () => {
         chain.mineEmptyBlock(CoreModel.REWARD_CYCLE_LENGTH * 2);
 
         // act
-        const result1 = tardis.getStackerStatsMia(
+        const result1 = tardis.getStackerStats(
           cycle1.height + CoreModel.REWARD_CYCLE_LENGTH + 1,
           wallet_1
         ).result;
-        const result2 = tardis.getStackerStatsMia(
+        const result2 = tardis.getStackerStats(
           cycle2.height + CoreModel.REWARD_CYCLE_LENGTH + 1,
           wallet_1
         ).result;

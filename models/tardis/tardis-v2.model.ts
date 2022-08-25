@@ -11,49 +11,23 @@ export class TardisModel extends Model {
   name = "citycoin-tardis-v3";
   static readonly ErrCode = ErrCode;
 
-  getBalanceMia(blockHeight: number, user: Account): ReadOnlyFn {
-    return this.callReadOnly("get-balance-mia", [
+  getBalance(blockHeight: number, user: Account): ReadOnlyFn {
+    return this.callReadOnly("get-balance", [
       types.uint(blockHeight),
       types.principal(user.address),
     ]);
   }
 
-  getBalanceNyc(blockHeight: number, user: Account): ReadOnlyFn {
-    return this.callReadOnly("get-balance-nyc", [
-      types.uint(blockHeight),
-      types.principal(user.address),
-    ]);
+  getSupply(blockHeight: number): ReadOnlyFn {
+    return this.callReadOnly("get-supply", [types.uint(blockHeight)]);
   }
 
-  getSupplyMia(blockHeight: number): ReadOnlyFn {
-    return this.callReadOnly("get-supply-mia", [types.uint(blockHeight)]);
+  getStackingStats(blockHeight: number): ReadOnlyFn {
+    return this.callReadOnly("get-stacking-stats", [types.uint(blockHeight)]);
   }
 
-  getSupplyNyc(blockHeight: number): ReadOnlyFn {
-    return this.callReadOnly("get-supply-nyc", [types.uint(blockHeight)]);
-  }
-
-  getStackingStatsMia(blockHeight: number): ReadOnlyFn {
-    return this.callReadOnly("get-stacking-stats-mia", [
-      types.uint(blockHeight),
-    ]);
-  }
-
-  getStackingStatsNyc(blockHeight: number): ReadOnlyFn {
-    return this.callReadOnly("get-stacking-stats-nyc", [
-      types.uint(blockHeight),
-    ]);
-  }
-
-  getStackerStatsMia(blockHeight: number, user: Account): ReadOnlyFn {
-    return this.callReadOnly("get-stacker-stats-mia", [
-      types.uint(blockHeight),
-      types.principal(user.address),
-    ]);
-  }
-
-  getStackerStatsNyc(blockHeight: number, user: Account): ReadOnlyFn {
-    return this.callReadOnly("get-stacker-stats-nyc", [
+  getStackerStats(blockHeight: number, user: Account): ReadOnlyFn {
+    return this.callReadOnly("get-stacker-stats", [
       types.uint(blockHeight),
       types.principal(user.address),
     ]);
