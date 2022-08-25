@@ -200,15 +200,10 @@ describe("[CityCoin Vote v2]", () => {
 
         // stack in cycles 2-3
         chain.mineEmptyBlock(CoreModel.REWARD_CYCLE_LENGTH);
-        const stack1 = chain.mineBlock([
-          core.stackTokens(amountCycle1, lockPeriod, wallet),
-        ]);
+        chain.mineBlock([core.stackTokens(amountCycle1, lockPeriod, wallet)]);
         chain.mineEmptyBlock(CoreModel.REWARD_CYCLE_LENGTH);
-        const stack2 = chain.mineBlock([
-          core.stackTokens(amountCycle2, lockPeriod, wallet),
-        ]);
+        chain.mineBlock([core.stackTokens(amountCycle2, lockPeriod, wallet)]);
         chain.mineEmptyBlock(CoreModel.REWARD_CYCLE_LENGTH);
-
         chain.mineEmptyBlockUntil(VoteModelV2.VOTE_START_BLOCK + 1);
 
         // act
@@ -225,8 +220,6 @@ describe("[CityCoin Vote v2]", () => {
 
         // set voter information to verify
         const expectedVoterRecord = {
-          mia: types.uint(miaVote),
-          nyc: types.uint(nycVote),
           total: types.uint(miaVote + nycVote),
           vote: types.bool(true),
         };
@@ -306,31 +299,21 @@ describe("[CityCoin Vote v2]", () => {
         // set vote information to verify
         const expectedProposalRecord = {
           noCount: types.uint(1),
-          noMia: types.uint(miaVote),
-          noNyc: types.uint(nycVote),
           noTotal: types.uint(miaVote + nycVote),
           yesCount: types.uint(2),
-          yesMia: types.uint(miaVote * 2),
-          yesNyc: types.uint(nycVote * 2),
           yesTotal: types.uint((miaVote + nycVote) * 2),
         };
 
         // set voter information to verify
         const expectedVoterRecord_1 = {
-          mia: types.uint(miaVote),
-          nyc: types.uint(nycVote),
           total: types.uint(miaVote + nycVote),
           vote: types.bool(true),
         };
         const expectedVoterRecord_2 = {
-          mia: types.uint(miaVote),
-          nyc: types.uint(nycVote),
           total: types.uint(miaVote + nycVote),
           vote: types.bool(true),
         };
         const expectedVoterRecord_3 = {
-          mia: types.uint(miaVote),
-          nyc: types.uint(nycVote),
           total: types.uint(miaVote + nycVote),
           vote: types.bool(false),
         };
@@ -460,19 +443,13 @@ describe("[CityCoin Vote v2]", () => {
         // set vote information to verify
         const expectedProposalRecord = {
           noCount: types.uint(0),
-          noMia: types.uint(0),
-          noNyc: types.uint(0),
           noTotal: types.uint(0),
           yesCount: types.uint(1),
-          yesMia: types.uint(miaVote),
-          yesNyc: types.uint(nycVote),
           yesTotal: types.uint(miaVote + nycVote),
         };
 
         // set voter information to verify
         const expectedVoterRecord = {
-          mia: types.uint(miaVote),
-          nyc: types.uint(nycVote),
           total: types.uint(miaVote + nycVote),
           vote: types.bool(true),
         };
@@ -562,31 +539,21 @@ describe("[CityCoin Vote v2]", () => {
         // set vote information to verify
         const expectedProposalRecord = {
           noCount: types.uint(1),
-          noMia: types.uint(miaVote),
-          noNyc: types.uint(nycVote),
           noTotal: types.uint(miaVote + nycVote),
           yesCount: types.uint(2),
-          yesMia: types.uint(miaVote * 2),
-          yesNyc: types.uint(nycVote * 2),
           yesTotal: types.uint((miaVote + nycVote) * 2),
         };
 
         // set voter information to verify
         const expectedVoterRecord_1 = {
-          mia: types.uint(miaVote),
-          nyc: types.uint(nycVote),
           total: types.uint(miaVote + nycVote),
           vote: types.bool(true),
         };
         const expectedVoterRecord_2 = {
-          mia: types.uint(miaVote),
-          nyc: types.uint(nycVote),
           total: types.uint(miaVote + nycVote),
           vote: types.bool(true),
         };
         const expectedVoterRecord_3 = {
-          mia: types.uint(miaVote),
-          nyc: types.uint(nycVote),
           total: types.uint(miaVote + nycVote),
           vote: types.bool(false),
         };
@@ -631,18 +598,12 @@ describe("[CityCoin Vote v2]", () => {
         chain.mineBlock([
           vote.initializeContract(startHeight, endHeight, deployer),
         ]);
-        const expectedResult = {
-          CCIP_008:
-            '{hash: "280010978431ef4eaadbaeaa8d72263ebbeb464d", link: "https://github.com/citycoins/governance/blob/feat/community-upgrade-1/ccips/ccip-008/ccip-008-citycoins-sip-010-token-v2.md", name: "CityCoins SIP-010 Token v2"}',
-          CCIP_009:
-            '{hash: "f4f44b8e6e3cc5cb7ef68d215c29c2cf1676f06f", link: "https://github.com/citycoins/governance/blob/feat/community-upgrade-1/ccips/ccip-009/ccip-009-citycoins-vrf-v2.md", name: "CityCoins VRF v2"}',
-          CCIP_010:
-            '{hash: "7438ad926d6094e241ea6586eed398378cf09041", link: "https://github.com/citycoins/governance/blob/feat/community-upgrade-1/ccips/ccip-010/ccip-010-citycoins-auth-v2.md", name: "CityCoins Auth v2"}',
-        };
+        const expectedResult =
+          '{hash: "TODO", link: "TODO", name: "Stabilize Emissions and Treasuries"}';
         // act
         const result = vote.getProposals().result;
         // assert
-        assertEquals(result.expectOk().expectTuple(), expectedResult);
+        assertEquals(result.expectOk(), expectedResult);
       });
     });
 
@@ -675,26 +636,26 @@ describe("[CityCoin Vote v2]", () => {
     });
 
     describe("get-vote-amount-mia()", () => {
-      it("succeeds and returns u0 if voter ID is not found", () => {
+      it("succeeds and returns none if voter ID is not found", () => {
         // arrange
         const wallet = accounts.get("wallet_1")!;
         // act
         const result = vote.getMiaVoteAmount(wallet, false).result;
         // assert
-        result.expectUint(0);
+        result.expectNone();
       });
       //it("succeeds and returns scaled MIA vote when set true", () => {});
       //it("succeeds and returns MIA vote when set false", () => {});
     });
 
     describe("get-vote-amount-nyc()", () => {
-      it("succeeds and returns u0 if voter ID is not found", () => {
+      it("succeeds and returns none if voter ID is not found", () => {
         // arrange
         const wallet = accounts.get("wallet_1")!;
         // act
         const result = vote.getNycVoteAmount(wallet, false).result;
         // assert
-        result.expectUint(0);
+        result.expectNone();
       });
       //it("succeeds and returns scaled NYC vote when set true", () => {});
       //it("succeeds and returns NYC vote when set false", () => {});
