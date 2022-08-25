@@ -35,7 +35,7 @@
 
 (define-constant CCIP_012 {
   name: "Stabilize Emissions and Treasuries",
-  link: "TODO",
+  link: "https://github.com/citycoins/governance/blob/feat/stabilize-protocol/ccips/ccip-012/ccip-012-stabilize-emissions-and-treasuries.md",
   hash: "TODO"
 })
 
