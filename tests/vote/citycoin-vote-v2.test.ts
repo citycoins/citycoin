@@ -576,7 +576,7 @@ describe("[CityCoin Vote v2]", () => {
           vote.initializeContract(startHeight, endHeight, deployer),
         ]);
         const expectedResult =
-          '{hash: "TODO", link: "TODO", name: "Stabilize Emissions and Treasuries"}';
+          '{hash: "TODO", link: "https://github.com/citycoins/governance/blob/feat/stabilize-protocol/ccips/ccip-012/ccip-012-stabilize-emissions-and-treasuries.md", name: "Stabilize Emissions and Treasuries"}';
         // act
         const result = vote.getProposals().result;
         // assert
@@ -585,15 +585,13 @@ describe("[CityCoin Vote v2]", () => {
     });
 
     describe("get-vote-blocks()", () => {
-      it("fails with ERR_CONTRACT_NOT_INITIALIZED if called before contract is initialized", () => {
+      it("succeeds and returns none if called before the contract is initialized", () => {
         // act
         const result = vote.getVoteBlocks().result;
         // assert
-        result
-          .expectErr()
-          .expectUint(VoteModelV2.ErrCode.ERR_CONTRACT_NOT_INITIALIZED);
+        result.expectNone();
       });
-      it("succeeds and returns the starting Stacks block for the vote", () => {
+      it("succeeds and returns the starting and ending Stacks block for the vote", () => {
         // arrange
         const deployer = accounts.get("deployer")!;
         const startHeight = 8500;
@@ -608,7 +606,7 @@ describe("[CityCoin Vote v2]", () => {
         // act
         const result = vote.getVoteBlocks().result;
         // assert
-        assertEquals(result.expectOk().expectTuple(), expectedResult);
+        assertEquals(result.expectSome().expectTuple(), expectedResult);
       });
     });
 

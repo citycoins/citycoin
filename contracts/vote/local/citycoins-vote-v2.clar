@@ -277,12 +277,12 @@
 
 ;; returns the start/end block heights, if set
 (define-read-only (get-vote-blocks)
-  (begin
-    (asserts! (is-initialized) ERR_CONTRACT_NOT_INITIALIZED)
-    (ok {
+  (if (is-initialized)
+    (some {
       startBlock: (var-get voteStartBlock),
       endBlock: (var-get voteEndBlock)
     })
+    none
   )
 )
 
