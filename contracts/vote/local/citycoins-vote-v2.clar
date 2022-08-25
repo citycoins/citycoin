@@ -169,8 +169,8 @@
       ;; vote record doesn't exist
       (let
         (
-          (scaledVoteMia (default-to u0 (get-mia-vote-amount tx-sender voterId)))
-          (scaledVoteNyc (default-to u0 (get-nyc-vote-amount tx-sender voterId)))
+          (scaledVoteMia (default-to u0 (get-mia-vote-amount tx-sender true)))
+          (scaledVoteNyc (default-to u0 (get-nyc-vote-amount tx-sender true)))
           (scaledVoteTotal (/ (+ scaledVoteMia scaledVoteNyc) u2))
           (voteMia (scale-down scaledVoteMia))
           (voteNyc (scale-down scaledVoteNyc))
@@ -206,9 +206,10 @@
   )
 )
 
-;; MIA HELPER - TODO: make read-only version?
+;; MIA HELPER
 ;; returns (some uint) or (none)
-(define-private (get-mia-vote-amount (user principal) (voterId uint))
+;; optionally scaled by VOTE_SCALE_FACTOR (10^6)
+(define-read-only (get-mia-vote-amount (user principal) (scaled bool))
   (let
     (
       ;; MIA Cycle 21
@@ -228,13 +229,17 @@
     ;; check if there is a positive value
     (asserts! (or (>= stackedCycle21 u0) (>= stackedCycle22 u0)) none)
     ;; return the value
-    (some scaledMiaVote)
+    (if scaled
+      (some scaledMiaVote)
+      (some (/ scaledMiaVote VOTE_SCALE_FACTOR))
+    )
   )
 )
 
-;; NYC HELPER - TODO: make read-only version?
+;; NYC HELPER
 ;; returns (some uint) or (none)
-(define-private (get-nyc-vote-amount (user principal) (voterId uint))
+;; optionally scaled by VOTE_SCALE_FACTOR (10^6)
+(define-read-only (get-nyc-vote-amount (user principal) (scaled bool))
   (let
     (
       ;; NYC Cycle 15
@@ -253,7 +258,10 @@
     ;; check if there is a positive value
     (asserts! (or (>= stackedCycle15 u0) (>= stackedCycle16 u0)) none)
     ;; return the value
-    (some nycVote)
+    (if scaled
+      (some nycVote)
+      (some (/ nycVote VOTE_SCALE_FACTOR))
+    )
   )
 )
 
@@ -280,24 +288,6 @@
       startBlock: (var-get voteStartBlock),
       endBlock: (var-get voteEndBlock)
     })
-  )
-)
-
-;; returns the total vote for a given principal
-;; TODO: FAILS DUE TO RUNTIME BUDGET?
-;; separate for MIA/NYC?
-(define-read-only (get-vote-amount (voter principal))
-  (let
-    (
-      (voterId (default-to u0 (get-voter-id voter)))
-      (scaledVoteMia (default-to u0 (get-mia-vote-amount voter voterId)))
-      (scaledVoteNyc (default-to u0 (get-nyc-vote-amount voter voterId)))
-      (scaledVoteTotal (/ (+ scaledVoteMia scaledVoteNyc) u2))
-      (voteMia (scale-down scaledVoteMia))
-      (voteNyc (scale-down scaledVoteNyc))
-      (voteTotal (+ voteMia voteNyc))
-    )
-    voteTotal
   )
 )
 
