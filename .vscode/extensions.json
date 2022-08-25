@@ -1,7 +1,6 @@
 {
   "recommendations": [
-    "blockstack.clarity",
-    "lgalabru.clarity-lsp",
+    "hirosystems.clarity-lsp",
     "coenraads.bracket-pair-colorizer-2",
     "denoland.vscode-deno"
   ]
