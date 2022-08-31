@@ -240,7 +240,7 @@ path = "contracts/vote/local/citycoin-vote-v1.clar"
 depends_on = ["citycoin-core-v1"]
 
 [contracts.citycoin-vote-v2]
-path = "contracts/vote/local/citycoins-vote-v2.clar"
+path = "contracts/vote/local/citycoin-vote-v2.clar"
 depends_on = ["citycoin-core-v1"]
 
 # vrf

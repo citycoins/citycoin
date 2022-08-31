@@ -1,13 +1,17 @@
 ;; CityCoins Vote V2
+;;
 ;; A voting mechanism inspired by SIP-012 for Stacks,
 ;; defined in CCIP-011 and used to vote on ratifying
 ;; CCIP-012.
+;;
+;; This contract combines the functionality of the
+;; original vote contract directly with the tardis
+;; to reduce the number of external calls required.
 ;;
 ;; External Link: https://github.com/citycoins/governance
 
 ;; ERRORS
 
-(define-constant ERR_USER_NOT_FOUND (err u8000))
 (define-constant ERR_PROPOSAL_NOT_FOUND (err u8002))
 (define-constant ERR_PROPOSAL_NOT_ACTIVE (err u8003))
 (define-constant ERR_VOTE_ALREADY_CAST (err u8004))
@@ -20,10 +24,10 @@
 (define-constant DEPLOYER tx-sender)
 (define-constant VOTE_PROPOSAL_ID u0)
 (define-constant VOTE_SCALE_FACTOR (pow u10 u16)) ;; 16 decimal places
-;; scale MIA votes to make 1 MIA = 1 NYC
-;; full calculation available in CCIP-011
+(define-constant MIA_SCALE_BASE (pow u10 u4)) ;; 4 decimal places
 (define-constant MIA_SCALE_FACTOR u8605) ;; 0.8605 or 86.05%
-(define-constant MIA_SCALE_BASE u10000)
+;; MIA votes scaled to make 1 MIA = 1 NYC
+;; full calculation available in CCIP-011
 
 ;; VARIABLES
 
@@ -35,8 +39,8 @@
 
 (define-constant CCIP_012 {
   name: "Stabilize Emissions and Treasuries",
-  link: "https://github.com/citycoins/governance/blob/feat/stabilize-protocol/ccips/ccip-012/ccip-012-stabilize-emissions-and-treasuries.md",
-  hash: "TODO"
+  link: "https://github.com/citycoins/governance/blob/main/ccips/ccip-012/ccip-012-stabilize-emissions-and-treasuries.md",
+  hash: "a029edb4e00571ce497862d4c7ab484c62f41905"
 })
 
 (define-map ProposalVotes
@@ -95,7 +99,7 @@
   )
 )
 
-;; INITIALIZATION
+;; UTILITIES
 
 ;; one-time function to set the start and end
 ;; block heights for voting
@@ -115,6 +119,11 @@
   )
 )
 
+;; get block hash by height
+(define-private (get-block-hash (blockHeight uint))
+  (get-block-info? id-header-hash blockHeight)
+)
+
 ;; VOTE FUNCTIONS
 
 (define-public (vote-on-proposal (vote bool))
@@ -125,8 +134,8 @@
       (proposalRecord (unwrap! (get-proposal-votes) ERR_PROPOSAL_NOT_FOUND))
     )
     ;; assert proposal is active
-    (asserts! (is-initialized) ERR_UNAUTHORIZED)
-    (asserts! (and 
+    (asserts! (is-initialized) ERR_CONTRACT_NOT_INITIALIZED)
+    (asserts! (and
       (>= block-height (var-get voteStartBlock))
       (<= block-height (var-get voteEndBlock)))
       ERR_PROPOSAL_NOT_ACTIVE)
@@ -163,9 +172,8 @@
       ;; vote record doesn't exist
       (let
         (
-          (scaledVoteMia (default-to u0 (get-mia-vote-amount tx-sender true)))
-          (scaledVoteNyc (default-to u0 (get-nyc-vote-amount tx-sender true)))
-          (scaledVoteTotal (/ (+ scaledVoteMia scaledVoteNyc) u2))
+          (scaledVoteMia (default-to u0 (get-mia-vote tx-sender true)))
+          (scaledVoteNyc (default-to u0 (get-nyc-vote tx-sender true)))
           (voteMia (scale-down scaledVoteMia))
           (voteNyc (scale-down scaledVoteNyc))
           (voteTotal (+ voteMia voteNyc))
@@ -200,65 +208,59 @@
   )
 )
 
-;; MIA HELPER
+;; MIA vote calculation
 ;; returns (some uint) or (none)
 ;; optionally scaled by VOTE_SCALE_FACTOR (10^6)
-(define-read-only (get-mia-vote-amount (user principal) (scaled bool))
+(define-read-only (get-mia-vote (user principal) (scaled bool))
   (let
     (
-      ;; MIA Cycle 21
-      ;; first block: 68,597
-      ;; target block: 68,600
-      ;; mainnet: 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v3
-      (userCycle21 (try! (contract-call? .citycoin-tardis-v3 get-stacker-stats u4500 user)))
-      (stackedCycle21 (get amountStacked userCycle21))
-      ;; MIA Cycle 22
-      ;; first block: 70,697
-      ;; target block: 70,700
-      ;; mainnet: 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v3
-      (userCycle22 (try! (contract-call? .citycoin-tardis-v3 get-stacker-stats u6600 user)))
-      (stackedCycle22 (get amountStacked userCycle22))
+      (userId (default-to u0 (contract-call? 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-core-v2 get-user-id user)))
+      ;; MIA cycle 21, first block 68,597
+      (cycle21Hash (unwrap! (get-block-hash u68597) none))
+      (cycle21Data (at-block cycle21Hash (contract-call? 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-core-v2 get-stacker-at-cycle-or-default u21 userId)))
+      (cycle21Amount (get amountStacked cycle21Data))
+      ;; MIA cycle 22, first block 70,697
+      (cycle22Hash (unwrap! (get-block-hash u70697) none))
+      (cycle22Data (at-block cycle22Hash (contract-call? 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-core-v2 get-stacker-at-cycle-or-default u22 userId)))
+      (cycle22Amount (get amountStacked cycle22Data))
       ;; MIA vote calculation
-      (avgStackedMia (/ (+ (scale-up stackedCycle21) (scale-up stackedCycle22)) u2))
-      (scaledMiaVote (/ (* avgStackedMia MIA_SCALE_FACTOR) MIA_SCALE_BASE))
+      (avgStacked (/ (+ (scale-up cycle21Amount) (scale-up cycle22Amount)) u2))
+      (scaledVote (/ (* avgStacked MIA_SCALE_FACTOR) MIA_SCALE_BASE))
     )
-    ;; check if there is a positive value
-    (asserts! (or (>= stackedCycle21 u0) (>= stackedCycle22 u0)) none)
+    ;; check for a positive value
+    (asserts! (or (> cycle21Amount u0) (> cycle22Amount u0)) none)
     ;; return the value
     (if scaled
-      (some scaledMiaVote)
-      (some (/ scaledMiaVote VOTE_SCALE_FACTOR))
+      (some scaledVote)
+      (some (/ scaledVote VOTE_SCALE_FACTOR))
     )
   )
 )
 
-;; NYC HELPER
+;; NYC vote calculation
 ;; returns (some uint) or (none)
 ;; optionally scaled by VOTE_SCALE_FACTOR (10^6)
-(define-read-only (get-nyc-vote-amount (user principal) (scaled bool))
+(define-read-only (get-nyc-vote (user principal) (scaled bool))
   (let
     (
-      ;; NYC Cycle 15
-      ;; first block: 68,949
-      ;; target block: 69,000
-      ;; mainnet: 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v3
-      (userCycle15 (try! (contract-call? .citycoin-tardis-v3 get-stacker-stats u4500 user)))
-      (stackedCycle15 (get amountStacked userCycle15))
-      ;; NYC Cycle 16
-      ;; first block: 71,049
-      ;; target block: 71,100
-      ;; mainnet: 'SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v3
-      (userCycle16 (try! (contract-call? .citycoin-tardis-v3 get-stacker-stats u6600 user)))
-      (stackedCycle16 (get amountStacked userCycle16))
+      (userId (default-to u0 (contract-call? 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.newyorkcitycoin-core-v2 get-user-id user)))
+      ;; NYC cycle 15, first block 68,949
+      (cycle15Hash (unwrap! (get-block-hash u68949) none))
+      (cycle15Data (at-block cycle15Hash (contract-call? 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.newyorkcitycoin-core-v2 get-stacker-at-cycle-or-default u15 userId)))
+      (cycle15Amount (get amountStacked cycle15Data))
+      ;; NYC cycle 16, first block 71,049
+      (cycle16Hash (unwrap! (get-block-hash u71049) none))
+      (cycle16Data (at-block cycle16Hash (contract-call? 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.newyorkcitycoin-core-v2 get-stacker-at-cycle-or-default u16 userId)))
+      (cycle16Amount (get amountStacked cycle16Data))
       ;; NYC vote calculation
-      (nycVote (/ (+ (scale-up stackedCycle15) (scale-up stackedCycle16)) u2))
+      (scaledVote (/ (+ (scale-up cycle15Amount) (scale-up cycle16Amount)) u2))
     )
-    ;; check if there is a positive value
-    (asserts! (or (>= stackedCycle15 u0) (>= stackedCycle16 u0)) none)
+    ;; check for a positive value
+    (asserts! (or (> cycle15Amount u0) (> cycle16Amount u0)) none)
     ;; return the value
     (if scaled
-      (some nycVote)
-      (some (/ nycVote VOTE_SCALE_FACTOR))
+      (some scaledVote)
+      (some (/ scaledVote VOTE_SCALE_FACTOR))
     )
   )
 )
@@ -272,7 +274,7 @@
 
 ;; returns the list of proposals being voted on
 (define-read-only (get-proposals)
-  (ok CCIP_012)
+  (some CCIP_012)
 )
 
 ;; returns the start/end block heights, if set
@@ -308,10 +310,13 @@
 
 ;; returns the vote totals for a given principal
 (define-read-only (get-voter-info (voter principal))
-  (ok (unwrap!
-    (map-get? Votes (unwrap! (get-voter-id voter) ERR_USER_NOT_FOUND))
-    ERR_USER_NOT_FOUND
-  ))
+  (let
+    (
+      (voterId (default-to u0 (get-voter-id voter)))
+    )
+    (asserts! (> voterId u0) none)
+    (map-get? Votes voterId)
+  )
 )
 
 ;; UTILITIES

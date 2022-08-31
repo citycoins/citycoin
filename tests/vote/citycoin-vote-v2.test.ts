@@ -242,7 +242,10 @@ describe("[CityCoin Vote v2]", () => {
           proposalRecord.expectSome().expectTuple(),
           expectedProposalRecord
         );
-        assertEquals(voterRecord.expectOk().expectTuple(), expectedVoterRecord);
+        assertEquals(
+          voterRecord.expectSome().expectTuple(),
+          expectedVoterRecord
+        );
       });
       it("succeeds with two yes votes and one no vote when called by a three new voters", () => {
         // arrange
@@ -342,15 +345,15 @@ describe("[CityCoin Vote v2]", () => {
           expectedProposalRecord
         );
         assertEquals(
-          voterRecord_1.expectOk().expectTuple(),
+          voterRecord_1.expectSome().expectTuple(),
           expectedVoterRecord_1
         );
         assertEquals(
-          voterRecord_2.expectOk().expectTuple(),
+          voterRecord_2.expectSome().expectTuple(),
           expectedVoterRecord_2
         );
         assertEquals(
-          voterRecord_3.expectOk().expectTuple(),
+          voterRecord_3.expectSome().expectTuple(),
           expectedVoterRecord_3
         );
       });
@@ -441,7 +444,10 @@ describe("[CityCoin Vote v2]", () => {
           proposalRecord.expectSome().expectTuple(),
           expectedProposalRecord
         );
-        assertEquals(voterRecord.expectOk().expectTuple(), expectedVoterRecord);
+        assertEquals(
+          voterRecord.expectSome().expectTuple(),
+          expectedVoterRecord
+        );
       });
       it("succeeds with two yes votes and one no vote when called by a three existing voters that change votes", () => {
         // arrange
@@ -550,15 +556,15 @@ describe("[CityCoin Vote v2]", () => {
           expectedProposalRecord
         );
         assertEquals(
-          voterRecord_1.expectOk().expectTuple(),
+          voterRecord_1.expectSome().expectTuple(),
           expectedVoterRecord_1
         );
         assertEquals(
-          voterRecord_2.expectOk().expectTuple(),
+          voterRecord_2.expectSome().expectTuple(),
           expectedVoterRecord_2
         );
         assertEquals(
-          voterRecord_3.expectOk().expectTuple(),
+          voterRecord_3.expectSome().expectTuple(),
           expectedVoterRecord_3
         );
       });
@@ -576,11 +582,11 @@ describe("[CityCoin Vote v2]", () => {
           vote.initializeContract(startHeight, endHeight, deployer),
         ]);
         const expectedResult =
-          '{hash: "TODO", link: "https://github.com/citycoins/governance/blob/feat/stabilize-protocol/ccips/ccip-012/ccip-012-stabilize-emissions-and-treasuries.md", name: "Stabilize Emissions and Treasuries"}';
+          '{hash: "a029edb4e00571ce497862d4c7ab484c62f41905", link: "https://github.com/citycoins/governance/blob/main/ccips/ccip-012/ccip-012-stabilize-emissions-and-treasuries.md", name: "Stabilize Emissions and Treasuries"}';
         // act
         const result = vote.getProposals().result;
         // assert
-        assertEquals(result.expectOk(), expectedResult);
+        assertEquals(result.expectSome(), expectedResult);
       });
     });
 
@@ -610,12 +616,12 @@ describe("[CityCoin Vote v2]", () => {
       });
     });
 
-    describe("get-mia-vote-amount()", () => {
+    describe("get-mia-vote()", () => {
       it("succeeds and returns none if voter ID is not found", () => {
         // arrange
         const wallet = accounts.get("wallet_1")!;
         // act
-        const result = vote.getMiaVoteAmount(wallet, false).result;
+        const result = vote.getMiaVote(wallet, false).result;
         // assert
         result.expectNone();
       });
@@ -641,7 +647,7 @@ describe("[CityCoin Vote v2]", () => {
         chain.mineEmptyBlockUntil(VoteModelV2.VOTE_START_BLOCK + 1);
 
         // act
-        const result = vote.getMiaVoteAmount(wallet, true).result;
+        const result = vote.getMiaVote(wallet, true).result;
         // assert
         const expectedResult = types.uint(miaVote * 10 ** 16);
         assertEquals(result.expectSome(), expectedResult);
@@ -668,19 +674,19 @@ describe("[CityCoin Vote v2]", () => {
         chain.mineEmptyBlockUntil(VoteModelV2.VOTE_START_BLOCK + 1);
 
         // act
-        const result = vote.getMiaVoteAmount(wallet, false).result;
+        const result = vote.getMiaVote(wallet, false).result;
         // assert
         const expectedResult = types.uint(miaVote);
         assertEquals(result.expectSome(), expectedResult);
       });
     });
 
-    describe("get-vote-amount-nyc()", () => {
+    describe("get-nyc-vote()", () => {
       it("succeeds and returns none if voter ID is not found", () => {
         // arrange
         const wallet = accounts.get("wallet_1")!;
         // act
-        const result = vote.getNycVoteAmount(wallet, false).result;
+        const result = vote.getNycVote(wallet, false).result;
         // assert
         result.expectNone();
       });
@@ -704,7 +710,7 @@ describe("[CityCoin Vote v2]", () => {
         chain.mineEmptyBlockUntil(VoteModelV2.VOTE_START_BLOCK + 1);
 
         // act
-        const result = vote.getNycVoteAmount(wallet, true).result;
+        const result = vote.getNycVote(wallet, true).result;
         // assert
         const expectedResult = types.uint(nycVote * 10 ** 16);
         assertEquals(result.expectSome(), expectedResult);
@@ -729,7 +735,7 @@ describe("[CityCoin Vote v2]", () => {
         chain.mineEmptyBlockUntil(VoteModelV2.VOTE_START_BLOCK + 1);
 
         // act
-        const result = vote.getNycVoteAmount(wallet, false).result;
+        const result = vote.getNycVote(wallet, false).result;
         // assert
         const expectedResult = types.uint(nycVote);
         assertEquals(result.expectSome(), expectedResult);
@@ -918,12 +924,12 @@ describe("[CityCoin Vote v2]", () => {
     });
 
     describe("get-voter-info()", () => {
-      it("fails with ERR_USER_NOT_FOUND if voter not found", () => {
+      it("succeeds and returns none if voter not found", () => {
         // arrange
         const wallet = accounts.get("wallet_1")!;
         const result = vote.getVoterInfo(wallet).result;
         // assert
-        result.expectErr().expectUint(VoteModelV2.ErrCode.ERR_USER_NOT_FOUND);
+        result.expectNone();
       });
     });
   });

@@ -40,15 +40,15 @@ export class VoteModelV2 extends Model {
     );
   }
 
-  getMiaVoteAmount(voter: Account, scaled: boolean): ReadOnlyFn {
-    return this.callReadOnly("get-mia-vote-amount", [
+  getMiaVote(voter: Account, scaled: boolean): ReadOnlyFn {
+    return this.callReadOnly("get-mia-vote", [
       types.principal(voter.address),
       types.bool(scaled),
     ]);
   }
 
-  getNycVoteAmount(voter: Account, scaled: boolean): ReadOnlyFn {
-    return this.callReadOnly("get-nyc-vote-amount", [
+  getNycVote(voter: Account, scaled: boolean): ReadOnlyFn {
+    return this.callReadOnly("get-nyc-vote", [
       types.principal(voter.address),
       types.bool(scaled),
     ]);
