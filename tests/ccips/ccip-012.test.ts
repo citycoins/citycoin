@@ -7,11 +7,11 @@ import {
   assertEquals,
   types,
   afterEach,
-} from "../../../../deps.ts";
-import { Accounts, Context } from "../../../../src/context.ts";
-import { MiamiCoinAuthModelV2 } from "../../../../models/cities/mia/miamicoin-auth-v2.model.ts";
-import { MiamiCoinCoreModelV2 } from "../../../../models/cities/mia/miamicoin-core-v2.model.ts";
-import { MiamiCoinTokenModelV2 } from "../../../../models/cities/mia/miamicoin-token-v2.model.ts";
+} from "../../deps.ts";
+import { Accounts, Context } from "../../src/context.ts";
+import { MiamiCoinAuthModelV2 } from "../../models/cities/mia/miamicoin-auth-v2.model.ts";
+import { MiamiCoinCoreModelV2 } from "../../models/cities/mia/miamicoin-core-v2.model.ts";
+import { MiamiCoinTokenModelV2 } from "../../models/cities/mia/miamicoin-token-v2.model.ts";
 
 let ctx: Context;
 let chain: Chain;
@@ -126,7 +126,6 @@ describe("[CCIP-012]", () => {
       const approver3 = accounts.get("wallet_4")!;
       const cityWallet = accounts.get("mia_wallet")!;
       const newCityWallet = coreV2.address;
-      console.log(typeof newCityWallet, newCityWallet);
       chain.mineBlock([
         coreV2.testInitializeCore(coreV2.address),
         authV2.testSetActiveCoreContract(cityWallet),
