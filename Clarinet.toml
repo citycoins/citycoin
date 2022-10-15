@@ -73,6 +73,9 @@ depends_on = []
 [contracts.citycoin-vote-v2-mainnet]
 path = "contracts/vote/mainnet/citycoins-vote-v2.clar"
 depends_on = []
+[contracts.citycoin-vote-v3-mainnet]
+path = "contracts/vote/mainnet/citycoins-vote-v3.clar"
+depends_on = []
 
 # all contracts below are used with the testing suite
 
