@@ -219,26 +219,7 @@
 
 ;; V1 TO V2 CONVERSION
 
-;; TODO: remove for testnet version, no V1?
-(define-public (convert-to-v2)
-  (let
-    (
-      (balanceV1 (unwrap! (contract-call? 'SP2H8PY27SEZ03MWRKS5XABZYQN17ETGQS3527SA5.newyorkcitycoin-token get-balance tx-sender) ERR_V1_BALANCE_NOT_FOUND))
-    )
-    ;; verify positive balance
-    (asserts! (> balanceV1 u0) ERR_V1_BALANCE_NOT_FOUND)
-    ;; burn old
-    (try! (contract-call? 'SP2H8PY27SEZ03MWRKS5XABZYQN17ETGQS3527SA5.newyorkcitycoin-token burn balanceV1 tx-sender))
-    (print {
-      burnedV1: balanceV1,
-      mintedV2: (* balanceV1 MICRO_CITYCOINS),
-      tx-sender: tx-sender,
-      contract-caller: contract-caller
-    })
-    ;; create new
-    (ft-mint? newyorkcitycoin (* balanceV1 MICRO_CITYCOINS) tx-sender)
-  )
-)
+;; TESTNET: convert-to-v2 removed, no v1
 
 ;; UTILITIES
 
