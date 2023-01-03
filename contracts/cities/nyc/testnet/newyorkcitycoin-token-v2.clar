@@ -3,10 +3,7 @@
 
 ;; TRAIT DEFINITIONS
 
-;; TODO: add TESTNET addresses here
-(impl-trait 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.citycoin-token-trait.citycoin-token)
-(impl-trait 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.citycoin-token-v2-trait.citycoin-token-v2)
-(use-trait coreTrait 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.citycoin-core-trait.citycoin-core)
+(impl-trait 'ST1XQXW9JNQ1W4A7PYTN3HCHPEY7SHM6KPA085ES6.citycoin-token-v2-trait.citycoin-token-v2)
 
 ;; ERROR CODES
 
@@ -19,8 +16,7 @@
 
 ;; SIP-010 DEFINITION
 
-;; TODO: add TESTNET addresses here
-(impl-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
+(impl-trait 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.sip-010-trait-ft-standard.sip-010-trait)
 
 (define-fungible-token newyorkcitycoin)
 
@@ -82,8 +78,7 @@
 (define-public (activate-token (coreContract principal) (stacksHeight uint))
   (let
     (
-      ;; TODO: add TESTNET addresses here
-      (coreContractMap (try! (contract-call? 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.newyorkcitycoin-auth-v2 get-core-contract-info coreContract)))
+      (coreContractMap (try! (contract-call? 'STSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1D64KKHQ.newyorkcitycoin-auth-v2 get-core-contract-info coreContract)))
       (threshold1 (+ stacksHeight TOKEN_BONUS_PERIOD TOKEN_EPOCH_LENGTH))         ;; 35,000 blocks
       (threshold2 (+ stacksHeight TOKEN_BONUS_PERIOD (* u3 TOKEN_EPOCH_LENGTH)))  ;; 85,000 blocks
       (threshold3 (+ stacksHeight TOKEN_BONUS_PERIOD (* u7 TOKEN_EPOCH_LENGTH)))  ;; 185,000 blocks
@@ -237,8 +232,7 @@
 (define-public (mint (amount uint) (recipient principal))
   (let
     (
-      ;; TODO: add TESTNET addresses here
-      (coreContract (try! (contract-call? 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.newyorkcitycoin-auth-v2 get-core-contract-info contract-caller)))
+      (coreContract (try! (contract-call? 'STSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1D64KKHQ.newyorkcitycoin-auth-v2 get-core-contract-info contract-caller)))
     )
     (ft-mint? newyorkcitycoin amount recipient)
   )
@@ -254,8 +248,7 @@
 
 ;; checks if caller is Auth contract
 (define-private (is-authorized-auth)
-  ;; TODO: add TESTNET addresses here
-  (is-eq contract-caller 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.newyorkcitycoin-auth-v2)
+  (is-eq contract-caller 'STSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1D64KKHQ.newyorkcitycoin-auth-v2)
 )
 
 ;; SEND-MANY
