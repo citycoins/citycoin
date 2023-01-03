@@ -5,6 +5,7 @@
 
 ;; TRAIT DEFINITIONS
 
+;; TODO: add TESTNET addresses here
 (use-trait coreTraitV2 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.citycoin-core-v2-trait.citycoin-core-v2)
 (use-trait tokenTraitV2 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.citycoin-token-v2-trait.citycoin-token-v2)
 
@@ -623,6 +624,7 @@
 
 ;; CONTRACT INITIALIZATION
 
+;; TODO: add TESTNET addresses here
 (map-insert Approvers 'SP372JVX6EWE2M0XPA84MWZYRRG2M6CAC4VVC12V1 true)
 (map-insert Approvers 'SP2R0DQYR7XHD161SH2GK49QRP1YSV7HE9JSG7W6G true)
 (map-insert Approvers 'SPN4Y5QPGQA8882ZXW90ADC2DHYXMSTN8VAR8C3X true)

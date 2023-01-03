@@ -3,6 +3,7 @@
 
 ;; TRAIT DEFINITIONS
 
+;; TODO: add TESTNET addresses here
 (impl-trait 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.citycoin-token-trait.citycoin-token)
 (impl-trait 'SPSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1F4DYQ11.citycoin-token-v2-trait.citycoin-token-v2)
 (use-trait coreTrait 'SP466FNC0P7JWTNM2R9T199QRZN1MYEDTAR0KP27.citycoin-core-trait.citycoin-core)
@@ -18,6 +19,7 @@
 
 ;; SIP-010 DEFINITION
 
+;; TODO: add TESTNET addresses here
 (impl-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
 (define-fungible-token miamicoin)
@@ -80,6 +82,7 @@
 (define-public (activate-token (coreContract principal) (stacksHeight uint))
   (let
     (
+      ;; TODO: add TESTNET addresses here
       (coreContractMap (try! (contract-call? 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-auth-v2 get-core-contract-info coreContract)))
       (threshold1 (+ stacksHeight TOKEN_BONUS_PERIOD TOKEN_EPOCH_LENGTH))         ;; 35,000 blocks
       (threshold2 (+ stacksHeight TOKEN_BONUS_PERIOD (* u3 TOKEN_EPOCH_LENGTH)))  ;; 85,000 blocks
@@ -216,6 +219,7 @@
 
 ;; V1 TO V2 CONVERSION
 
+;; TODO: remove for testnet version, no V1?
 (define-public (convert-to-v2)
   (let
     (
@@ -252,6 +256,7 @@
 (define-public (mint (amount uint) (recipient principal))
   (let
     (
+      ;; TODO: add TESTNET addresses here
       (coreContract (try! (contract-call? 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-auth-v2 get-core-contract-info contract-caller)))
     )
     (ft-mint? miamicoin amount recipient)
@@ -268,6 +273,7 @@
 
 ;; checks if caller is Auth contract
 (define-private (is-authorized-auth)
+  ;; TODO: add TESTNET addresses here
   (is-eq contract-caller 'SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-auth-v2)
 )
 
