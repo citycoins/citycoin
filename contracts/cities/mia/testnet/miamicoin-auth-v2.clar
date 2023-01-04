@@ -26,7 +26,7 @@
 
 ;; JOB MANAGEMENT
 
-(define-constant REQUIRED_APPROVALS u3)
+(define-constant REQUIRED_APPROVALS u2)
 
 (define-data-var lastJobId uint u0)
 
@@ -494,7 +494,7 @@
 ;; CITY WALLET MANAGEMENT
 
 ;; initial value for city wallet
-(define-data-var cityWallet principal 'SM2MARAVW6BEJCD13YV2RHGYHQWT7TDDNMNRB1MVT)
+(define-data-var cityWallet principal 'ST3PM583Q21NF0GB428P79VFPYH8X5DQVKDDGD74T)
 
 ;; returns city wallet principal
 (define-read-only (get-city-wallet)
