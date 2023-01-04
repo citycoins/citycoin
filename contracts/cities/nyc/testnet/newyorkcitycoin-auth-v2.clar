@@ -26,7 +26,7 @@
 
 ;; JOB MANAGEMENT
 
-(define-constant REQUIRED_APPROVALS u2)
+(define-constant REQUIRED_APPROVALS u2) ;; TESTNET: set to 2 approvals
 
 (define-data-var lastJobId uint u0)
 
