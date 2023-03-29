@@ -29,6 +29,25 @@ contract_id = "SP1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8Y634C7R.miamicoin-core-v2"
 [[project.requirements]]
 contract_id = "SP2NS7CNBBN3S9J6M4JJHT7WNBETRSBZ9KPVRENBJ.citycoin-tardis-v3"
 
+# testnet contract references
+
+[[project.requirements]]
+contract_id = "ST1XQXW9JNQ1W4A7PYTN3HCHPEY7SHM6KPA085ES6.citycoin-core-v2-trait"
+[[project.requirements]]
+contract_id = "ST1XQXW9JNQ1W4A7PYTN3HCHPEY7SHM6KPA085ES6.citycoin-token-v2-trait"
+[[project.requirements]]
+contract_id = "ST1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8WRH7C6H.miamicoin-token-v2"
+[[project.requirements]]
+contract_id = "ST1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8WRH7C6H.miamicoin-core-v2"
+[[project.requirements]]
+contract_id = "ST1H1733V5MZ3SZ9XRW9FKYGEZT0JDGEB8WRH7C6H.miamicoin-auth-v2"
+[[project.requirements]]
+contract_id = "STSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1D64KKHQ.newyorkcitycoin-token-v2"
+[[project.requirements]]
+contract_id = "STSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1D64KKHQ.newyorkcitycoin-core-v2"
+[[project.requirements]]
+contract_id = "STSCWDV3RKV5ZRN1FQD84YE1NQFEDJ9R1D64KKHQ.newyorkcitycoin-auth-v2"
+
 # contracts listed below are already deployed
 # and added only to ensure clarinet check passes
 # a syntax check - no other tests are run
@@ -45,6 +64,18 @@ depends_on = []
 path = "contracts/cities/mia/mainnet/miamicoin-token.clar"
 depends_on = []
 
+[contracts.miamicoin-auth-v2-testnet]
+path = "contracts/cities/mia/testnet/miamicoin-auth-v2.clar"
+depends_on = []
+
+[contracts.miamicoin-core-v2-testnet]
+path = "contracts/cities/mia/testnet/miamicoin-core-v2.clar"
+depends_on = []
+
+[contracts.miamicoin-token-v2-testnet]
+path = "contracts/cities/mia/testnet/miamicoin-token-v2.clar"
+depends_on = []
+
 [contracts.newyorkcitycoin-auth-mainnet]
 path = "contracts/cities/nyc/mainnet/newyorkcitycoin-auth.clar"
 depends_on = []
@@ -55,6 +86,18 @@ depends_on = []
 
 [contracts.newyorkcitycoin-token-mainnet]
 path = "contracts/cities/nyc/mainnet/newyorkcitycoin-token.clar"
+depends_on = []
+
+[contracts.newyorkcitycoin-auth-v2-testnet]
+path = "contracts/cities/nyc/testnet/newyorkcitycoin-auth-v2.clar"
+depends_on = []
+
+[contracts.newyorkcitycoin-core-v2-testnet]
+path = "contracts/cities/nyc/testnet/newyorkcitycoin-core-v2.clar"
+depends_on = []
+
+[contracts.newyorkcitycoin-token-v2-testnet]
+path = "contracts/cities/nyc/testnet/newyorkcitycoin-token-v2.clar"
 depends_on = []
 
 [contracts.citycoin-tardis-v1-mainnet]
